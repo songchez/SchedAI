@@ -1,8 +1,6 @@
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
 
-console.log("Loaded API Key:", process.env.OPENAI_API_KEY);
-
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
