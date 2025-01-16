@@ -4,8 +4,6 @@ SchedAI는 Google Calendar와 ChatGPT를 연동하여 사용자가 채팅형 인
 
 ## 프로젝트 개요
 
-- **백엔드**: Next.js v14
-- **스타일링**: Tailwind CSS 및 Glassmorphism
 - **핵심 기능**:
   - Google 계정을 통한 사용자 로그인 및 인증
   - OpenAI API를 활용한 대화형 채팅 기능
@@ -43,7 +41,7 @@ SchedAI는 Google Calendar와 ChatGPT를 연동하여 사용자가 채팅형 인
 1. **레포지토리 클론**
 
    ```bash
-   git clone https://github.com/yourusername/schedai.git
+   git clone https://github.com/songchez/schedai.git
    cd schedai
    ```
 
@@ -54,11 +52,13 @@ SchedAI는 Google Calendar와 ChatGPT를 연동하여 사용자가 채팅형 인
    ```
 
 3. **환경 변수 설정**
-   `.env.local` 파일을 생성하고 필요한 환경 변수를 추가합니다.
+   `.env` 파일을 생성하고 필요한 환경 변수를 추가합니다.
 
    ```plaintext
-   GOOGLE_CLIENT_ID=your_google_client_id
-   GOOGLE_CLIENT_SECRET=your_google_client_secret
+   AUTH_GOOGLE_ID=your_google_client_id
+   AUTH_GOOGLE_SECRET=your_google_client_secret
+   NEXTAUTH_SECRET=your_nextauth_secret
+   DATABASE_URL=database_url
    OPENAI_API_KEY=your_openai_api_key
    ```
 
@@ -81,7 +81,7 @@ SchedAI는 Google Calendar와 ChatGPT를 연동하여 사용자가 채팅형 인
 
 - **프론트엔드**: Next.js, Tailwind CSS
 - **백엔드**: OpenAI API, Google Calendar API, JWT
-- **데이터베이스**: SQLite (개발 및 테스트), PostgreSQL (프로덕션)
+- **데이터베이스**: PostgreSQL (Neon.tech)
 
 ## 기여
 

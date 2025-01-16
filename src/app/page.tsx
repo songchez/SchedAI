@@ -1,7 +1,9 @@
-export default function HomePage() {
+import ChatInterface from "@/components/Chat/ChatInterface";
+
+export default async function HomePage() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-3xl font-bold mb-8">Google Calendar Integration</h1>
-    </main>
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center">
+      <ChatInterface />
+    </div>
   );
 }

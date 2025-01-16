@@ -1,5 +1,6 @@
-import Navbar from "@/components/Navbar";
-import { ThemeProvider } from "next-themes";
+import CustomNavbar from "@/components/Navbar";
+import { Providers } from "./providers";
+import "./globals.css";
 
 export default function RootLayout({
   children,
@@ -7,12 +8,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body>
-        <ThemeProvider attribute="class">
-          <Navbar />
+        <Providers>
+          <CustomNavbar />
           {children}
-        </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );
