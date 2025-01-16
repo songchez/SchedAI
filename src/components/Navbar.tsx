@@ -1,9 +1,7 @@
-"use client";
+import { auth, signIn, signOut } from "@/auth";
 
-import { signIn, signOut, useSession } from "next-auth/react";
-
-export default function Navbar() {
-  const { data: session } = useSession();
+export default async function Navbar() {
+  const session = await auth();
 
   return (
     <nav className="p-4 bg-blue-500 text-white flex justify-between items-center">
@@ -11,15 +9,25 @@ export default function Navbar() {
       <div>
         {session ? (
           <>
-            <span className="mr-4">안녕하세요, {session.user?.name}님!</span>
-            <button className="btn btn-outline" onClick={() => signOut()}>
-              로그아웃
-            </button>
+            <form
+              action={async () => {
+                "use server";
+                await signOut();
+              }}
+            >
+              <button type="submit">Sign Out</button>
+            </form>
           </>
         ) : (
-          <button className="btn btn-primary" onClick={() => signIn("google")}>
-            로그인
-          </button>
+          <form
+            className="btn btn-primary"
+            action={async () => {
+              "use server";
+              await signIn("google");
+            }}
+          >
+            <button type="submit">Sign in</button>
+          </form>
         )}
       </div>
     </nav>
