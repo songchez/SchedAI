@@ -1,19 +1,19 @@
-import type { Config } from "tailwindcss";
-
-const config: Config = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+module.exports = {
+  content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+      backgroundColor: {
+        glass: "rgba(255, 255, 255, 0.15)",
+      },
+      backdropBlur: {
+        sm: "4px",
+        lg: "12px",
+      },
+      boxShadow: {
+        glass: "0 4px 30px rgba(0, 0, 0, 0.1)",
       },
     },
   },
+  darkMode: "class",
   plugins: [],
 };
-export default config;
