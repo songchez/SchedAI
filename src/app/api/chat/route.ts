@@ -3,7 +3,9 @@ import OpenAI from "openai";
 
 // OpenAI API 클라이언트 초기화
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // 환경 변수에서 API 키 로드
+  organization: process.env.OPENAI_ORGANIZATION,
+  project: process.env.OPENAI_PROJECT,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export async function POST(request: Request) {

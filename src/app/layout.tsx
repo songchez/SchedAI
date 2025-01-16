@@ -1,4 +1,4 @@
-import CustomNavbar from "@/components/Navbar";
+import CustomNavbar from "@/components/Navbar/CustomNavbar";
 import { Providers } from "./providers";
 import "./globals.css";
 

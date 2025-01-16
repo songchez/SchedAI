@@ -8,9 +8,9 @@ interface MessageBubbleProps {
 export default function MessageBubble({ content, isUser }: MessageBubbleProps) {
   return (
     <Card
-      className={`p-4 rounded-lg ${
-        isUser ? "bg-blue-500 text-white" : "bg-gray-200"
-      }`}
+      className={`p-4 ${
+        isUser ? "bg-blue-500 text-white ml-auto" : "bg-gray-200 text-black"
+      } rounded-lg`}
     >
       {content}
     </Card>
