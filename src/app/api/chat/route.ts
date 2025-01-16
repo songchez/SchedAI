@@ -1,47 +1,37 @@
-import { NextResponse } from "next/server";
-import OpenAI from "openai";
+import { openai } from "@ai-sdk/openai";
+import { streamText } from "ai";
 
-// OpenAI API 클라이언트 초기화
-const openai = new OpenAI({
-  organization: process.env.OPENAI_ORGANIZATION,
-  project: process.env.OPENAI_PROJECT,
-  apiKey: process.env.OPENAI_API_KEY,
-});
+console.log("Loaded API Key:", process.env.OPENAI_API_KEY);
 
-export async function POST(request: Request) {
-  try {
-    // 요청 바디에서 메시지 데이터 가져오기
-    const { messages } = await request.json();
+// Allow streaming responses up to 30 seconds
+export const maxDuration = 30;
 
-    if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json(
-        { error: "Invalid request format. 'messages' should be an array." },
-        { status: 400 }
-      );
-    }
+export async function POST(req: Request) {
+  const { messages } = await req.json();
 
-    // OpenAI API 호출
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // 사용할 모델
-      messages: [
-        {
-          role: "system",
-          content:
-            "You act as a personal assistant for users, helping them manage their schedules. Your primary task is to interpret user requests and generate precise queries to interact with Google Calendar. Ensure the queries are formatted correctly for actions such as adding, modifying, deleting, or retrieving events. Maintain a clear and professional tone while ensuring user requirements are accurately represented in the queries.",
-        }, // 시스템 초기 메시지
-        ...messages, // 클라이언트에서 전달받은 사용자 메시지
-      ],
-    });
+  const result = streamText({
+    model: openai("gpt-4o-mini"),
+    messages,
+  });
 
-    // OpenAI 응답 반환
-    return NextResponse.json({
-      completion: completion.choices[0]?.message?.content || "No response",
-    });
-  } catch (error) {
-    console.error("OpenAI API Error:", error);
-    return NextResponse.json(
-      { error: "Failed to process the request" },
-      { status: 500 }
-    );
+  return result.toDataStreamResponse({
+    getErrorMessage: errorHandler,
+  });
+}
+
+// 에러핸들러(요청에 문제생겼을시)
+export function errorHandler(error: unknown) {
+  if (error == null) {
+    return "unknown error";
   }
+
+  if (typeof error === "string") {
+    return error;
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return JSON.stringify(error);
 }
