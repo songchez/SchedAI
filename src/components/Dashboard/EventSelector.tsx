@@ -32,7 +32,7 @@ export default function EventSelector({
         setEvents(data);
       } catch (err) {
         console.error("Failed to fetch events:", err);
-        setError("Failed to fetch events.");
+        setError("이벤트가 없습니다.");
       } finally {
         setLoading(false);
       }

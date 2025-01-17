@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import CalendarSelector from "./CalendarSelector";
+import { parseDate } from "@internationalized/date";
 import EventSelector from "./EventSelector";
+import { Button, DatePicker } from "@nextui-org/react";
 
 export default function EventTester() {
   const [eventDetails, setEventDetails] = useState({
@@ -16,10 +18,22 @@ export default function EventTester() {
   const [selectedEventId, setSelectedEventId] = useState("");
   const [response, setResponse] = useState(null);
 
+  interface RequestBody {
+    userId: string;
+    selectedCalendarId: string;
+    selectedEventId: string;
+    eventDetails: {
+      title: string;
+      description: string;
+      start: string;
+      end: string;
+    };
+  }
+
   const handleApiRequest = async (
     endpoint: string,
     method: string,
-    body: any = null
+    body: RequestBody
   ) => {
     try {
       const res = await fetch(endpoint, {
@@ -50,13 +64,13 @@ export default function EventTester() {
 
       <div className="mb-4">
         <h2 className="text-lg font-semibold mb-2">Event Details</h2>
-        {["title", "description", "start", "end"].map((field) => (
+        {["title", "description"].map((field) => (
           <div key={field} className="mb-2">
             <label className="block text-sm font-medium mb-2">
               {field.charAt(0).toUpperCase() + field.slice(1)}
             </label>
             <input
-              type={field.includes("Time") ? "datetime-local" : "text"}
+              type="text"
               className="border rounded w-full p-2"
               value={eventDetails[field as keyof typeof eventDetails]}
               onChange={(e) =>
@@ -65,6 +79,30 @@ export default function EventTester() {
             />
           </div>
         ))}
+        <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
+          <DatePicker
+            label="Start"
+            selectorButtonPlacement="start"
+            value={eventDetails.start ? parseDate(eventDetails.start) : null}
+            onChange={(date) =>
+              setEventDetails({
+                ...eventDetails,
+                start: date ? date.toString() : "",
+              })
+            }
+          />
+          <DatePicker
+            label="End"
+            selectorButtonPlacement="end"
+            value={eventDetails.end ? parseDate(eventDetails.end) : null}
+            onChange={(date) =>
+              setEventDetails({
+                ...eventDetails,
+                end: date ? date.toString() : "",
+              })
+            }
+          />
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-4">
@@ -73,20 +111,12 @@ export default function EventTester() {
           { label: "Add Event", method: "POST" },
           { label: "Update Event", method: "PUT" },
           { label: "Delete Event", method: "DELETE" },
-        ].map((btn) => (
-          <button
-            key={btn.label}
-            className={`bg-${
-              btn.method === "DELETE"
-                ? "red"
-                : btn.method === "PUT"
-                ? "yellow"
-                : btn.method === "POST"
-                ? "green"
-                : "blue"
-            }-500 text-white px-4 py-2 rounded`}
-            onClick={() =>
-              handleApiRequest(`/api/calendar`, btn.method, {
+        ].map(({ label, method }) => (
+          <Button
+            key={label}
+            className={`bg-red-700 text-white px-4 py-2 rounded`}
+            onPress={() =>
+              handleApiRequest(`/api/calendar`, method, {
                 userId,
                 selectedCalendarId,
                 selectedEventId,
@@ -94,8 +124,8 @@ export default function EventTester() {
               })
             }
           >
-            {btn.label}
-          </button>
+            {label}
+          </Button>
         ))}
       </div>
 
