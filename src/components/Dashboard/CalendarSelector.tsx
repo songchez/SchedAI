@@ -1,6 +1,6 @@
 "use client";
 
-import { CircularProgress } from "@nextui-org/react";
+import { CircularProgress, Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 
 interface CalendarSelectorProps {
@@ -48,19 +48,16 @@ export default function CalendarSelector({
 
   return (
     <div>
-      <label className="block text-sm font-medium mb-2">Select Calendar</label>
-
-      <select
-        className="border rounded w-full p-2"
+      <Select
+        label="Select Calendar"
         onChange={(e) => onSelect(e.target.value)}
       >
-        <option value="">-- Select Calendar --</option>
         {calendars.map((calendar) => (
-          <option key={calendar.id} value={calendar.id}>
+          <SelectItem key={calendar.id} value={calendar.id}>
             {calendar.summary}
-          </option>
+          </SelectItem>
         ))}
-      </select>
+      </Select>
     </div>
   );
 }

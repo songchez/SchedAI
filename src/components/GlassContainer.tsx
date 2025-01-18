@@ -12,7 +12,7 @@ export default function GlassContainer({
   return (
     <Card
       isBlurred
-      className={`bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg shadow-lg p-6 ${className}`}
+      className={`bg-white/10 backdrop-blur-lg rounded-lg shadow-lg p-6 ${className}`}
     >
       {children}
     </Card>

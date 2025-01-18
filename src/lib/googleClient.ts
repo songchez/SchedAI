@@ -62,13 +62,28 @@ export async function getCalendarEvents(userId: string, calendarId: string) {
 export async function addEventToCalendar(
   userId: string,
   calendarId: string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  eventDetails: any
+  eventDetails: {
+    summary: string;
+    location?: string;
+    description?: string;
+    start: { date: string };
+    end: { date: string };
+  }
 ) {
   const calendarClient = await createGoogleCalendarClient(userId);
+
+  // Google Calendar API에 전달할 requestBody
+  const requestBody = {
+    summary: eventDetails.summary,
+    location: eventDetails.location || "",
+    description: eventDetails.description || "",
+    start: eventDetails.start, // 이미 { date: "YYYY-MM-DD" } 형식
+    end: eventDetails.end, // 이미 { date: "YYYY-MM-DD" } 형식
+  };
+
   const response = await calendarClient.events.insert({
     calendarId,
-    requestBody: eventDetails,
+    requestBody,
   });
 
   return response.data;

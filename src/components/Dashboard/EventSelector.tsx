@@ -1,5 +1,6 @@
 "use client";
 
+import { CircularProgress, Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 
 interface EventSelectorProps {
@@ -41,26 +42,21 @@ export default function EventSelector({
     fetchEvents();
   }, [calendarId, userId]);
 
-  if (loading) return <p>Loading events...</p>;
+  if (loading) return <CircularProgress />;
   if (error) return <p className="text-sm text-red-500">{error}</p>;
 
   return (
     <div>
-      <label className="block text-sm font-medium mb-2">Select Event</label>
-      <select
-        className="border rounded w-full p-2"
-        onChange={(e) => onSelect(e.target.value)}
-      >
-        <option value="">-- Select Event --</option>
+      <Select label="Select Event" onChange={(e) => onSelect(e.target.value)}>
         {events.map((event) => (
-          <option key={event.id} value={event.id}>
+          <SelectItem key={event.id} value={event.id}>
             {event.summary || "No Title"} -{" "}
             {new Date(
               event.start.dateTime || event.start.date
             ).toLocaleString()}
-          </option>
+          </SelectItem>
         ))}
-      </select>
+      </Select>
     </div>
   );
 }

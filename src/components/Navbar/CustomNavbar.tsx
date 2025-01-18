@@ -13,10 +13,13 @@ export default async function CustomNavbar() {
   const session = await auth();
 
   return (
-    <Navbar shouldHideOnScroll>
+    <Navbar
+      shouldHideOnScroll
+      classNames={{ base: "bg-opacity-15 bg-orange-400" }}
+    >
       <NavbarBrand>
         <Link href="/">
-          <h1 className="text-xl font-bold text-orange-500">SchedAI</h1>
+          <h1 className="text-xl font-bold text-orange-500 ">SchedAI</h1>
         </Link>
       </NavbarBrand>
       {/* theme */}

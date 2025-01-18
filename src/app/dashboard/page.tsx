@@ -4,6 +4,7 @@ import TaskTester from "@/components/Dashboard/TaskTester";
 import { SessionProvider } from "next-auth/react";
 import Image from "next/image";
 import background from "@/images/dashboard_background.png";
+import GlassContainer from "@/components/GlassContainer";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -22,15 +23,19 @@ export default async function DashboardPage() {
         width={1080}
       ></Image>
       <div className="max-w-7xl">
-        <h1 className="text-2xl font-bold">Welcome, {session.user?.name}!</h1>
-        <p>Email: {session.user?.email}</p>
-        <div className="p-6">
-          <h1 className="text-xl font-bold mb-4">Dashboard API Tester</h1>
-          <SessionProvider>
-            <EventTester />
-            <TaskTester />
-          </SessionProvider>
-        </div>
+        <GlassContainer>
+          <div className="flex flex-col items-center">
+            <h1 className="text-2xl font-bold mb-4">Dashboard API Tester</h1>
+            <h1 className="text-xl">Welcome, {session.user?.name}!</h1>
+            <h2 className="text-sm">등록하고 싶은 일정을 입력해 보세요</h2>
+          </div>
+          <div className="p-6">
+            <SessionProvider>
+              <EventTester />
+              <TaskTester />
+            </SessionProvider>
+          </div>
+        </GlassContainer>
       </div>
     </div>
   );
