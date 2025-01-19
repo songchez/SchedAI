@@ -8,8 +8,7 @@ import {
 } from "@/lib/googleClient";
 import { auth } from "@/auth";
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
+export async function GET() {
   const session = await auth();
   const userId = session?.user.id;
 
@@ -20,8 +19,12 @@ export async function GET(req: NextRequest) {
   try {
     const tasks = await getTasksFromList(session?.user.id);
     return NextResponse.json(tasks);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      throw new Error("알 수 없는 오류가 발생했습니다!");
+    }
   }
 }
 
@@ -37,8 +40,12 @@ export async function POST(req: NextRequest) {
   try {
     const newTask = await addTaskToList(session?.user.id, title, dueDate);
     return NextResponse.json(newTask);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      throw new Error("알 수 없는 오류가 발생했습니다!");
+    }
   }
 }
 
@@ -54,8 +61,12 @@ export async function DELETE(req: NextRequest) {
   try {
     await deleteTaskFromList(session?.user.id, taskId);
     return NextResponse.json({ message: "Task deleted successfully" });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      throw new Error("알 수 없는 오류가 발생했습니다!");
+    }
   }
 }
 
@@ -75,12 +86,16 @@ export async function PATCH(req: NextRequest) {
       updates
     );
     return NextResponse.json(updatedTask);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      throw new Error("알 수 없는 오류가 발생했습니다!");
+    }
   }
 }
 
-export async function CLEAR(req: NextRequest) {
+export async function CLEAR() {
   const session = await auth();
   const userId = session?.user.id;
 
@@ -93,7 +108,11 @@ export async function CLEAR(req: NextRequest) {
     return NextResponse.json({
       message: "Completed tasks cleared successfully",
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      throw new Error("알 수 없는 오류가 발생했습니다!");
+    }
   }
 }

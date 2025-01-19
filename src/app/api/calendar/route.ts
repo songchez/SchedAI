@@ -30,8 +30,12 @@ export async function GET(req: NextRequest) {
       ? await getCalendarEvents(userId, calendarId)
       : await getCalendarList(userId);
     return NextResponse.json(calendars);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      throw new Error("알 수 없는 오류가 발생했습니다!");
+    }
   }
 }
 
@@ -47,8 +51,12 @@ export async function POST(req: NextRequest) {
   try {
     const newEvent = await addEventToCalendar(userId, calendarId, eventDetails);
     return NextResponse.json(newEvent);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      throw new Error("알 수 없는 오류가 발생했습니다!");
+    }
   }
 }
 
@@ -69,8 +77,12 @@ export async function PUT(req: NextRequest) {
       eventDetails
     );
     return NextResponse.json(updatedEvent);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      throw new Error("알 수 없는 오류가 발생했습니다!");
+    }
   }
 }
 
@@ -86,7 +98,11 @@ export async function DELETE(req: NextRequest) {
   try {
     await deleteEventFromCalendar(userId, calendarId, eventId);
     return NextResponse.json({ message: "Event deleted successfully" });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      throw new Error("알 수 없는 오류가 발생했습니다!");
+    }
   }
 }
