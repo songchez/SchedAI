@@ -3,6 +3,15 @@
 import { CircularProgress, Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 
+interface CalendarEvent {
+  id: string;
+  summary?: string;
+  start: {
+    dateTime?: string;
+    date?: string;
+  };
+}
+
 interface EventSelectorProps {
   calendarId: string;
   onSelect: (eventId: string) => void;
@@ -12,7 +21,7 @@ export default function EventSelector({
   calendarId,
   onSelect,
 }: EventSelectorProps) {
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,9 +58,6 @@ export default function EventSelector({
         {events.map((event) => (
           <SelectItem key={event.id} value={event.id}>
             {event.summary || "No Title"} -{" "}
-            {new Date(
-              event.start.dateTime || event.start.date
-            ).toLocaleString()}
           </SelectItem>
         ))}
       </Select>
