@@ -4,14 +4,10 @@ import { CircularProgress, Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 
 interface CalendarSelectorProps {
-  userId: string;
   onSelect: (calendarId: string) => void;
 }
 
-export default function CalendarSelector({
-  userId,
-  onSelect,
-}: CalendarSelectorProps) {
+export default function CalendarSelector({ onSelect }: CalendarSelectorProps) {
   const [calendars, setCalendars] = useState<{ id: string; summary: string }[]>(
     []
   );
@@ -20,16 +16,11 @@ export default function CalendarSelector({
 
   useEffect(() => {
     const fetchCalendars = async () => {
-      if (!userId) {
-        setError("User ID is required to load calendars.");
-        return;
-      }
-
       setLoading(true);
       setError(null);
-
       try {
-        const res = await fetch(`/api/calendar?userId=${userId}`);
+        // userId는 route.ts에서 처리
+        const res = await fetch(`/api/calendar`);
         const data = await res.json();
         setCalendars(data);
       } catch (err) {
@@ -41,7 +32,7 @@ export default function CalendarSelector({
     };
 
     fetchCalendars();
-  }, [userId]);
+  }, []);
 
   if (loading) return <CircularProgress />;
   if (error) return <p className="text-sm text-red-500">{error}</p>;

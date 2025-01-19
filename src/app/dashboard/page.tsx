@@ -1,10 +1,10 @@
 import { auth } from "@/auth";
-import EventTester from "@/components/Dashboard/EventTester";
 import TaskTester from "@/components/Dashboard/TaskTester";
 import { SessionProvider } from "next-auth/react";
 import Image from "next/image";
 import background from "@/images/dashboard_background.png";
 import GlassContainer from "@/components/GlassContainer";
+import CalendarEventHandler from "@/components/Dashboard/CalendarEventHandler";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -31,7 +31,7 @@ export default async function DashboardPage() {
           </div>
           <div className="p-6">
             <SessionProvider>
-              <EventTester />
+              <CalendarEventHandler />
               <TaskTester />
             </SessionProvider>
           </div>

@@ -7,12 +7,14 @@ import {
   deleteEventFromCalendar,
   searchEvents,
 } from "@/lib/googleClient";
+import { auth } from "@/auth";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const userId = searchParams.get("userId");
   const calendarId = searchParams.get("calendarId");
   const query = searchParams.get("query");
+  const session = await auth();
+  const userId = session?.user.id;
 
   if (!userId) {
     return NextResponse.json({ error: "Missing userId" }, { status: 400 });
@@ -28,13 +30,15 @@ export async function GET(req: NextRequest) {
       ? await getCalendarEvents(userId, calendarId)
       : await getCalendarList(userId);
     return NextResponse.json(calendars);
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
-  const { userId, calendarId, eventDetails } = await req.json();
+  const { calendarId, eventDetails } = await req.json();
+  const session = await auth();
+  const userId = session?.user.id;
 
   if (!userId || !calendarId || !eventDetails) {
     return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
@@ -43,13 +47,15 @@ export async function POST(req: NextRequest) {
   try {
     const newEvent = await addEventToCalendar(userId, calendarId, eventDetails);
     return NextResponse.json(newEvent);
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function PUT(req: NextRequest) {
-  const { userId, calendarId, eventId, eventDetails } = await req.json();
+  const { calendarId, eventId, eventDetails } = await req.json();
+  const session = await auth();
+  const userId = session?.user.id;
 
   if (!userId || !calendarId || !eventId || !eventDetails) {
     return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
@@ -63,13 +69,15 @@ export async function PUT(req: NextRequest) {
       eventDetails
     );
     return NextResponse.json(updatedEvent);
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest) {
-  const { userId, calendarId, eventId } = await req.json();
+  const { calendarId, eventId } = await req.json();
+  const session = await auth();
+  const userId = session?.user.id;
 
   if (!userId || !calendarId || !eventId) {
     return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
@@ -78,7 +86,7 @@ export async function DELETE(req: NextRequest) {
   try {
     await deleteEventFromCalendar(userId, calendarId, eventId);
     return NextResponse.json({ message: "Event deleted successfully" });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

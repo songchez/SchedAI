@@ -4,13 +4,11 @@ import { CircularProgress, Select, SelectItem } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 
 interface EventSelectorProps {
-  userId: string;
   calendarId: string;
   onSelect: (eventId: string) => void;
 }
 
 export default function EventSelector({
-  userId,
   calendarId,
   onSelect,
 }: EventSelectorProps) {
@@ -27,7 +25,7 @@ export default function EventSelector({
 
       try {
         const res = await fetch(
-          `/api/calendar/events?userId=${userId}&calendarId=${calendarId}`
+          `/api/calendar/events?calendarId=${calendarId}`
         );
         const data = await res.json();
         setEvents(data);
@@ -40,7 +38,7 @@ export default function EventSelector({
     };
 
     fetchEvents();
-  }, [calendarId, userId]);
+  }, [calendarId]);
 
   if (loading) return <CircularProgress />;
   if (error) return <p className="text-sm text-red-500">{error}</p>;

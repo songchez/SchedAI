@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import CalendarSelector from "./CalendarSelector";
 import { parseDate } from "@internationalized/date";
-import EventSelector from "./EventSelector";
 import { Button, DatePicker, Input } from "@nextui-org/react";
+import CalendarSelector from "./CalendarSelector";
+import EventSelector from "./EventSelector";
 
-export default function EventTester() {
+export default function CalendarEventHandler() {
   const [eventDetails, setEventDetails] = useState({
     summary: "",
     location: "",
@@ -19,7 +18,21 @@ export default function EventTester() {
   const [selectedEventId, setSelectedEventId] = useState("");
   const [response, setResponse] = useState(null);
 
-  const handleApiRequest = async (
+  // RequestBody : 요청을 보내는 body의 type 지정
+  // CalendarEventHandleApiRequest : 캘린더 이벤트 API요청을 보내는 함수
+  interface RequestBody {
+    calendarId: string;
+    eventId?: string;
+    eventDetails: {
+      summary: string;
+      location?: string;
+      description?: string;
+      start: { date: string };
+      end: { date: string };
+    };
+  }
+
+  const CalendarEventHandleApiRequest = async (
     endpoint: string,
     method: string,
     body: RequestBody
@@ -37,32 +50,19 @@ export default function EventTester() {
     }
   };
 
-  interface RequestBody {
-    userId: string;
-    calendarId: string;
-    eventId?: string;
-    eventDetails: {
-      summary: string;
-      location?: string;
-      description?: string;
-      start: { date: string };
-      end: { date: string };
-    };
-  }
-
-  const { data: session } = useSession();
-  const userId = session?.user?.id;
-
+  // 렌더부분 : 캘린더와 이벤트 셀렉터의 선택(CalendarSelector,EventSelector)이후 폼 입력.
+  // 이벤트가 하나 이상 있을경우, Delete, Put 버튼 등장. userID는 route.ts에서 처리
   return (
     <div className="mb-8">
       <h2 className="text-lg font-semibold mb-4">Event API Tester</h2>
       <div className="flex flex-col gap-3">
-        <CalendarSelector onSelect={setSelectedCalendarId} userId={userId} />
-        <EventSelector
-          onSelect={setSelectedEventId}
-          calendarId={selectedCalendarId}
-          userId={userId}
-        />
+        <CalendarSelector onSelect={setSelectedCalendarId} />
+        {selectedCalendarId && (
+          <EventSelector
+            onSelect={setSelectedEventId}
+            calendarId={selectedCalendarId}
+          />
+        )}
       </div>
       <div className="mb-4">
         <h2 className="text-lg font-semibold mb-2">Event Details</h2>
@@ -129,8 +129,7 @@ export default function EventTester() {
                 : `${selectedEventId ? "" : "hidden"} bg-blue-500`
             } text-white bg-opacity-60`}
             onPress={() =>
-              handleApiRequest(`/api/calendar`, method, {
-                userId,
+              CalendarEventHandleApiRequest(`/api/calendar`, method, {
                 calendarId: selectedCalendarId,
                 eventId: selectedEventId,
                 eventDetails,

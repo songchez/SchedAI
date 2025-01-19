@@ -10,7 +10,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       authorization: {
         params: {
           scope:
-            "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
+            "https://www.googleapis.com/auth/tasks https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
           access_type: "offline", // Refresh Token 요청
           prompt: "consent", // Refresh Token을 매번 새로 발급받도록 설정. 사용자에게 동의화면 나옴
         },
