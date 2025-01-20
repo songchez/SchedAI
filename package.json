@@ -9,9 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/google": "^1.1.0",
     "@ai-sdk/openai": "^1.0.19",
     "@auth/prisma-adapter": "^2.7.4",
     "@google-cloud/local-auth": "^2.1.0",
+    "@google/generative-ai": "^0.21.0",
     "@nextui-org/react": "^2.6.11",
     "@prisma/client": "^6.2.1",
     "ai": "^4.0.38",
