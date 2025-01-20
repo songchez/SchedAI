@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" className="dark">
-      <body>
+      <body className={gowunBatang.className}>
         <Providers>
           <CustomNavbar />
           {children}

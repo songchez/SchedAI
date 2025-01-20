@@ -36,7 +36,7 @@ export default function ChatInterface() {
                 : "bg-transparent shadow-none self-start"
             }`}
           >
-            <div className="whitespace-pre-wrap font-GowunBatang">
+            <div className="whitespace-pre-wrap">
               <ReactMarkdown rehypePlugins={[rehypeHighlight]}>
                 {m.content}
               </ReactMarkdown>
@@ -59,6 +59,7 @@ export default function ChatInterface() {
             {/* 모델 선택 */}
             <div className="w-36 bottom-3">
               <Select
+                isRequired
                 defaultSelectedKeys={["gemini-2.0-flash-exp"]}
                 value={selectedModel}
                 label="Select AI Model"
@@ -73,7 +74,10 @@ export default function ChatInterface() {
               value={input}
               placeholder="Type your message..."
               onChange={handleInputChange}
-              className="flex-1"
+              classNames={{
+                inputWrapper: ["h-14 bg-transprent border-none shadow-none"],
+              }}
+              className="flex-1 "
               size="lg"
             />
             <Button type="submit" color="primary">
