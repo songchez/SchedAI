@@ -4,6 +4,8 @@ SchedAI는 Google Calendar와 ChatGPT를 연동하여 사용자가 채팅형 인
 
 ## 프로젝트 개요
 
+- **백엔드**: Next.js v14
+- **스타일링**: Tailwind CSS 및 NextUI
 - **핵심 기능**:
   - Google 계정을 통한 사용자 로그인 및 인증
   - OpenAI API를 활용한 대화형 채팅 기능
@@ -36,12 +38,55 @@ SchedAI는 Google Calendar와 ChatGPT를 연동하여 사용자가 채팅형 인
 - 대화 내용 및 Google Calendar 데이터를 클라우드에 아카이브
 - 개인화된 일정 추천 및 자동화 기능 제공
 
+## 프로젝트 구조
+
+```scss
+src/
+├── app/
+│   ├── api/
+│   │   ├── auth/
+│   │   │   └── [...nextauth]/route.ts  # NextAuth API 라우트
+│   │   ├── chat/
+│   │   │   └── route.ts               # ChatGPT 연동 API
+│   │   ├── calendar/
+│   │   │   ├── events/
+│   │   │   │   └── route.ts           # Google Calendar 이벤트 API
+│   │   │   └── logs/
+│   │   │       └── route.ts           # Google Calendar 로그 API
+│   ├── dashboard/
+│   │   └── page.tsx                   # 사용자 대시보드
+│   ├── fonts/
+│   ├── login/
+│   │   └── page.tsx                   # 로그인 페이지
+│   ├── page.tsx                       # 메인 페이지 (홈)
+│   ├── favicon.ico                     # 파비콘
+│   ├── layout.tsx                     # 공통 레이아웃
+│   └── globals.css                    # 전역 스타일
+├── components/
+│   ├── Chat.tsx                       # 채팅 컴포넌트
+│   ├── Navbar.tsx                     # 네비게이션 바
+│   ├── LogTable.tsx                   # Google Calendar 로그 테이블
+│   └── Footer.tsx                     # 푸터
+├── lib/
+│   ├── google.ts                      # Google API 클라이언트 설정
+│   ├── auth.ts                        # 인증 관련 유틸리티
+│   └── openai.ts                      # OpenAI API 클라이언트 설정
+├── prisma/
+│   └── schema.prisma                  # Prisma 데이터베이스 스키마
+├── styles/
+│   ├── globals.css                    # Tailwind 전역 스타일
+├── .env                               # 환경 변수 파일
+├── next.config.js                     # Next.js 설정 파일
+├── package.json                       # 프로젝트 의존성
+└── tsconfig.json                      # TypeScript 설정 파일
+```
+
 ## 설치 방법
 
 1. **레포지토리 클론**
 
    ```bash
-   git clone https://github.com/songchez/schedai.git
+   git clone https://github.com/yourusername/schedai.git
    cd schedai
    ```
 
@@ -52,13 +97,11 @@ SchedAI는 Google Calendar와 ChatGPT를 연동하여 사용자가 채팅형 인
    ```
 
 3. **환경 변수 설정**
-   `.env` 파일을 생성하고 필요한 환경 변수를 추가합니다.
+   `.env.local` 파일을 생성하고 필요한 환경 변수를 추가합니다.
 
    ```plaintext
-   AUTH_GOOGLE_ID=your_google_client_id
-   AUTH_GOOGLE_SECRET=your_google_client_secret
-   NEXTAUTH_SECRET=your_nextauth_secret
-   DATABASE_URL=database_url
+   GOOGLE_CLIENT_ID=your_google_client_id
+   GOOGLE_CLIENT_SECRET=your_google_client_secret
    OPENAI_API_KEY=your_openai_api_key
    ```
 
@@ -81,7 +124,7 @@ SchedAI는 Google Calendar와 ChatGPT를 연동하여 사용자가 채팅형 인
 
 - **프론트엔드**: Next.js, Tailwind CSS
 - **백엔드**: OpenAI API, Google Calendar API, JWT
-- **데이터베이스**: PostgreSQL (Neon.tech)
+- **데이터베이스**: SQLite (개발 및 테스트), PostgreSQL (프로덕션)
 
 ## 기여
 
