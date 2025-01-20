@@ -7,6 +7,7 @@ module.exports = {
   ],
   theme: {
     extend: {},
+    fontFamily: { GowunBatang: ["gowunBatang"] },
   },
   darkMode: "class",
   plugins: [nextui()],
