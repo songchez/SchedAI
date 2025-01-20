@@ -63,7 +63,9 @@ export async function getCalendarEvents(userId: string, calendarId: string) {
   const calendarClient = await createGoogleCalendarClient(userId);
   const response = await calendarClient.events.list({
     calendarId,
-    timeMin: new Date().toISOString(),
+    // timeMin(Start)부터 timeMax(End)까지의 이벤트
+    timeMin: new Date("2024-12-01").toISOString(),
+    timeMax: new Date().toISOString(),
     maxResults: 10,
     singleEvents: true,
     orderBy: "startTime",
