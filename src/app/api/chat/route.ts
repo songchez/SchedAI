@@ -2,6 +2,8 @@ import { openai } from "@ai-sdk/openai";
 import { google } from "@ai-sdk/google";
 import { LanguageModelV1, streamText, ToolInvocation } from "ai";
 import { z } from "zod";
+import { auth } from "@/auth";
+import { getCalendarEvents, getCalendarList } from "@/lib/googleClient";
 
 interface Message {
   role: "user" | "assistant";
@@ -30,36 +32,18 @@ const getModelWithProvider = (model: string): LanguageModelV1 => {
   return provider();
 };
 
-// POST 핸들러
+// POST 핸들러, 챗이 input될때 작동한다.
 export async function POST(req: Request): Promise<Response> {
   const { messages, model }: { messages: Message[]; model: string } =
     await req.json();
 
-  // Calendar API와 TaskAPI를 호출하기 위한 BaseUrl 동적으로 가져옴
-  const url = new URL(req.url);
-  const baseURL = `${url.protocol}//${url.host}`;
-  const cookie = req.headers.get("cookie");
-
-  // 캘린더 가져오기
-  const getCalendars = async () => {
-    try {
-      const res = await fetch(`${baseURL}/api/calendar`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      console.log(data);
-      return { calendars: data };
-    } catch (err) {
-      console.error("Failed to fetch calendars:", err);
-    }
-  };
-
   if (!messages || !model) {
     return new Response("Invalid request payload", { status: 400 });
   }
+
+  // 다양한 Tools를 만들기 위한 파라미터(googleClient)
+  const session = await auth();
+  const userId = session?.user.id;
 
   const modelWithProvider = getModelWithProvider(model);
   const today = new Date();
@@ -72,42 +56,47 @@ export async function POST(req: Request): Promise<Response> {
       `,
     messages,
     tools: {
-      // getWeather: {
-      //   description: "Get the weather for a location",
-      //   parameters: z.object({
-      //     city: z.string().describe("The city to get the weather for"),
-      //     unit: z
-      //       .enum(["C", "F"])
-      //       .describe("The unit to display the temperature in"),
-      //   }),
-      //   execute: async ({ city, unit }) => {
-      //     try {
-      //       const weather = {
-      //         value: 24,
-      //         description: "Sunny",
-      //       };
-
-      //       return `It is currently ${weather.value}°${unit} and ${weather.description} in ${city}!`;
-      //     } catch (error) {
-      //       console.error("Error fetching weather data:", error);
-      //       return "An error occurred while fetching weather data.";
-      //     }
-      //   },
-      // },
-      //
       // .optional()을 객체형 그 자체에 넣으면 오류남, 가장 lower type에다가 추가해야함
       getCalendars: {
         description: "Get the Calendars of the user",
         parameters: z.object({}),
         execute: async () => {
-          const { calendars } = await getCalendars();
-          return `당신의 캘린더는 ${calendars
-            .map((calendar: any) => `${calendar}와 `)
-            .join("")}`;
+          const calendars = await getCalendarList(userId);
+          console.log(calendars);
+          const calendarText = calendars
+            .map((calendar) => `${calendar.id}와 `)
+            .join("");
+          return `당신의 캘린더는 ${calendarText}입니다`;
         },
       },
-
-      calendarTool: {
+      getCalendarEvents: {
+        description: "Manage calendar events and get calendarlist",
+        parameters: z.object({
+          calendarId: z.string(),
+          // timeMin(Start)부터 timeMax(End)까지의 이벤트
+          timeMin: z.string().describe("ISOstring date. start date"),
+          timeMax: z.string().describe("ISOstring date. end date"),
+          maxResults: z.number(),
+        }),
+        execute: async ({ calendarId, timeMin, timeMax, maxResults }: any) => {
+          const events = await getCalendarEvents(
+            userId,
+            calendarId,
+            timeMin,
+            timeMax,
+            maxResults
+          );
+          if (events === null) {
+            return "이벤트가 없습니다.";
+          }
+          return `당신의 이벤트는 ${events
+            .map((event) => {
+              `${event.summary}와 `;
+            })
+            .join("")}입니다`;
+        },
+      },
+      manageCalendarEvents: {
         description: "Manage calendar events and get calendarlist",
         parameters: z.object({
           method: z
