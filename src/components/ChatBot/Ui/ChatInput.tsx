@@ -8,7 +8,6 @@ interface ChatInputProps {
   onSubmit: () => void;
   stop: () => void;
   isLoading: boolean;
-  isGoogleApiLoading: boolean;
 }
 
 /**
@@ -22,7 +21,6 @@ export default function ChatInput({
   onSubmit,
   stop,
   isLoading,
-  isGoogleApiLoading,
 }: ChatInputProps) {
   return (
     <form
@@ -49,6 +47,7 @@ export default function ChatInput({
       <Input
         fullWidth
         value={input}
+        autoComplete="off"
         placeholder="Type your message..."
         onChange={onInputChange}
         classNames={{
@@ -57,7 +56,7 @@ export default function ChatInput({
         className="flex-1"
         size="lg"
       />
-      {isLoading && isGoogleApiLoading ? (
+      {isLoading ? (
         <Button onPress={stop} color="primary">
           <svg
             xmlns="http://www.w3.org/2000/svg"

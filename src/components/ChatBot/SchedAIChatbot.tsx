@@ -33,7 +33,6 @@ export default function SchedAIChatbot() {
           onSubmit={handleSubmit}
           stop={stop}
           isLoading={isLoading}
-          isGoogleApiLoading={isGoogleApiLoading}
         />
       </div>
     </div>

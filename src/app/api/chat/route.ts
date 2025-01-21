@@ -35,6 +35,28 @@ export async function POST(req: Request): Promise<Response> {
   const { messages, model }: { messages: Message[]; model: string } =
     await req.json();
 
+  // Calendar API와 TaskAPI를 호출하기 위한 BaseUrl 동적으로 가져옴
+  const url = new URL(req.url);
+  const baseURL = `${url.protocol}//${url.host}`;
+  const cookie = req.headers.get("cookie");
+
+  // 캘린더 가져오기
+  const getCalendars = async () => {
+    try {
+      const res = await fetch(`${baseURL}/api/calendar`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await res.json();
+      console.log(data);
+      return { calendars: data };
+    } catch (err) {
+      console.error("Failed to fetch calendars:", err);
+    }
+  };
+
   if (!messages || !model) {
     return new Response("Invalid request payload", { status: 400 });
   }
@@ -50,50 +72,88 @@ export async function POST(req: Request): Promise<Response> {
       `,
     messages,
     tools: {
-      getWeather: {
-        description: "Get the weather for a location",
-        parameters: z.object({
-          city: z.string().describe("The city to get the weather for"),
-          unit: z
-            .enum(["C", "F"])
-            .describe("The unit to display the temperature in"),
-        }),
-        execute: async ({ city, unit }) => {
-          try {
-            const weather = {
-              value: 24,
-              description: "Sunny",
-            };
+      // getWeather: {
+      //   description: "Get the weather for a location",
+      //   parameters: z.object({
+      //     city: z.string().describe("The city to get the weather for"),
+      //     unit: z
+      //       .enum(["C", "F"])
+      //       .describe("The unit to display the temperature in"),
+      //   }),
+      //   execute: async ({ city, unit }) => {
+      //     try {
+      //       const weather = {
+      //         value: 24,
+      //         description: "Sunny",
+      //       };
 
-            return `It is currently ${weather.value}°${unit} and ${weather.description} in ${city}!`;
-          } catch (error) {
-            console.error("Error fetching weather data:", error);
-            return "An error occurred while fetching weather data.";
-          }
+      //       return `It is currently ${weather.value}°${unit} and ${weather.description} in ${city}!`;
+      //     } catch (error) {
+      //       console.error("Error fetching weather data:", error);
+      //       return "An error occurred while fetching weather data.";
+      //     }
+      //   },
+      // },
+      //
+      // .optional()을 객체형 그 자체에 넣으면 오류남, 가장 lower type에다가 추가해야함
+      getCalendars: {
+        description: "Get the Calendars of the user",
+        parameters: z.object({}),
+        execute: async () => {
+          const { calendars } = await getCalendars();
+          return `당신의 캘린더는 ${calendars
+            .map((calendar: any) => `${calendar}와 `)
+            .join("")}`;
         },
       },
+
       calendarTool: {
-        description: "Manage calendar events",
+        description: "Manage calendar events and get calendarlist",
         parameters: z.object({
           method: z
-            .enum(["GET", "POST", "PUT", "DELETE"])
+            .enum(["POST", "PUT", "DELETE"])
             .describe("HTTP method for the calendar action"),
-          calendarId: z.string().describe("The ID of the calendar").optional(),
-          eventDetails: z.object({
-            summary: z.string(),
-            start: z.object({ date: z.string() }),
-            end: z.object({ date: z.string() }),
+          body: z.object({
+            eventId: z.string().optional(),
+            eventDetails: z.object({
+              summary: z.string().optional(),
+              descrtption: z.string().optional(),
+              start: z.object({ date: z.string().optional() }),
+              end: z.object({ date: z.string().optional() }),
+            }),
           }),
         }),
-        execute: async ({ method, calendarId, eventDetails }: any) => {
+        execute: async ({ method, body }: any) => {
           try {
-            const response = await fetch(`/api/calendar`, {
-              method,
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ calendarId, eventDetails }),
-            });
+            const calendars = await getCalendars();
+            console.log(calendars[0].id, body.eventDetails);
+            let response;
+            if (calendars[0].id && body.eventId) {
+              response = await fetch(`${baseURL}/api/calendar`, {
+                method,
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  calendarId: body.calendarId,
+                  eventDetails: body.eventDetails,
+                  eventId: body.eventId,
+                }),
+              });
+            } else {
+              response = await fetch(`${baseURL}/api/calendar`, {
+                method,
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  calendarId: body.calendarId,
+                  eventDetails: body.eventDetails,
+                }),
+              });
+            }
+
+            console.log(response.json);
 
             if (!response.ok) {
               throw new Error(`Calendar API error: ${response.statusText}`);
@@ -121,7 +181,7 @@ export async function POST(req: Request): Promise<Response> {
         }),
         execute: async ({ method, details }: any) => {
           try {
-            const response = await fetch(`/api/task`, {
+            const response = await fetch(`${baseURL}/api/task`, {
               method,
               headers: {
                 "Content-Type": "application/json",

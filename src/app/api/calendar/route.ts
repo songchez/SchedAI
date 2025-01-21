@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const newEvent = await addEventToCalendar(userId, calendarId, eventDetails);
+    console.log(newEvent);
     return NextResponse.json(newEvent);
   } catch (error) {
     if (error instanceof Error) {
