@@ -1,9 +1,12 @@
 import { Input, Button, Select, SelectItem } from "@heroui/react";
+import { ChangeEvent } from "react";
 
 interface ChatInputProps {
   input: string;
   selectedModel: AIModels;
-  onInputChange: () => void;
+  onInputChange: (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
+  ) => void;
   onModelChange: (value: AIModels) => void;
   onSubmit: () => void;
   stop: () => void;
