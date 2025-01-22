@@ -9,11 +9,6 @@ import GlassContainer from "@/components/GlassContainer";
 
 export default async function DashboardPage() {
   const session = await auth();
-
-  if (!session) {
-    return <p>You need to be signed in to access this page.</p>;
-  }
-
   return (
     <div className="p-4 flex justify-center">
       <Image
@@ -35,9 +30,11 @@ export default async function DashboardPage() {
           <div className="flex flex-col items-center">
             <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
             <p className="text-3xl">현재 준비중...</p>
-            <h1 className="text-xl">
-              Welcome, to Dashboard {session.user?.name}!
-            </h1>
+            {session && (
+              <h1 className="text-xl">
+                Welcome, to Dashboard {session.user?.name}!
+              </h1>
+            )}
 
             <h2>
               여러분의 일정관리가 더 편안해지도록 현재 다양한 기능을
