@@ -10,19 +10,7 @@ import { Message, ToolInvocation } from "@ai-sdk/ui-utils";
  * - role === "assistant" → 왼쪽 정렬
  * - Markdown + 코드 하이라이트
  */
-export default function ChatMessageList({
-  messages,
-  addToolResult,
-}: {
-  messages: Message[];
-  addToolResult: ({
-    toolCallId,
-    result,
-  }: {
-    toolCallId: string;
-    result: any;
-  }) => void;
-}) {
+export default function ChatMessageList({ messages }: { messages: Message[] }) {
   return (
     <div className="flex flex-col gap-4 overflow-y-auto p-6 mb-28">
       {messages.map((m) => (

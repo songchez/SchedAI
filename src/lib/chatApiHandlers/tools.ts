@@ -36,9 +36,9 @@ export const getCalendarEventsTool = {
   description: "특정 calendarId에서 일정 목록을 가져옵니다.",
   parameters: z.object({
     calendarId: z.string(),
-    timeMin: z.string().describe("ISO 문자열 (검색 시작 시점)"),
-    timeMax: z.string().describe("ISO 문자열 (검색 종료 시점)"),
-    maxResults: z.number().default(5).describe("최대 이벤트 개수"),
+    timeMin: z.string().describe("검색 시작 시점"),
+    timeMax: z.string().describe("검색 종료 시점"),
+    maxResults: z.number().describe("최대 이벤트 개수"),
   }),
   execute: async ({
     calendarId,
