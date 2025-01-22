@@ -27,13 +27,13 @@ export default async function CustomNavbar() {
       </NavbarBrand>
       {/* theme */}
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <Link href={"/"} className="hover:text-primary">
-          <p>Home</p>
+        <Link href={"/chat"} className="hover:text-primary">
+          <p>SchedAI</p>
         </Link>
         <Link href={"/dashboard"} className="hover:text-primary">
           <p>Dashboard</p>
         </Link>
-        <Link href={"/About"} className="hover:text-primary">
+        <Link href={"/about"} className="hover:text-primary">
           <p>About</p>
         </Link>
       </NavbarContent>

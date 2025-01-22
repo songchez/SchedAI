@@ -6,6 +6,18 @@ module.exports = {
     "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    color: {
+      primary: {
+        DEFAULT: "#2D2D2A",
+        100: "#F4F4F1",
+        200: "#E9E9E3",
+        300: "#BFBFB8",
+        400: "#81817A",
+        500: "#2D2D2A",
+        600: "#202015",
+        700: "#1A1A0D",
+      },
+    },
     extend: {},
     fontFamily: { GowunBatang: ["gowunBatang"] },
   },

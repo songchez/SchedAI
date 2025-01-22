@@ -4,6 +4,7 @@ import { useState } from "react";
 import ChatMessageList from "./Ui/ChatMessageList";
 import ChatInput from "./Ui/ChatInput";
 import { useChat } from "ai/react";
+import { SessionProvider } from "next-auth/react";
 
 export default function SchedAIChatbot() {
   const [selectedModel, setSelectedModel] = useState<AIModels>(
@@ -27,16 +28,17 @@ export default function SchedAIChatbot() {
             어떤 일정이 있으신가요?
           </p>
         )}
-
-        <ChatInput
-          input={input}
-          selectedModel={selectedModel}
-          onInputChange={handleInputChange}
-          onModelChange={setSelectedModel}
-          onSubmit={handleSubmit}
-          stop={stop}
-          isLoading={isLoading}
-        />
+        <SessionProvider>
+          <ChatInput
+            input={input}
+            selectedModel={selectedModel}
+            onInputChange={handleInputChange}
+            onModelChange={setSelectedModel}
+            onSubmit={handleSubmit}
+            stop={stop}
+            isLoading={isLoading}
+          />
+        </SessionProvider>
       </div>
     </div>
   );

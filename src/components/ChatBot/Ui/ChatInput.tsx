@@ -1,5 +1,19 @@
-import { Input, Button, Select, SelectItem } from "@heroui/react";
+import {
+  Input,
+  Button,
+  Select,
+  SelectItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@heroui/react";
 import { ChangeEvent } from "react";
+import { useSession, signIn } from "next-auth/react";
+import SchedAILogdo from "@/images/SchedAILogo.png";
+import Image from "next/image";
 
 interface ChatInputProps {
   input: string;
@@ -25,10 +39,21 @@ export default function ChatInput({
   stop,
   isLoading,
 }: ChatInputProps) {
+  const { data: session } = useSession();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const handleLoginClick = () => {
+    signIn("google");
+  };
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
+        if (!session) {
+          onOpen();
+          return;
+        }
         onSubmit();
       }}
       className="flex gap-2 items-end"
@@ -100,6 +125,56 @@ export default function ChatInput({
           </svg>
         </Button>
       )}
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalContent>
+          <ModalHeader className="text-center text-xl font-bold text-primary-500">
+            <div className="flex gap-3 items-center">
+              <Image
+                src={SchedAILogdo}
+                alt="SchedAI 로고"
+                height={30}
+                width={30}
+              />
+              <span>SchedAI에 오신 것을 환영합니다!</span>
+            </div>
+          </ModalHeader>
+          <ModalBody>
+            <div className="flex flex-col items-center gap-4 text-center">
+              <p className="text-gray-700">
+                SchedAI를 사용하면 Google 캘린더와의 통합을 통해 <br />
+                <span className="font-semibold text-primary-500">
+                  더 스마트하고 간편한 일정 관리
+                </span>
+                를 경험할 수 있습니다!
+              </p>
+              <div className="w-full flex flex-col items-start px-6">
+                <p>🤖 AI 기반 자동 일정 추가 및 수정</p>
+                <p>📆 구글 캘린더 + TASK 완벽 연동</p>
+                <p>👍 직관적인 UI로 편리한 사용</p>
+              </div>
+            </div>
+          </ModalBody>
+          <ModalFooter className="flex flex-col gap-3">
+            <Button
+              className="bg-primary-500 text-white text-lg w-full py-3 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-all"
+              onPress={handleLoginClick}
+              variant="flat"
+              size="lg"
+            >
+              Google 계정으로 로그인
+            </Button>
+            <Button
+              color="danger"
+              variant="light"
+              onPress={onClose}
+              className="w-full py-3 rounded-lg"
+            >
+              취소
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </form>
   );
 }
