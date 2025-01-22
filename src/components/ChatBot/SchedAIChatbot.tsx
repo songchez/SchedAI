@@ -15,11 +15,6 @@ export default function SchedAIChatbot() {
       body: {
         model: selectedModel,
       },
-      // run client-side tools that are automatically executed:
-      async onToolCall({ toolCall }) {
-        if (toolCall.toolName === "getCalendarList") {
-        }
-      },
     });
 
   return (

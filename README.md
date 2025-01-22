@@ -2,6 +2,16 @@
 
 SchedAI는 Google Calendar와 ChatGPT를 연동하여 사용자가 채팅형 인터페이스로 일정을 관리하고 대화를 통해 효율적인 비서 역할을 수행할 수 있는 웹 애플리케이션입니다. 이 애플리케이션은 바쁜 직장인, 학생, 프리랜서를 위한 일정 관리 솔루션을 제공합니다.
 
+SchedAI is an AI-powered scheduling solution designed to simplify and enhance personal and professional time management. By integrating with Google Calendar, SchedAI allows users to effortlessly add, modify, and view events using natural language commands.
+
+Key Features
+Smart Scheduling: AI learns your patterns to recommend optimized schedules.
+Natural Language Interface: Easily manage schedules with commands like "Set a meeting next Friday at 3 PM."
+Real-Time Sync: Instantly updates with Google Calendar for seamless access anywhere.
+Personalized Experience: Tailored suggestions and automation based on user preferences.
+Elegant Design: Modern glassmorphism UI with dark and light mode support.
+SchedAI is your smart companion, offering more than just schedule management—it optimizes your time and boosts productivity. "Effortless scheduling, powered by AI."
+
 ## 프로젝트 개요
 
 - **백엔드**: Next.js v14

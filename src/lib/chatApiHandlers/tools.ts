@@ -12,7 +12,7 @@ import {
  * 1. 캘린더 목록 가져오기
  */
 export const getCalendarsListTool = {
-  description: `유저의 캘린더 목록을 가져옵니다. 이 ID로 다른 캘린더 관련 작업이 가능합니다.`,
+  description: `Get the user calendars`,
   parameters: z.object({}),
   execute: async () => {
     const session = await auth();
@@ -33,11 +33,11 @@ export const getCalendarsListTool = {
  * 2. 특정 캘린더의 이벤트 조회
  */
 export const getCalendarEventsTool = {
-  description: "특정 calendarId에서 일정 목록을 가져옵니다.",
+  description: "Get user events",
   parameters: z.object({
     calendarId: z.string(),
-    timeMin: z.string().describe("검색 시작 시점"),
-    timeMax: z.string().describe("검색 종료 시점"),
+    timeMin: z.string().describe("start date"),
+    timeMax: z.string().describe("end date"),
     maxResults: z.number().describe("최대 이벤트 개수"),
   }),
   execute: async ({
@@ -106,7 +106,7 @@ export const getCalendarEventsTool = {
  * 3. 일정 추가
  */
 export const addEventToCalendarTool = {
-  description: "특정 calendarId에 새 일정을 추가합니다.",
+  description: "add new event",
   parameters: z.object({
     calendarId: z.string(),
     eventDetails: z.object({
@@ -114,10 +114,12 @@ export const addEventToCalendarTool = {
       location: z.string().optional(),
       description: z.string().optional(),
       start: z.object({
-        dateTime: z.string().describe("예: 2023-01-01T09:00:00"),
+        dateTime: z.string(),
+        timeZone: z.string(),
       }),
       end: z.object({
-        dateTime: z.string().describe("예: 2023-01-01T10:00:00"),
+        dateTime: z.string(),
+        timeZone: z.string(),
       }),
     }),
   }),
@@ -130,19 +132,31 @@ export const addEventToCalendarTool = {
       summary: string;
       location?: string;
       description?: string;
-      start: { dateTime: string };
-      end: { dateTime: string };
+      start: { dateTime: string; timeZone: string };
+      end: { dateTime: string; timeZone: string };
     };
   }) => {
-    const session = await auth();
-    const userId = session?.user.id;
-
-    const newEvent = await addEventToCalendar(userId, calendarId, eventDetails);
-    return (
-      `"${newEvent.summary}" 일정이 추가되었습니다!\n` +
-      `시작: ${formatToKoreanDateTime(newEvent.start?.dateTime)}\n` +
-      `종료: ${formatToKoreanDateTime(newEvent.end?.dateTime)}`
-    );
+    try {
+      const session = await auth();
+      const userId = session?.user.id;
+      console.log(calendarId, eventDetails);
+      const newEvent = await addEventToCalendar(
+        userId,
+        calendarId,
+        eventDetails
+      );
+      if (!newEvent) {
+        throw new Error("캘린더에 이벤트를 추가하지 못했습니다.");
+      }
+      console.log("새로운 이벤트 추가:", newEvent);
+      return `"${newEvent.summary}" 일정이 추가되었습니다!
+      시작: ${formatToKoreanDateTime(newEvent.start?.dateTime)}
+      종료: ${formatToKoreanDateTime(newEvent.end?.dateTime)}`;
+    } catch (error) {
+      if (error instanceof Error) {
+        return `이벤트 추가함수에서 오류발생: ${error}`;
+      }
+    }
   },
 };
 

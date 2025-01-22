@@ -93,8 +93,8 @@ export async function addEventToCalendar(
     summary: string;
     location?: string;
     description?: string;
-    start: { dateTime: string };
-    end: { dateTime: string };
+    start: { dateTime: string; timeZone: string };
+    end: { dateTime: string; timeZone: string };
   }
 ) {
   const calendarClient = await createGoogleCalendarClient(userId);
