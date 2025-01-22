@@ -2,7 +2,7 @@
 
 // import { useState } from "react";
 // import { parseDate } from "@internationalized/date";
-// import { Button, DatePicker, Input } from "@nextui-org/react";
+// import { Button, DatePicker, Input } from "@heroui/react";
 // import CalendarSelector from "./CalendarSelector";
 // import EventSelector from "./EventSelector";
 

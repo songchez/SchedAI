@@ -1,4 +1,4 @@
-import { Input, Button, Select, SelectItem } from "@nextui-org/react";
+import { Input, Button, Select, SelectItem } from "@heroui/react";
 
 interface ChatInputProps {
   input: string;

@@ -15,7 +15,7 @@ SchedAI is your smart companion, offering more than just schedule management—i
 ## 프로젝트 개요
 
 - **백엔드**: Next.js v14
-- **스타일링**: Tailwind CSS 및 NextUI
+- **스타일링**: Tailwind CSS 및 HeroUI
 - **핵심 기능**:
   - Google 계정을 통한 사용자 로그인 및 인증
   - OpenAI API를 활용한 대화형 채팅 기능
