@@ -15,22 +15,22 @@ export default async function CustomNavbar() {
   return (
     <Navbar
       shouldHideOnScroll
-      classNames={{ base: "bg-opacity-15 bg-orange-400" }}
+      classNames={{ base: "bg-opacity-10 bg-primary" }}
     >
       <NavbarBrand>
         <Link href="/">
-          <h1 className="text-xl font-bold text-orange-500 ">SchedAI</h1>
+          <h1 className="text-xl font-bold text-primary ">SchedAI</h1>
         </Link>
       </NavbarBrand>
       {/* theme */}
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <Link href={"/"} className="hover:text-orange-500">
+        <Link href={"/"} className="hover:text-primary">
           <p>Home</p>
         </Link>
-        <Link href={"/dashboard"} className="hover:text-orange-500">
+        <Link href={"/dashboard"} className="hover:text-primary">
           <p>Dashboard</p>
         </Link>
-        <Link href={"/About"} className="hover:text-orange-500">
+        <Link href={"/About"} className="hover:text-primary">
           <p>About</p>
         </Link>
       </NavbarContent>

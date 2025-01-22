@@ -93,8 +93,8 @@ export async function addEventToCalendar(
     summary: string;
     location?: string;
     description?: string;
-    start: { date: string };
-    end: { date: string };
+    start: { dateTime: string };
+    end: { dateTime: string };
   }
 ) {
   const calendarClient = await createGoogleCalendarClient(userId);
@@ -155,27 +155,6 @@ export async function deleteEventFromCalendar(
     calendarId,
     eventId,
   });
-}
-
-/**
- * Searches events in a specific calendar.
- * @param userId The ID of the user.
- * @param calendarId The ID of the calendar.
- * @param query Search term to look for in event titles or descriptions.
- * @returns List of matching events.
- */
-export async function searchEvents(
-  userId: string,
-  calendarId: string,
-  query: string
-) {
-  const calendarClient = await createGoogleCalendarClient(userId);
-  const response = await calendarClient.events.list({
-    calendarId,
-    q: query,
-    timeMin: new Date().toISOString(),
-  });
-  return response.data.items || [];
 }
 
 /* ------------------------------------------------------------------
