@@ -3,7 +3,7 @@ import { Input, Button, Select, SelectItem } from "@heroui/react";
 interface ChatInputProps {
   input: string;
   selectedModel: AIModels;
-  onInputChange: (value: any) => void;
+  onInputChange: () => void;
   onModelChange: (value: AIModels) => void;
   onSubmit: () => void;
   stop: () => void;

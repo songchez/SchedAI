@@ -1,9 +1,9 @@
 import CustomNavbar from "@/components/Navbar/CustomNavbar";
+import { Gowun_Batang } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
-import { Gowun_Batang } from "next/font/google";
 
-export const gowunBatang = Gowun_Batang({
+const gowunBatang = Gowun_Batang({
   display: "swap",
   subsets: ["latin"],
   weight: ["400", "700"],
