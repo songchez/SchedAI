@@ -31,11 +31,13 @@ export default function ChatInput({
       className="flex gap-2 items-end"
     >
       {/* 모델 선택 */}
-      <div className="w-36 bottom-3">
+      <div className="w-36 bottom-3 ">
         <Select
           isRequired
           defaultSelectedKeys={[selectedModel]}
           value={selectedModel}
+          color="primary"
+          variant="underlined"
           label="Select AI Model"
           onChange={(e) => onModelChange(e.target.value as AIModels)}
         >
@@ -46,13 +48,12 @@ export default function ChatInput({
 
       <Input
         fullWidth
+        color="primary"
         value={input}
         autoComplete="off"
         placeholder="Type your message..."
         onChange={onInputChange}
-        classNames={{
-          inputWrapper: ["h-14 bg-transparent border-none shadow-none"],
-        }}
+        variant="underlined"
         className="flex-1"
         size="lg"
       />
@@ -74,14 +75,14 @@ export default function ChatInput({
           </svg>
         </Button>
       ) : (
-        <Button type="submit" color="primary">
+        <Button type="submit" color="primary" variant="solid">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-6"
+            className="size-6 dark:text-black"
           >
             <path
               strokeLinecap="round"

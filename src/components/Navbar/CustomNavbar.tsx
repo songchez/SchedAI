@@ -15,7 +15,7 @@ export default async function CustomNavbar() {
   return (
     <Navbar
       shouldHideOnScroll
-      classNames={{ base: "bg-opacity-10 bg-primary" }}
+      classNames={{ base: "bg-white/40 dark:bg-black/10" }}
     >
       <NavbarBrand>
         <Link href="/">
