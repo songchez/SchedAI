@@ -11,7 +11,6 @@ import {
   getModelWithProvider,
 } from "@/lib/chatApiHandlers/constants";
 import {
-  getCalendarsListTool,
   getCalendarEventsTool,
   addEventToCalendarTool,
   // updateEventInCalendarTool,
@@ -21,6 +20,8 @@ import {
   // deleteTaskFromListTool,
   // clearCompletedTasksTool,
 } from "@/lib/chatApiHandlers/tools";
+import { auth } from "@/auth";
+import { getCalendarList } from "@/lib/googleClient";
 
 /**
  * providersMap: 모델 키 -> 실제 모델 인스턴스 생성 함수
@@ -44,13 +45,18 @@ export async function POST(req: NextRequest): Promise<Response> {
     const modelWithProvider = getModelWithProvider(model, providersMap);
     const today = new Date();
 
+    const session = await auth();
+    const userId: string = session?.user?.id;
+    const calendars = await getCalendarList(userId);
+
     // streamText를 이용해 AI 호출
     const result = streamText({
       model: modelWithProvider,
-      system: `You are SchedAI. Today is ${today.toISOString()}.`,
+      system: `You are SchedAI. 
+      Today is ${today.toISOString()}.
+      User calendar id is ${calendars[0].id?.toString()}`,
       messages,
       tools: {
-        getCalendarsListTool,
         getCalendarEventsTool,
         addEventToCalendarTool,
       },

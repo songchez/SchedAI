@@ -1,10 +1,10 @@
 import { auth } from "@/auth";
-import TaskTester from "@/components/Dashboard/TaskTester";
-import { SessionProvider } from "next-auth/react";
+// import TaskTester from "@/components/Dashboard/TaskTester";
+// import { SessionProvider } from "next-auth/react";
 import Image from "next/image";
 import background from "@/images/dashboard_background.png";
 import GlassContainer from "@/components/GlassContainer";
-import CalendarEventHandler from "@/components/Dashboard/CalendarEventHandler";
+// import CalendarEventHandler from "@/components/Dashboard/CalendarEventHandler";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -29,11 +29,12 @@ export default async function DashboardPage() {
             <h1 className="text-xl">Welcome, {session.user?.name}!</h1>
             <h2 className="text-sm">등록하고 싶은 일정을 입력해 보세요</h2>
           </div>
-          <div className="p-6">
-            <SessionProvider>
+          <div className="p-6 text-3xl">
+            준비중
+            {/* <SessionProvider>
               <CalendarEventHandler />
               <TaskTester />
-            </SessionProvider>
+            </SessionProvider> */}
           </div>
         </GlassContainer>
       </div>

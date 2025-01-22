@@ -31,25 +31,6 @@ export default function ChatMessageList({ messages }: { messages: Message[] }) {
             const toolCallId = toolInvocation.toolCallId;
 
             // render confirmation tool (client-side tool with user interaction)
-            if (toolInvocation.toolName === "getCalendarsListTool") {
-              return (
-                <div
-                  key={toolCallId}
-                  className="text-gray-500 flex flex-col gap-2"
-                >
-                  {toolInvocation.args.message}
-                  <div className="flex gap-2">
-                    {"result" in toolInvocation ? (
-                      <p className="whitespace-pre-line">
-                        {toolInvocation.result}
-                      </p>
-                    ) : (
-                      <Spinner />
-                    )}
-                  </div>
-                </div>
-              );
-            }
             if (toolInvocation.toolName === "getCalendarEventsTool") {
               return (
                 <div

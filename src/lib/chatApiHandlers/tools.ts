@@ -5,29 +5,29 @@ import { formatToKoreanDateTime } from "./utils";
 import {
   addEventToCalendar,
   getCalendarEvents,
-  getCalendarList,
+  // getCalendarList,
 } from "@/lib/googleClient";
 
 /**
- * 1. 캘린더 목록 가져오기
+ * 1. 캘린더 목록 가져오기 : 캘린더 목록을 가져오면 너무 단계가 많아져서 캘린더ID를 시작전에 줌.
  */
-export const getCalendarsListTool = {
-  description: `Get the user calendars`,
-  parameters: z.object({}),
-  execute: async () => {
-    const session = await auth();
-    const userId = session?.user.id;
-    const calendars = await getCalendarList(userId);
+// export const getCalendarsListTool = {
+//   description: `Get the user calendars`,
+//   parameters: z.object({}),
+//   execute: async () => {
+//     const session = await auth();
+//     const userId = session?.user.id;
+//     const calendars = await getCalendarList(userId);
 
-    if (!calendars?.length) {
-      return "등록된 캘린더가 없습니다.";
-    }
+//     if (!calendars?.length) {
+//       return "등록된 캘린더가 없습니다.";
+//     }
 
-    const calendarText = calendars.map((calendar) => calendar.id).join(", ");
-    return `현재 캘린더 목록: ${calendarText}.
-원하시는 캘린더 ID를 알려주세요 (예: ${calendars[0].id}).`;
-  },
-};
+//     const calendarText = calendars.map((calendar) => calendar.id).join(", ");
+//     return `현재 캘린더 목록: ${calendarText}.
+// 원하시는 캘린더 ID를 알려주세요 (예: ${calendars[0].id}).`;
+//   },
+// };
 
 /**
  * 2. 특정 캘린더의 이벤트 조회
@@ -115,11 +115,11 @@ export const addEventToCalendarTool = {
       description: z.string().optional(),
       start: z.object({
         dateTime: z.string(),
-        timeZone: z.string(),
+        timeZone: z.string().describe("GMT+09:00"),
       }),
       end: z.object({
         dateTime: z.string(),
-        timeZone: z.string(),
+        timeZone: z.string().describe("GMT+09:00"),
       }),
     }),
   }),
@@ -139,7 +139,8 @@ export const addEventToCalendarTool = {
     try {
       const session = await auth();
       const userId = session?.user.id;
-      console.log(calendarId, eventDetails);
+      console.log(userId, calendarId, eventDetails);
+
       const newEvent = await addEventToCalendar(
         userId,
         calendarId,
