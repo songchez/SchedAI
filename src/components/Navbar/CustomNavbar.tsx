@@ -8,6 +8,8 @@ import {
   Button,
 } from "@heroui/react";
 import Link from "next/link";
+import Image from "next/image";
+import Logo from "@/images/SchedAILogo.png";
 
 export default async function CustomNavbar() {
   const session = await auth();
@@ -18,7 +20,8 @@ export default async function CustomNavbar() {
       classNames={{ base: "bg-white/40 dark:bg-black/10" }}
     >
       <NavbarBrand>
-        <Link href="/">
+        <Link href="/" className="flex gap-2 items-center">
+          <Image src={Logo} alt="logo" height={30} width={30} />
           <h1 className="text-xl font-bold text-primary ">SchedAI</h1>
         </Link>
       </NavbarBrand>

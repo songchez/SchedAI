@@ -23,9 +23,9 @@ export default function SchedAIChatbot() {
 
       <div className="sticky bottom-14 flex flex-col">
         {messages.length === 0 && (
-          <div className="flex justify-center text-2xl">
-            어떤 계획이 있으신가요? 일정을 생성해보세요
-          </div>
+          <p className="flex justify-center text-2xl">
+            어떤 일정이 있으신가요?
+          </p>
         )}
 
         <ChatInput
