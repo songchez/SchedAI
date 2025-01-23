@@ -10,6 +10,7 @@ import Image from "next/image";
 import SchedAILogdo from "@/images/SchedAILogo.png";
 import Link from "next/link";
 import { useEffect } from "react";
+import Footer from "./Footer";
 
 export default function LandingPage() {
   const sectionRef = useRef(null);
@@ -25,10 +26,10 @@ export default function LandingPage() {
       sections[index].scrollIntoView({ behavior: "smooth" });
       setTimeout(() => {
         isScrolling = false;
-      }, 1000);
+      }, 500);
     };
 
-    const handleWheel = (e: WheelEvent) => {
+    const handleWheel = (e: { deltaY: number }) => {
       if (isScrolling) return;
 
       if (e.deltaY > 0 && currentSection < sections.length - 1) {
@@ -40,8 +41,11 @@ export default function LandingPage() {
       }
     };
 
-    window.addEventListener("wheel", handleWheel);
-    return () => window.removeEventListener("wheel", handleWheel);
+    window.addEventListener("wheel", handleWheel, { passive: true });
+
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+    };
   }, []);
 
   return (
@@ -192,22 +196,7 @@ export default function LandingPage() {
           </GlassContainer>
         </div>
       </section>
-
-      {/* 푸터 섹션 */}
-      <section className="h-screen flex items-center">
-        <motion.div
-          className="py-8 bg-gray-800/80 text-white w-full"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-        >
-          <GlassContainer className="text-center">
-            <p className="text-sm opacity-75">
-              &copy; 2025 SchedAI. 모든 권리 보유.
-            </p>
-          </GlassContainer>
-        </motion.div>
-      </section>
+      <Footer />
     </div>
   );
 }
