@@ -97,7 +97,7 @@ SchedAI: "프랑스 여행 계획을 세우기 위해,
     loop: 5, // 반복 횟수 (0이면 무한)
     typeSpeed: 30,
     deleteSpeed: 10,
-    delaySpeed: 1500,
+    delaySpeed: 4000,
   });
 
   return (
