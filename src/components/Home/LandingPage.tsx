@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
-import { motion, useInView, useScroll } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useTypewriter, Cursor } from "react-simple-typewriter";
 import SchedAILogo from "@/images/SchedAILogo.png";
 import bakgroundImageNewYork from "@/images/dark_dashboard_background.png";
