@@ -15,15 +15,12 @@ import usageCard1 from "@/images/usageCard_1.png";
 import usageCard2 from "@/images/usageCard_2.png";
 import usageCard3 from "@/images/usageCard_3.png";
 import profileImage from "@/images/profileimage.jpeg";
-import githubLogo from "@/images/github-mark.svg";
 
 import {
   CalendarDaysIcon,
   ChatBubbleOvalLeftEllipsisIcon,
   BeakerIcon,
 } from "@heroicons/react/24/solid";
-import Script from "next/script";
-import Coffee from "./Coffee";
 import GithubLogo from "./GithubLogo";
 
 export default function HomePage() {
