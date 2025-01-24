@@ -404,9 +404,9 @@ function ParallaxCard({
       ) : (
         <div className="absolute inset-0 bg-gray-200" />
       )}
-      <div className="absolute bottom-0 w-full bg-white p-4">
+      <div className="absolute bottom-0 w-full bg-white text-primary-600 p-4">
         <h3 className="font-semibold text-lg">{title}</h3>
-        <p className="text-sm text-gray-600 mt-1">{description}</p>
+        <p className="text-sm  mt-1">{description}</p>
         <Link
           href={link}
           className="text-primary-500 text-sm mt-2 inline-block"
