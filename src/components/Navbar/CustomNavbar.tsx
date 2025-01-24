@@ -48,7 +48,7 @@ export default async function CustomNavbar() {
                 <form
                   action={async () => {
                     "use server";
-                    await signOut();
+                    await signOut({ redirectTo: "/" });
                   }}
                 >
                   <Button type="submit">Sign Out</Button>
