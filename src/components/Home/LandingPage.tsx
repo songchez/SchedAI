@@ -101,7 +101,7 @@ SchedAI: "프랑스 여행 계획을 세우기 위해,
   });
 
   return (
-    <section className="relative w-full h-screen flex items-center justify-center bg-no-repeat bg-center bg-cover">
+    <section className="relative w-full min-h-screen flex items-center justify-center bg-no-repeat bg-center bg-cover">
       <div className="fixed top-0 left-0 w-screen h-screen -z-10">
         <Image
           className="w-full h-full object-cover"
@@ -123,9 +123,8 @@ SchedAI: "프랑스 여행 계획을 세우기 위해,
         transition={{ duration: 1, delay: 0.3 }}
       >
         {/* 왼쪽: 스트리밍 대화 텍스트: 2초후에 등장 */}
-
         <motion.div
-          className="text-lg md:text-xl font-light overflow-hidden bg-black/10 backdrop-blur-sm rounded-lg"
+          className="text-md md:text-xl font-light overflow-hidden bg-black/10 backdrop-blur-sm rounded-lg order-2 md:order-1"
           initial={{ width: 0, padding: 0 }}
           animate={{ width: 500, padding: 4 }}
           transition={{
@@ -134,7 +133,7 @@ SchedAI: "프랑스 여행 계획을 세우기 위해,
             ease: "easeOut",
           }}
         >
-          <div className="text-primary-300 whitespace-pre m-3">
+          <div className="text-primary-300 whitespace-pre m-3 h-72">
             {/* Typewriter로 출력되는 영역 */}
             {text}
             <Cursor />
@@ -142,7 +141,7 @@ SchedAI: "프랑스 여행 계획을 세우기 위해,
         </motion.div>
 
         {/* 오른쪽: 로고 + 타이틀 + CTA 버튼 */}
-        <div className="flex flex-col items-center text-white text-center">
+        <div className="flex flex-col items-center text-white text-center m-36 md:m-0 order-1 md:order-2">
           {/* 로고 */}
           <motion.div
             className="mb-5"

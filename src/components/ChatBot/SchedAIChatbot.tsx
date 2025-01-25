@@ -27,7 +27,7 @@ export default function SchedAIChatbot() {
 
       <div className="sticky bottom-14 flex flex-col">
         {messages.length === 0 && (
-          <p className="flex justify-center text-2xl">
+          <p className="flex justify-center md:text-2xl text-sm">
             어떤 일정이 있으신가요?
           </p>
         )}
