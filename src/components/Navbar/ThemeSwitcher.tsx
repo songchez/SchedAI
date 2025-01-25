@@ -38,6 +38,7 @@ export function ThemeSwitcher() {
         className="md:hidden"
         defaultSelected
         size="sm"
+        isSelected={theme === "dark" ? false : true}
         onValueChange={(value) => {
           if (value) {
             setTheme("light");

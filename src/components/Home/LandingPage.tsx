@@ -6,9 +6,10 @@ import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import { useTypewriter, Cursor } from "react-simple-typewriter";
 import SchedAILogo from "@/images/SchedAILogo.png";
-import bakgroundImageNewYork from "@/images/dark_dashboard_background.png";
+import darkBackground from "@/images/dark_dashboard_background.png";
+import lightBackground from "@/images/light_dashboard_background.png";
 import calendarIcon from "@/images/3d_calendar.png";
-import { CardBody, CardHeader } from "@heroui/react";
+import { Button, CardBody, CardHeader } from "@heroui/react";
 import GlassContainer from "../GlassContainer";
 import GoolgleIcon from "@/images/google-icon-logo.svg";
 import usageCard1 from "@/images/usageCard_1.png";
@@ -102,18 +103,23 @@ SchedAI: "프랑스 여행 계획을 세우기 위해,
 
   return (
     <section className="relative w-full min-h-screen flex items-center justify-center bg-no-repeat bg-center bg-cover">
-      <div className="fixed top-0 left-0 w-screen h-screen -z-10">
-        <Image
-          className="w-full h-full object-cover"
-          src={bakgroundImageNewYork}
-          height={1980}
-          width={1080}
-          alt="backgroundimage"
-          priority
-        />
-      </div>
-
-      <div className="fixed inset-0 bg-gradient-to-b from-black/40 to-black/20" />
+      <Image
+        className="object-cover fixed top-0 left-0 w-screen h-screen -z-10"
+        src={darkBackground}
+        height={1980}
+        width={1080}
+        alt="backgroundimage"
+        priority
+      />
+      <Image
+        className="object-cover fixed top-0 left-0 w-screen h-screen -z-10 dark:hidden"
+        src={lightBackground}
+        height={1980}
+        width={1080}
+        alt="backgroundimage"
+        priority
+      />
+      <div className="fixed inset-0 bg-gradient-to-b dark:from-black/40 dark:to-black/20 from-white/50 to-white/20" />
 
       {/* 본문 컨테이너 */}
       <motion.div
@@ -124,7 +130,7 @@ SchedAI: "프랑스 여행 계획을 세우기 위해,
       >
         {/* 왼쪽: 스트리밍 대화 텍스트: 2초후에 등장 */}
         <motion.div
-          className="text-md md:text-xl font-light overflow-hidden bg-black/10 backdrop-blur-sm rounded-lg order-2 md:order-1"
+          className="text-md md:text-xl font-light overflow-hidden dark:bg-black/10 bg-white/30 backdrop-blur-sm rounded-lg order-2 md:order-1"
           initial={{ width: 0, padding: 0 }}
           animate={{ width: 500, padding: 4 }}
           transition={{
@@ -133,7 +139,7 @@ SchedAI: "프랑스 여행 계획을 세우기 위해,
             ease: "easeOut",
           }}
         >
-          <div className="text-primary-300 whitespace-pre m-3 h-72">
+          <div className="dark:text-primary-300 whitespace-pre m-3 h-72">
             {/* Typewriter로 출력되는 영역 */}
             {text}
             <Cursor />
@@ -141,7 +147,7 @@ SchedAI: "프랑스 여행 계획을 세우기 위해,
         </motion.div>
 
         {/* 오른쪽: 로고 + 타이틀 + CTA 버튼 */}
-        <div className="flex flex-col items-center text-white text-center m-36 md:m-0 order-1 md:order-2">
+        <div className="flex flex-col items-center dark:text-primary-200 text-primary-500 text-center m-36 md:m-0 order-1 md:order-2">
           {/* 로고 */}
           <motion.div
             className="mb-5"
@@ -179,15 +185,17 @@ SchedAI: "프랑스 여행 계획을 세우기 위해,
 
           {/* Hero CTA 버튼 */}
           <motion.div
-            initial={{ y: 100, opacity: 0 }}
+            initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1.3 }}
+            transition={{ duration: 1 }}
           >
-            <Link
-              href="/chat"
-              className="bg-primary-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-primary-600 transition-all"
-            >
-              SchedAI 시작하기
+            <Link href="/chat">
+              <Button
+                variant="shadow"
+                className="dark:bg-primary-500 bg-yellow-400 dark:text-white px-6 py-3 rounded-full shadow-lg dark:hover:bg-primary-600"
+              >
+                SchedAI 시작하기
+              </Button>
             </Link>
           </motion.div>
         </div>
@@ -222,7 +230,6 @@ function CalendarDisplay() {
           height={400}
           width={400}
           style={{ objectFit: "contain" }}
-          className="rounded-lg shadow-lg"
         />
       </div>
     </div>
@@ -282,7 +289,7 @@ function FeatureCard({
 }) {
   return (
     <div className="rounded-lg shadow-lg hover:shadow-primary-400 hover:drop-shadow-2xl">
-      <GlassContainer className="hover:text-blue-400 text-primary-100 min-h-60">
+      <GlassContainer className="hover:text-blue-400 min-h-60">
         <CardHeader className="flex-col md:flex-row gap-3">
           {icon}
           <h3 className="md:text-xl text-lg font-semibold">{title}</h3>

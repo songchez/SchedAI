@@ -128,7 +128,7 @@ export default function ChatInput({
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalContent>
-          <ModalHeader className="text-center text-xl font-bold text-primary-500">
+          <ModalHeader className="text-center text-xl font-bold text-primary-500 dark:text-amber-300">
             <div className="flex gap-3 items-center">
               <Image
                 src={SchedAILogdo}
@@ -141,10 +141,10 @@ export default function ChatInput({
           </ModalHeader>
           <ModalBody>
             <div className="flex flex-col items-center gap-4 text-center">
-              <p className="text-gray-700">
+              <p className="text-gray-700 dark:text-primary-300">
                 SchedAI를 사용하면 Google 캘린더와의 통합을 통해 <br />
-                <span className="font-semibold text-primary-500">
-                  더 스마트하고 간편한 일정 관리
+                <span className="font-semibold text-primary-500 dark:text-amber-300">
+                  스마트하고 간편한 일정 관리
                 </span>
                 를 경험할 수 있습니다!
               </p>

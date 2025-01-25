@@ -44,8 +44,8 @@ export default async function CustomNavbar() {
         <NavbarItem>
           <ThemeSwitcher />
         </NavbarItem>
-        <NavbarItem>
-          {/* client component */}
+        <NavbarItem className="md:hidden">
+          {/* client component 모바일 전용 메뉴 */}
           <MobileDropDown session={session} />
         </NavbarItem>
         <NavbarItem className="hidden md:inline-block">
