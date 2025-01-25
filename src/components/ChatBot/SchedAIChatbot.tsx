@@ -5,6 +5,7 @@ import ChatMessageList from "./Ui/ChatMessageList";
 import ChatInput from "./Ui/ChatInput";
 import { useChat } from "ai/react";
 import { SessionProvider } from "next-auth/react";
+import { ScrollShadow } from "@heroui/scroll-shadow";
 
 export default function SchedAIChatbot() {
   const [selectedModel, setSelectedModel] = useState<AIModels>(
@@ -20,7 +21,9 @@ export default function SchedAIChatbot() {
 
   return (
     <div className="flex flex-col justify-end w-full max-w-4xl mx-auto p-4 rounded-lg">
-      <ChatMessageList messages={messages} />
+      <ScrollShadow hideScrollBar className="h-[84vh]">
+        <ChatMessageList messages={messages} />
+      </ScrollShadow>
 
       <div className="sticky bottom-14 flex flex-col">
         {messages.length === 0 && (
