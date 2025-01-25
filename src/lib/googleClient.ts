@@ -192,16 +192,18 @@ export async function getTasksFromList(
 export async function addTaskToList(
   userId: string,
   title: string,
-  dueDate?: string,
+  due?: string,
   notes?: string,
   taskListId = "@default"
 ) {
   const tasksClient = await createGoogleTasksClient(userId);
+  console.log(userId, title, due, notes, taskListId);
+
   const response = await tasksClient.tasks.insert({
     tasklist: taskListId,
     requestBody: {
       title,
-      due: dueDate || undefined,
+      due: due,
       notes: notes || undefined,
     },
   });

@@ -49,8 +49,8 @@ export const getCalendarEventsTool = {
   description: "Get user events",
   parameters: z.object({
     calendarId: z.string(),
-    timeMin: z.string().describe("start date"),
-    timeMax: z.string().describe("end date"),
+    timeMin: z.string().describe("start date in ISO 8601 format"),
+    timeMax: z.string().describe("end date in ISO 8601 format"),
     maxResults: z.number().describe("최대 이벤트 개수"),
   }),
   execute: async ({
@@ -98,28 +98,7 @@ export const getCalendarEventsTool = {
       });
       return acc;
     }, {});
-
-    // 결과 문자열 생성
-    const formattedEvents = Object.entries(groupedEvents)
-      .map(([date, evts]) => {
-        const dateHeader = formatToKoreanDateTime(date);
-        const lines = evts
-          .map(
-            (evt) =>
-              `  - ${formatToKoreanDateTime(evt.start?.dateTime)
-                .split(" ")
-                .slice(-2)
-                .join(" ")} : ${evt.summary}
-          <span style="font-size: 0; color: transparent;" data-event-id="${
-            evt.id
-          }">${evt.id}</span>`
-          )
-          .join("\n");
-        return `${dateHeader}:\n${lines}`;
-      })
-      .join("\n\n");
-
-    return `이벤트 목록:\n\n${formattedEvents}`;
+    return groupedEvents;
   },
 };
 
@@ -187,7 +166,7 @@ export const addEventToCalendarTool = {
  */
 export const updateEventInCalendarTool = {
   description:
-    "update existing event. In order to use update, eventId is necessary. if you dont know the event have to update, use getCalendarEventsTool(get eventIds). And ask user 'Which one would you like to update?'",
+    "update existing event. In order to use update, eventId is necessary. if you dont know the eventId have to update, use getCalendarEventsTool(get eventIds). And ask user 'Which one would you like to update?'.don't tell the eventId to user.",
   parameters: z.object({
     calendarId: z.string(),
     eventId: z.string(),
@@ -251,7 +230,8 @@ export const updateEventInCalendarTool = {
  */
 
 export const deleteEventFromCalendarTool = {
-  description: "delete existing event",
+  description:
+    "delete existing event. if you dont know the event have to delete, use getCalendarEventsTool(get eventIds). And ask user 'Which one would you like to delete?'. don't tell the eventId to user.",
   parameters: z.object({
     calendarId: z.string(),
     eventId: z.string(),
@@ -330,24 +310,7 @@ export const getTasksFromListTool = {
       // 작업 리스트 가져오기
       const tasks = await getTasksFromList(userId);
 
-      if (tasks.length === 0) {
-        return "작업 리스트가 비어 있습니다.";
-      }
-
-      // 작업들을 포맷팅
-      const formattedTasks = tasks
-        .map(
-          (task) =>
-            `- ${task.title || "제목 없음"} ${
-              task.due ? `(Due: ${new Date(task.due).toLocaleString()})` : ""
-            }
-            <span style="display:none;" data-task-id="${task.id}">${
-              task.id
-            }</span>`
-        )
-        .join("\n");
-
-      return `작업 리스트:\n\n${formattedTasks}`;
+      return tasks;
     } catch (error) {
       if (error instanceof Error) {
         return `작업을 가져오는 중 오류가 발생했습니다: ${error.message}`;
@@ -364,21 +327,19 @@ export const addTaskToListTool = {
   description: "Add a new task to a Google Task list",
   parameters: z.object({
     title: z.string().describe("The title of the task"),
-    dueDate: z
+    due: z
       .string()
       .optional()
-      .describe(
-        "The due date of the task in ISO 8601 format (e.g., 2025-01-28)"
-      ),
+      .describe("format => '2025-02-01T00:00:00+09:00'"),
     notes: z.string().optional().describe("Additional notes for the task"),
   }),
   execute: async ({
     title,
-    dueDate,
+    due,
     notes,
   }: {
     title: string;
-    dueDate?: string;
+    due?: string;
     notes?: string;
   }) => {
     try {
@@ -387,7 +348,9 @@ export const addTaskToListTool = {
       const userId = session?.user.id;
 
       // 작업 추가
-      const newTask = await addTaskToList(userId, title, dueDate, notes);
+      const newTask = await addTaskToList(userId, title, due, notes);
+
+      console.log(newTask);
 
       return `작업이 성공적으로 추가되었습니다:
       - 제목: ${newTask.title}
@@ -411,16 +374,15 @@ export const addTaskToListTool = {
  */
 
 export const updateTaskInListTool = {
-  description: "Update a task in a Google Task list",
+  description:
+    "Update a task in a Google Task List. If you dont know the taskId have to update, use getTasksFromListTool(get taskIds). And ask user 'Which one would you like to update?'. don't tell the taskId to user.",
   parameters: z.object({
     taskId: z.string().describe("The ID of the task to update."),
     title: z.string().optional().describe("The new title of the task."),
     dueDate: z
       .string()
       .optional()
-      .describe(
-        "The new due date of the task in ISO 8601 format (e.g., 2025-01-28)"
-      ),
+      .describe("The new due date. format => '2025-02-01T00:00:00+09:00'"),
     notes: z.string().optional().describe("The new notes for the task."),
     status: z
       .string()
@@ -485,7 +447,8 @@ export const updateTaskInListTool = {
  */
 
 export const deleteTaskFromListTool = {
-  description: "Delete a task from a Google Task list",
+  description:
+    "Delete a task from a Google Task list. If you dont know the taskId have to delete, use getTasksFromListTool(get taskIds). And ask user 'Which one would you like to delete?'.don't tell the taskId to user.",
   parameters: z.object({
     taskId: z.string().describe("The ID of the task to delete."),
     title: z.string().describe("The title of the task to delete."),
