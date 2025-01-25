@@ -6,9 +6,9 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/react";
-import { signIn, signOut } from "next-auth/react";
 import { Bars3Icon } from "@heroicons/react/24/outline";
 import { Session } from "next-auth";
+import { signIn, signOut } from "next-auth/react";
 
 interface Props {
   session: Session | null;
@@ -27,15 +27,10 @@ export default function MyDropdown({ session }: Props) {
 
   // 2. Handle item press
   const onItemPress = async (key: string) => {
-    switch (key) {
-      case "signIn":
-        await signIn("google");
-        break;
-      case "signOut":
-        await signOut({ redirectTo: "/" });
-        break;
-      default:
-        break;
+    if (key === "signIn") {
+      signIn("google", { redirectTo: "/chat" });
+    } else if (key === "signOut") {
+      signOut({ redirectTo: "/" });
     }
   };
 
@@ -46,7 +41,7 @@ export default function MyDropdown({ session }: Props) {
         <Bars3Icon className="w-9" />
       </DropdownTrigger>
       {/* 3. Manually map items into <DropdownItem> elements */}
-      <DropdownMenu aria-label="Dynamic Menu">
+      <DropdownMenu>
         {items.map((item) => (
           <DropdownItem
             key={item.key}
