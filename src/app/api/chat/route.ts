@@ -15,9 +15,10 @@ import {
   addEventToCalendarTool,
   updateEventInCalendarTool,
   deleteEventFromCalendarTool,
-  // addTaskToListTool,
-  // updateTaskInListTool,
-  // deleteTaskFromListTool,
+  getTasksFromListTool,
+  addTaskToListTool,
+  updateTaskInListTool,
+  deleteTaskFromListTool,
   // clearCompletedTasksTool,
 } from "@/lib/chatApiHandlers/tools";
 import { auth } from "@/auth";
@@ -61,6 +62,10 @@ export async function POST(req: NextRequest): Promise<Response> {
         addEventToCalendarTool,
         updateEventInCalendarTool,
         deleteEventFromCalendarTool,
+        getTasksFromListTool,
+        addTaskToListTool,
+        updateTaskInListTool,
+        deleteTaskFromListTool,
       },
     });
 

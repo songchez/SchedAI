@@ -22,6 +22,9 @@ function ToolInvocationRenderer({
       "addEventToCalendarTool",
       "updateEventInCalendarTool",
       "deleteEventFromCalendarTool",
+      "getTasksFromListTool",
+      "addTaskToListTool",
+      "updateTaskInListTool",
     ].includes(toolInvocation.toolName)
   ) {
     return (
