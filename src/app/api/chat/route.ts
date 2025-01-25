@@ -13,8 +13,8 @@ import {
 import {
   getCalendarEventsTool,
   addEventToCalendarTool,
-  // updateEventInCalendarTool,
-  // deleteEventFromCalendarTool,
+  updateEventInCalendarTool,
+  deleteEventFromCalendarTool,
   // addTaskToListTool,
   // updateTaskInListTool,
   // deleteTaskFromListTool,
@@ -59,6 +59,8 @@ export async function POST(req: NextRequest): Promise<Response> {
       tools: {
         getCalendarEventsTool,
         addEventToCalendarTool,
+        updateEventInCalendarTool,
+        deleteEventFromCalendarTool,
       },
     });
 

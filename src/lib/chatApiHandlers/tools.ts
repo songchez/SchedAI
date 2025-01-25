@@ -184,18 +184,14 @@ export const updateEventInCalendarTool = {
       summary: z.string().optional(),
       location: z.string().optional(),
       description: z.string().optional(),
-      start: z
-        .object({
-          dateTime: z.string().optional(),
-          timeZone: z.string().optional().describe("GMT+09:00"),
-        })
-        .optional(),
-      end: z
-        .object({
-          dateTime: z.string().optional(),
-          timeZone: z.string().optional().describe("GMT+09:00"),
-        })
-        .optional(),
+      start: z.object({
+        dateTime: z.string().optional(),
+        timeZone: z.string().optional().describe("GMT+09:00"),
+      }),
+      end: z.object({
+        dateTime: z.string().optional(),
+        timeZone: z.string().optional().describe("GMT+09:00"),
+      }),
     }),
   }),
   execute: async ({
@@ -239,7 +235,7 @@ export const updateEventInCalendarTool = {
   },
 };
 
-export const deleteEventInCalendarTool = {
+export const deleteEventFromCalendarTool = {
   description: "delete existing event",
   parameters: z.object({
     calendarId: z.string(),
@@ -248,18 +244,14 @@ export const deleteEventInCalendarTool = {
       summary: z.string().optional(),
       location: z.string().optional(),
       description: z.string().optional(),
-      start: z
-        .object({
-          dateTime: z.string().optional(),
-          timeZone: z.string().optional().describe("GMT+09:00"),
-        })
-        .optional(),
-      end: z
-        .object({
-          dateTime: z.string().optional(),
-          timeZone: z.string().optional().describe("GMT+09:00"),
-        })
-        .optional(),
+      start: z.object({
+        dateTime: z.string().optional(),
+        timeZone: z.string().optional().describe("GMT+09:00"),
+      }),
+      end: z.object({
+        dateTime: z.string().optional(),
+        timeZone: z.string().optional().describe("GMT+09:00"),
+      }),
     }),
   }),
   execute: async ({
