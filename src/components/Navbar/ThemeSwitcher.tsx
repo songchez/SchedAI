@@ -3,6 +3,8 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Select, SelectItem } from "@heroui/react";
+import { Switch } from "@heroui/react";
+import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
 
 export const themes = [
   { key: "system", label: "System" },
@@ -23,7 +25,7 @@ export function ThemeSwitcher() {
   return (
     <div>
       <Select
-        className="min-w-32"
+        className="w-32 md:inline-block hidden"
         placeholder={theme}
         value={theme}
         onChange={(e) => setTheme(e.target.value)}
@@ -32,6 +34,20 @@ export function ThemeSwitcher() {
           <SelectItem key={theme.key}>{theme.label}</SelectItem>
         ))}
       </Select>
+      <Switch
+        className="md:hidden"
+        defaultSelected
+        size="sm"
+        onValueChange={(value) => {
+          if (value) {
+            setTheme("light");
+          } else {
+            setTheme("dark");
+          }
+        }}
+        endContent={<MoonIcon />}
+        startContent={<SunIcon />}
+      ></Switch>
     </div>
   );
 }

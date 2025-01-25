@@ -10,6 +10,9 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import Logo from "@/images/SchedAILogo.png";
+import { Bars3Icon } from "@heroicons/react/24/solid";
+import { Session } from "next-auth";
+import MobileDropDown from "./MobileDropdownMenu";
 
 export default async function CustomNavbar() {
   const session = await auth();
@@ -27,13 +30,13 @@ export default async function CustomNavbar() {
       </NavbarBrand>
       {/* theme */}
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <Link href={"/chat"} className="hover:text-primary">
-          <p>SchedAI</p>
+        <Link href={"/chat"} className="hover:text-primary-300">
+          <p>✨ChatBot</p>
         </Link>
-        <Link href={"/dashboard"} className="hover:text-primary">
+        <Link href={"/dashboard"} className="hover:text-primary-300">
           <p>Dashboard</p>
         </Link>
-        <Link href={"/pricing"} className="hover:text-primary">
+        <Link href={"/pricing"} className="hover:text-primary-300">
           <p>Pricing</p>
         </Link>
       </NavbarContent>
@@ -42,6 +45,10 @@ export default async function CustomNavbar() {
           <ThemeSwitcher />
         </NavbarItem>
         <NavbarItem>
+          {/* client component */}
+          <MobileDropDown session={session} />
+        </NavbarItem>
+        <NavbarItem className="hidden md:inline-block">
           <div>
             {session ? (
               <>
