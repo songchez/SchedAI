@@ -48,49 +48,6 @@ SchedAI is your smart companion, offering more than just schedule management—i
 - 대화 내용 및 Google Calendar 데이터를 클라우드에 아카이브
 - 개인화된 일정 추천 및 자동화 기능 제공
 
-## 프로젝트 구조
-
-```scss
-src/
-├── app/
-│   ├── api/
-│   │   ├── auth/
-│   │   │   └── [...nextauth]/route.ts  # NextAuth API 라우트
-│   │   ├── chat/
-│   │   │   └── route.ts               # ChatGPT 연동 API
-│   │   ├── calendar/
-│   │   │   ├── events/
-│   │   │   │   └── route.ts           # Google Calendar 이벤트 API
-│   │   │   └── logs/
-│   │   │       └── route.ts           # Google Calendar 로그 API
-│   ├── dashboard/
-│   │   └── page.tsx                   # 사용자 대시보드
-│   ├── fonts/
-│   ├── login/
-│   │   └── page.tsx                   # 로그인 페이지
-│   ├── page.tsx                       # 메인 페이지 (홈)
-│   ├── favicon.ico                     # 파비콘
-│   ├── layout.tsx                     # 공통 레이아웃
-│   └── globals.css                    # 전역 스타일
-├── components/
-│   ├── Chat.tsx                       # 채팅 컴포넌트
-│   ├── Navbar.tsx                     # 네비게이션 바
-│   ├── LogTable.tsx                   # Google Calendar 로그 테이블
-│   └── Footer.tsx                     # 푸터
-├── lib/
-│   ├── google.ts                      # Google API 클라이언트 설정
-│   ├── auth.ts                        # 인증 관련 유틸리티
-│   └── openai.ts                      # OpenAI API 클라이언트 설정
-├── prisma/
-│   └── schema.prisma                  # Prisma 데이터베이스 스키마
-├── styles/
-│   ├── globals.css                    # Tailwind 전역 스타일
-├── .env                               # 환경 변수 파일
-├── next.config.js                     # Next.js 설정 파일
-├── package.json                       # 프로젝트 의존성
-└── tsconfig.json                      # TypeScript 설정 파일
-```
-
 ## 설치 방법
 
 1. **레포지토리 클론**

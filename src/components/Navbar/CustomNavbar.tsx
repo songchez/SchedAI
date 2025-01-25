@@ -33,8 +33,8 @@ export default async function CustomNavbar() {
         <Link href={"/dashboard"} className="hover:text-primary">
           <p>Dashboard</p>
         </Link>
-        <Link href={"/about"} className="hover:text-primary">
-          <p>About</p>
+        <Link href={"/pricing"} className="hover:text-primary">
+          <p>Pricing</p>
         </Link>
       </NavbarContent>
       <NavbarContent justify="end">

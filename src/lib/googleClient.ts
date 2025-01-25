@@ -151,10 +151,11 @@ export async function deleteEventFromCalendar(
   eventId: string
 ) {
   const calendarClient = await createGoogleCalendarClient(userId);
-  await calendarClient.events.delete({
+  const response = await calendarClient.events.delete({
     calendarId,
     eventId,
   });
+  return response;
 }
 
 /* ------------------------------------------------------------------

@@ -4,12 +4,14 @@ import { auth } from "@/auth";
 import { formatToKoreanDateTime } from "./utils";
 import {
   addEventToCalendar,
+  deleteEventFromCalendar,
   getCalendarEvents,
+  updateEventInCalendar,
   // getCalendarList,
 } from "@/lib/googleClient";
 
 /**
- * 1. 캘린더 목록 가져오기 : 캘린더 목록을 가져오면 너무 단계가 많아져서 캘린더ID를 시작전에 줌.
+ * 1. 캘린더 목록 가져오기 : 캘린더 목록을 가져오면 너무 단계가 많아져서 캘린더ID를 시작전에 프롬프트로 줌으로써 일단 해결.(캘린더가 많은사람이 별로 없을거라는 가정)
  */
 // export const getCalendarsListTool = {
 //   description: `Get the user calendars`,
@@ -64,9 +66,13 @@ export const getCalendarEventsTool = {
     if (!events.length) {
       return "일정이 없습니다.";
     }
+
     // 날짜별로 그룹화
     const groupedEvents = events.reduce<
-      Record<string, { summary: string; start?: { dateTime?: string } }[]>
+      Record<
+        string,
+        { summary: string; start?: { dateTime?: string }; id: string }[]
+      >
     >((acc, event) => {
       const dateTime = event.start?.dateTime;
       if (!dateTime) return acc;
@@ -77,6 +83,7 @@ export const getCalendarEventsTool = {
         start: {
           dateTime: event.start?.dateTime || undefined,
         },
+        id: event.id || "", // eventId 추가
       });
       return acc;
     }, {});
@@ -91,7 +98,10 @@ export const getCalendarEventsTool = {
               `  - ${formatToKoreanDateTime(evt.start?.dateTime)
                 .split(" ")
                 .slice(-2)
-                .join(" ")} : ${evt.summary}`
+                .join(" ")} : ${evt.summary}
+          <span style="font-size: 0; color: transparent;" data-event-id="${
+            evt.id
+          }">${evt.id}</span>`
           )
           .join("\n");
         return `${dateHeader}:\n${lines}`;
@@ -162,23 +172,140 @@ export const addEventToCalendarTool = {
 };
 
 /**
- * 4. Placeholder Tools (미구현)
+ * 4. UpdateEventInCalendar
  */
 export const updateEventInCalendarTool = {
-  description: "캘린더 이벤트를 업데이트 (미구현).",
-  parameters: z.object({}),
-  execute: async () => {
-    return "이 기능은 아직 구현되지 않았습니다.";
+  description:
+    "update existing event. In order to use update, eventId is necessary. if you dont know the event have to update, use getCalendarEventsTool(get eventIds). And ask user 'Which one would you like to update?'",
+  parameters: z.object({
+    calendarId: z.string(),
+    eventId: z.string(),
+    eventDetails: z.object({
+      summary: z.string().optional(),
+      location: z.string().optional(),
+      description: z.string().optional(),
+      start: z
+        .object({
+          dateTime: z.string().optional(),
+          timeZone: z.string().optional().describe("GMT+09:00"),
+        })
+        .optional(),
+      end: z
+        .object({
+          dateTime: z.string().optional(),
+          timeZone: z.string().optional().describe("GMT+09:00"),
+        })
+        .optional(),
+    }),
+  }),
+  execute: async ({
+    calendarId,
+    eventId,
+    eventDetails,
+  }: {
+    calendarId: string;
+    eventId: string;
+    eventDetails: {
+      summary?: string;
+      location?: string;
+      description?: string;
+      start?: { dateTime?: string; timeZone?: string };
+      end?: { dateTime?: string; timeZone?: string };
+    };
+  }) => {
+    try {
+      const session = await auth();
+      const userId = session?.user.id;
+      console.log(userId, calendarId, eventId, eventDetails);
+
+      const updatedEvent = await updateEventInCalendar(
+        userId,
+        calendarId,
+        eventId,
+        eventDetails
+      );
+      if (!updatedEvent) {
+        throw new Error("캘린더 이벤트를 업데이트하지 못했습니다.");
+      }
+      console.log("이벤트 업데이트 완료:", updatedEvent);
+      return `"${updatedEvent.summary}" 일정이 업데이트되었습니다!
+      시작: ${formatToKoreanDateTime(updatedEvent.start?.dateTime)}
+      종료: ${formatToKoreanDateTime(updatedEvent.end?.dateTime)}`;
+    } catch (error) {
+      if (error instanceof Error) {
+        return `이벤트 업데이트 함수에서 오류 발생: ${error}`;
+      }
+    }
   },
 };
 
-export const deleteEventFromCalendarTool = {
-  description: "캘린더 이벤트를 삭제 (미구현).",
-  parameters: z.object({}),
-  execute: async () => {
-    return "이 기능은 아직 구현되지 않았습니다.";
+export const deleteEventInCalendarTool = {
+  description: "delete existing event",
+  parameters: z.object({
+    calendarId: z.string(),
+    eventId: z.string(),
+    eventDetails: z.object({
+      summary: z.string().optional(),
+      location: z.string().optional(),
+      description: z.string().optional(),
+      start: z
+        .object({
+          dateTime: z.string().optional(),
+          timeZone: z.string().optional().describe("GMT+09:00"),
+        })
+        .optional(),
+      end: z
+        .object({
+          dateTime: z.string().optional(),
+          timeZone: z.string().optional().describe("GMT+09:00"),
+        })
+        .optional(),
+    }),
+  }),
+  execute: async ({
+    calendarId,
+    eventId,
+    eventDetails,
+  }: {
+    calendarId: string;
+    eventId: string;
+    eventDetails: {
+      summary?: string;
+      location?: string;
+      description?: string;
+      start?: { dateTime?: string; timeZone?: string };
+      end?: { dateTime?: string; timeZone?: string };
+    };
+  }) => {
+    try {
+      const session = await auth();
+      const userId = session?.user.id;
+      console.log(
+        "deleteEventInCalendarTool 사용",
+        userId,
+        calendarId,
+        eventId
+      );
+
+      const response = await deleteEventFromCalendar(
+        userId,
+        calendarId,
+        eventId
+      );
+      if (!response.status) {
+        throw new Error("캘린더 이벤트를 삭제하지 못했습니다.");
+      }
+      console.log("이벤트 삭제 완료:");
+      return `"${eventDetails.summary}" 일정이 삭제되었습니다.`;
+    } catch (error) {
+      if (error instanceof Error) {
+        return `이벤트 삭제 함수에서 오류 발생: ${error}`;
+      }
+    }
   },
 };
+
+// TODO: 여기서부터 미구현
 
 export const addTaskToListTool = {
   description: "할 일을 추가 (미구현).",
