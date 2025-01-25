@@ -368,7 +368,7 @@ export const addTaskToListTool = {
       .string()
       .optional()
       .describe(
-        "The due date of the task in ISO 8601 format (e.g., 2025-01-28T12:00:00Z)"
+        "The due date of the task in ISO 8601 format (e.g., 2025-01-28)"
       ),
     notes: z.string().optional().describe("Additional notes for the task"),
   }),
@@ -418,7 +418,9 @@ export const updateTaskInListTool = {
     dueDate: z
       .string()
       .optional()
-      .describe("The new due date of the task in ISO 8601 format."),
+      .describe(
+        "The new due date of the task in ISO 8601 format (e.g., 2025-01-28)"
+      ),
     notes: z.string().optional().describe("The new notes for the task."),
     status: z
       .string()
