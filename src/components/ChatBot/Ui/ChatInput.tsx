@@ -10,7 +10,8 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
+import { useRef } from "react";
 import { useSession, signIn } from "next-auth/react";
 import SchedAILogdo from "@/images/SchedAILogo.png";
 import Image from "next/image";
@@ -41,10 +42,18 @@ export default function ChatInput({
 }: ChatInputProps) {
   const { data: session } = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleLoginClick = () => {
     signIn("google");
   };
+
+  // 로딩 상태가 끝난 후 포커스 이동
+  useEffect(() => {
+    if (!isLoading) {
+      inputRef.current?.focus();
+    }
+  }, [isLoading]);
 
   return (
     <form
@@ -59,7 +68,7 @@ export default function ChatInput({
       className="flex gap-2 items-end"
     >
       {/* 모델 선택 */}
-      <div className="w-36 bottom-3 ">
+      <div className="w-36 hidden md:inline-block bottom-3 ">
         <Select
           isRequired
           defaultSelectedKeys={[selectedModel]}
@@ -75,6 +84,8 @@ export default function ChatInput({
       </div>
 
       <Input
+        ref={inputRef} // ref 연결: submit후 input에 리포커싱
+        isDisabled={isLoading}
         fullWidth
         color="primary"
         value={input}
@@ -86,14 +97,19 @@ export default function ChatInput({
         size="lg"
       />
       {isLoading ? (
-        <Button onPress={stop} color="primary">
+        <Button
+          onPress={stop}
+          color="primary"
+          className="w-12"
+          isIconOnly={true}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            fill="none"
+            fill="primary-500"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-6"
+            className="size-6 dark:text-black"
           >
             <path
               strokeLinecap="round"
@@ -103,12 +119,17 @@ export default function ChatInput({
           </svg>
         </Button>
       ) : (
-        <Button type="submit" color="primary" variant="solid">
+        <Button
+          className="w-12"
+          type="submit"
+          color="primary"
+          isIconOnly={true}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
-            strokeWidth={1.5}
+            strokeWidth={2}
             stroke="currentColor"
             className="size-6 dark:text-black"
           >
@@ -125,7 +146,7 @@ export default function ChatInput({
           </svg>
         </Button>
       )}
-
+      {/* 로그인 안되어있을때 모달 등장 */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalContent>
           <ModalHeader className="text-center text-xl font-bold text-primary-500 dark:text-amber-300">

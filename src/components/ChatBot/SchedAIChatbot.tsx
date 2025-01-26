@@ -21,13 +21,13 @@ export default function SchedAIChatbot() {
 
   return (
     <div className="flex flex-col justify-end w-full max-w-4xl mx-auto p-4 rounded-lg">
-      <ScrollShadow hideScrollBar className="h-[84vh]">
-        <ChatMessageList messages={messages} />
+      <ScrollShadow hideScrollBar className="h-[82vh]">
+        <ChatMessageList messages={messages} isLoading={isLoading} />
       </ScrollShadow>
 
       <div className="sticky bottom-14 flex flex-col">
         {messages.length === 0 && (
-          <p className="flex justify-center md:text-2xl text-sm">
+          <p className="flex justify-center md:text-2xl text-md">
             어떤 일정이 있으신가요?
           </p>
         )}

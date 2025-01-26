@@ -172,7 +172,13 @@ function ToolInvocationRenderer({
  * ChatMessageList - 채팅 메시지를 표시하는 리스트 컴포넌트
  */
 
-export default function ChatMessageList({ messages }: { messages: Message[] }) {
+export default function ChatMessageList({
+  messages,
+  isLoading,
+}: {
+  messages: Message[];
+  isLoading: boolean;
+}) {
   const messageEndRef = useRef<HTMLDivElement | null>(null);
   // 새로운 메시지가 추가될 때 스크롤
   useEffect(() => {
@@ -204,6 +210,12 @@ export default function ChatMessageList({ messages }: { messages: Message[] }) {
           ))}
         </Card>
       ))}
+      {isLoading && (
+        <span className="p-4 bg-transparent shadow-none self-start animate-pulse text-gray-500">
+          생각중...
+        </span>
+      )}
+
       {/* 스크롤을 끝으로 이동시키는 요소 */}
       <div ref={messageEndRef} />
     </div>

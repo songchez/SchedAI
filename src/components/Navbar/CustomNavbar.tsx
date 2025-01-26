@@ -10,8 +10,6 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import Logo from "@/images/SchedAILogo.png";
-import { Bars3Icon } from "@heroicons/react/24/solid";
-import { Session } from "next-auth";
 import MobileDropDown from "./MobileDropdownMenu";
 
 export default async function CustomNavbar() {
