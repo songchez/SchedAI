@@ -29,10 +29,7 @@ function ToolInvocationRenderer({
     ].includes(toolInvocation.toolName)
   ) {
     return (
-      <div
-        key={toolInvocation.toolCallId}
-        className="text-primary-600 flex flex-col gap-2"
-      >
+      <div key={toolInvocation.toolCallId} className="flex flex-col gap-2">
         {toolInvocation.args.message}
 
         <div className="flex gap-2">
@@ -46,10 +43,7 @@ function ToolInvocationRenderer({
     );
   } else if (["getCalendarEventsTool"].includes(toolInvocation.toolName)) {
     return (
-      <div
-        key={toolInvocation.toolCallId}
-        className="text-primary-600 flex flex-col gap-2"
-      >
+      <div key={toolInvocation.toolCallId} className="flex flex-col gap-2">
         {toolInvocation.args.message}
 
         <div className="flex gap-2">
@@ -114,10 +108,7 @@ function ToolInvocationRenderer({
     );
   } else if (["getTasksFromListTool"].includes(toolInvocation.toolName)) {
     return (
-      <div
-        key={toolInvocation.toolCallId}
-        className="text-primary-600 flex flex-col gap-2"
-      >
+      <div key={toolInvocation.toolCallId} className="flex flex-col gap-2">
         {toolInvocation.args.message}
 
         <div className="flex gap-2">
