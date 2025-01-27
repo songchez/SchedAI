@@ -8,16 +8,56 @@ datasource db {
 }
 
 model User {
-  id             String    @id @default(cuid())
-  name           String?
-  email          String    @unique
-  emailVerified  DateTime?
-  image          String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  accounts       Account[]
-  sessions       Session[]
+  id              String    @id @default(cuid())
+  name            String?
+  email           String    @unique
+  emailVerified   DateTime?
+  image           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  accounts        Account[]
+  sessions        Session[]
+  chats           Chat[]      // 추가된 채팅 관계
+  subscription    Subscription? // 구독 정보
+  availableTokens Int    @default(100)
+  tokenUsages     TokenUsage[]  // 토큰 사용 기록
 }
+
+model TokenUsage {
+  id          String     @id @default(cuid())
+  userId      String
+  tokensUsed  Int        @default(1) // 소모 토큰 수
+  actionType  String     // "chat", "api_call", "calendar_sync"
+  user        User       @relation(fields: [userId], references: [id])
+  createdAt   DateTime   @default(now())
+  @@index([userId, createdAt])
+}
+
+model Subscription {
+  id            String     @id @default(cuid())
+  userId        String     @unique
+  planType      String     @default("free") // "free" | "premium"
+  startDate     DateTime
+  endDate       DateTime?
+  paymentStatus String     @default("inactive") // "active", "canceled"
+  user          User       @relation(fields: [userId], references: [id])
+}
+
+model Chat {
+  id           String    @id @default(cuid())
+  userId       String
+  title        String    @default("새 채팅")  // AI가 생성한 제목
+  messages     Json      // 대화 내용 저장 [{role: "user"|"assistant", content: "..."}]
+  aiModel      String    @default("gpt-3.5") // 사용된 AI 모델
+  messageCount Int       @default(0)         // 총 메시지 수
+  isArchived   Boolean   @default(false)     // 채팅 숨김 여부
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId, createdAt])
+}
+
 
 model Account {
   id                 String    @id @default(cuid())
@@ -35,7 +75,6 @@ model Account {
 
   @@unique([provider, providerAccountId])
 }
-
 
 model Session {
   id           String    @id @default(cuid())
