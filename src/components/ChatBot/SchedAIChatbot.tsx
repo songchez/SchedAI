@@ -6,7 +6,18 @@ import ChatInput from "./Ui/ChatInput";
 import { useChat } from "ai/react";
 import { SessionProvider } from "next-auth/react";
 import { ScrollShadow } from "@heroui/scroll-shadow";
-import { Card, CardBody } from "@heroui/react";
+import {
+  Button,
+  Card,
+  CardBody,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  useDisclosure,
+} from "@heroui/react";
+import Link from "next/link";
 
 export default function SchedAIChatbot() {
   const [selectedModel, setSelectedModel] = useState<AIModels>(
@@ -15,10 +26,18 @@ export default function SchedAIChatbot() {
   // 대화 시작 전 보이는 recommendations
   const [recommendations, setRecommendations] = useState<string[]>([]);
 
+  // heroUI의 useDisclosure 훅을 사용하여 모달 열고 닫기 관리
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
   const { messages, input, handleInputChange, handleSubmit, stop, isLoading } =
     useChat({
       body: {
         model: selectedModel,
+      },
+      onResponse: (response) => {
+        if (response.status === 402) {
+          onOpen();
+        }
       },
     });
 
@@ -44,7 +63,60 @@ export default function SchedAIChatbot() {
   }, []); // 클라이언트에서만 실행
 
   return (
-    <div className="flex flex-col justify-end w-full max-w-4xl mx-auto p-4 rounded-lg">
+    <div className="flex flex-col justify-end w-full max-w-3xl mx-auto p-4 rounded-lg">
+      {/* 결제 모달: 응답 상태가 402일 경우 표시 */}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                결제가 필요합니다
+              </ModalHeader>
+              <ModalBody>
+                <p className="mb-4">
+                  이용 가능한 플랜을 선택하시면 결제 페이지로 이동합니다.
+                </p>
+                <div className="flex gap-4 flex-wrap justify-center">
+                  {/* 무료 플랜 카드 */}
+                  <Link href="/checkout?plan=free" passHref>
+                    <Card
+                      isPressable
+                      className="w-60 px-4 py-2 text-sm rounded-lg shadow-md transition-all hover:scale-105 cursor-pointer"
+                      onPress={onClose}
+                    >
+                      <CardBody>
+                        <h3 className="text-lg font-bold mb-2">무료 플랜</h3>
+                        <p>기본 기능 제공 (일부 제한 있을 수 있음)</p>
+                      </CardBody>
+                    </Card>
+                  </Link>
+                  {/* 프리미엄 플랜 카드 */}
+                  <Link href="/checkout?plan=premium" passHref>
+                    <Card
+                      isPressable
+                      className="w-60 px-4 py-2 text-sm rounded-lg shadow-md transition-all hover:scale-105 cursor-pointer"
+                      onPress={onClose}
+                    >
+                      <CardBody>
+                        <h3 className="text-lg font-bold mb-2">
+                          프리미엄 플랜
+                        </h3>
+                        <p>모든 기능 제공, 우선 지원 포함</p>
+                      </CardBody>
+                    </Card>
+                  </Link>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  닫기
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
       <ScrollShadow hideScrollBar className="h-[82vh]">
         <ChatMessageList messages={messages} isLoading={isLoading} />
       </ScrollShadow>
@@ -57,11 +129,11 @@ export default function SchedAIChatbot() {
                 isPressable
                 key={recommendation}
                 onPress={() => {
+                  // 추천 문구 클릭 시 입력창에 값 채워 넣기
                   const simulatedEvent = {
                     target: { value: recommendation },
-                  } as React.ChangeEvent<HTMLInputElement>; // 강제 타입 캐스팅
+                  } as React.ChangeEvent<HTMLInputElement>;
                   handleInputChange(simulatedEvent);
-                  handleSubmit();
                 }}
                 className="px-4 py-2 text-sm rounded-lg shadow-md transition-all hover:scale-105"
               >
