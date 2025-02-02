@@ -4,7 +4,6 @@ import { useRef } from "react";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
-import { useTypewriter, Cursor } from "react-simple-typewriter";
 import SchedAILogo from "@/images/SchedAILogo.png";
 import darkBackground from "@/images/dark_dashboard_background.png";
 import lightBackground from "@/images/light_dashboard_background.png";
@@ -23,6 +22,7 @@ import {
   BeakerIcon,
 } from "@heroicons/react/24/solid";
 import GithubLogo from "./GithubLogo";
+import BluePrintSection from "./BluePrintSection";
 
 export default function HomePage() {
   return (
@@ -31,6 +31,7 @@ export default function HomePage() {
           1. Hero 섹션
       ======================= */}
       <HeroSection />
+      <BluePrintSection />
 
       {/* =======================
           2. Feature 섹션
@@ -64,45 +65,8 @@ export default function HomePage() {
    Hero Section
 -----------------------------------*/
 function HeroSection() {
-  // 타자 효과 예시 문구s
-  const [text] = useTypewriter({
-    words: [
-      `"SchedAI, 오늘 일정 브리핑해줘."
-------------
-SchedAI: "오전 10시 마케팅 회의,
-오후 12시 바이어와 점심식사, 
-오후 3시 테니스 모임이 있습니다."`,
-
-      `"내일 오후 3시부터 5시 비즈니스 미팅일정 추가해줘"
-------------
-SchedAI: "구글 캘린더에 일정추가를 도와드릴까요? 
-회의 내용과 참석자에 대한부분도 
-말씀해주시면 적용해드리겠습니다."
-------------
-"회의 내용은 3분기 비스니스 전략회의 이고, 
-참석자는 기획부서 임원진이야."
-------------
-SchedAI: "구글 캘린더에 일정 추가가 완료되었습니다."`,
-      `"다음주 24일~26일 휴일 프랑스파리 여행 계획 짜줘"
-------------
-SchedAI: "프랑스 여행 계획을 세우기 위해, 
-여행의 목적, 선호하는 여행 스타일, 기간, 
-방문하고 싶은 지역 등을 알아야 
-더욱 맞춤형으로 작성할 수 있습니다."
-
-1일차: 파리 도착 및 주요 명소 탐방
-오전
-샤를 드골 공항 도착 후 숙소 체크인
-..."`,
-    ],
-    loop: 5, // 반복 횟수 (0이면 무한)
-    typeSpeed: 30,
-    deleteSpeed: 10,
-    delaySpeed: 4000,
-  });
-
   return (
-    <section className="relative w-full min-h-screen flex items-center justify-center bg-no-repeat bg-center bg-cover">
+    <section className="relative w-full min-h-screen flex flex-col items-center justify-center bg-no-repeat bg-center bg-cover">
       <Image
         className="object-cover fixed top-0 left-0 w-screen h-screen -z-10"
         src={darkBackground}
@@ -128,24 +92,6 @@ SchedAI: "프랑스 여행 계획을 세우기 위해,
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.3 }}
       >
-        {/* 왼쪽: 스트리밍 대화 텍스트: 2초후에 등장 */}
-        <motion.div
-          className="text-md md:text-xl font-light overflow-hidden dark:bg-black/10 bg-white/30 backdrop-blur-sm rounded-lg order-2 md:order-1"
-          initial={{ width: 0, padding: 0 }}
-          animate={{ width: 500, padding: 4 }}
-          transition={{
-            delay: 2,
-            duration: 1,
-            ease: "easeOut",
-          }}
-        >
-          <div className="dark:text-primary-300 whitespace-pre m-3 h-72">
-            {/* Typewriter로 출력되는 영역 */}
-            {text}
-            <Cursor />
-          </div>
-        </motion.div>
-
         {/* 오른쪽: 로고 + 타이틀 + CTA 버튼 */}
         <div className="flex flex-col items-center dark:text-primary-200 text-primary-500 text-center m-36 md:m-0 order-1 md:order-2">
           {/* 로고 */}
