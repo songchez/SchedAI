@@ -69,6 +69,8 @@ export async function POST(req: NextRequest): Promise<Response> {
         where: { id: userId },
         data: { availableTokens: { decrement: 1 } },
       });
+
+      // TODO: 일일토큰 - 만약 마지막 요청이 어제였다면, 토큰 100개로 초기화
     }
 
     // body 파싱
