@@ -7,7 +7,6 @@ import { motion, useInView } from "framer-motion";
 import SchedAILogo from "@/images/SchedAILogo.png";
 import darkBackground from "@/images/dark_dashboard_background.png";
 import lightBackground from "@/images/light_dashboard_background.png";
-import calendarIcon from "@/images/3d_calendar.png";
 import { Button, CardBody, CardHeader } from "@heroui/react";
 import GlassContainer from "../GlassContainer";
 import GoolgleIcon from "@/images/google-icon-logo.svg";
@@ -156,9 +155,7 @@ function HeroSection() {
 function FeatureSection() {
   return (
     <section className="w-full py-20">
-      <div className="max-w-7xl mx-auto flex flex-col md:grid md:grid-cols-2 gap-4 items-center">
-        {/* 오른쪽 달력 아이콘 */}
-        <CalendarDisplay />
+      <div className="flex items-center justify-center">
         {/* 왼쪽 Feature Cards 목록 */}
         <FeatureCards />
       </div>
@@ -166,44 +163,28 @@ function FeatureSection() {
   );
 }
 
-function CalendarDisplay() {
-  return (
-    <div className="flex justify-center">
-      <div className="relative">
-        <Image
-          src={calendarIcon}
-          alt="Calendar Icon"
-          height={400}
-          width={400}
-          style={{ objectFit: "contain" }}
-        />
-      </div>
-    </div>
-  );
-}
-
 function FeatureCards() {
   const features = [
     {
-      icon: <CalendarDaysIcon className="w-10" />,
+      icon: <CalendarDaysIcon className="md:w-10 w-6" />,
       title: "스마트 일정 관리",
       description:
         "AI 기반 패턴 분석으로 당신의 일정 패턴을 학습해 최적의 스케줄을 제안합니다.",
     },
     {
-      icon: <ChatBubbleOvalLeftEllipsisIcon className="w-10" />,
-      title: "직관적인 대화 명령이해",
+      icon: <ChatBubbleOvalLeftEllipsisIcon className="md:w-10 w-6" />,
+      title: "직관적인 명령이해",
       description:
         '"내일 저녁 7시 회의 잡아줘"처럼 자연어 명령으로 손쉽게 스케줄을 생성합니다.',
     },
     {
-      icon: <Image src={GoolgleIcon} alt="googleLogo" className="w-9" />,
+      icon: <Image src={GoolgleIcon} alt="googleLogo" className="md:w-9 w-6" />,
       title: "Google Calendar 완벽 연동",
       description:
         "구글 캘린더와 자동 동기화로 한 곳에서 모든 일정을 관리하세요.",
     },
     {
-      icon: <BeakerIcon className="w-10" />,
+      icon: <BeakerIcon className="md:w-10 w-6" />,
       title: "다양한 LLM모델 지원",
       description:
         "ChatGPT 4o mini, Gemini 2.0 flash 등 다양한 언어모델 지원으로 선호에 맞게 커스텀 가능",
@@ -211,7 +192,7 @@ function FeatureCards() {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-4 max-w-xl px-5">
       {features.map((feature, index) => (
         <FeatureCard
           key={index}
@@ -234,14 +215,16 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="rounded-lg shadow-lg hover:shadow-primary-400 hover:drop-shadow-2xl">
+    <div className="rounded-lg shadow-lg hover:shadow-primary-400 hover:drop-shadow-2xl text-balance">
       <GlassContainer className="hover:text-blue-400 min-h-60">
         <CardHeader className="flex-col md:flex-row gap-3">
           {icon}
-          <h3 className="md:text-xl text-lg font-semibold">{title}</h3>
+          <h3 className="md:text-xl text-md font-semibold md:text-start text-center">
+            {title}
+          </h3>
         </CardHeader>
         <CardBody>
-          <p>{description}</p>
+          <p className="md:text-base text-xs">{description}</p>
         </CardBody>
       </GlassContainer>
     </div>
@@ -274,7 +257,7 @@ function CTASection() {
               backgroundClip: "text",
             }}
           >
-            <div className="flex items-center gap-2 mb-6">
+            <div className="flex flex-col md:flex-row items-center gap-2 mb-6">
               <h2 className="text-3xl md:text-4xl font-bold">무료로 SchedAI</h2>
               <Image
                 src={SchedAILogo}
