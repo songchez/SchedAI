@@ -65,46 +65,71 @@ export default function SchedAIChatbot() {
   return (
     <div className="flex flex-col justify-end w-full max-w-3xl mx-auto p-4 rounded-lg">
       {/* 결제 모달: 응답 상태가 402일 경우 표시 */}
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="3xl">
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                결제가 필요합니다
+                토큰이 부족합니다. 계정을 업그레이드 하고 무제한으로
+                사용해보세요!
               </ModalHeader>
               <ModalBody>
-                <p className="mb-4">
-                  이용 가능한 플랜을 선택하시면 결제 페이지로 이동합니다.
-                </p>
-                <div className="flex gap-4 flex-wrap justify-center">
+                <div className="grid grid-cols-2 gap-4 w-full">
                   {/* 무료 플랜 카드 */}
-                  <Link href="/checkout?plan=free" passHref>
-                    <Card
-                      isPressable
-                      className="w-60 px-4 py-2 text-sm rounded-lg shadow-md transition-all hover:scale-105 cursor-pointer"
-                      onPress={onClose}
-                    >
-                      <CardBody>
-                        <h3 className="text-lg font-bold mb-2">무료 플랜</h3>
-                        <p>기본 기능 제공 (일부 제한 있을 수 있음)</p>
-                      </CardBody>
-                    </Card>
-                  </Link>
+                  <Card
+                    className="border border-gray-200 rounded-lg shadow-md p-4 hover:border-primary-500"
+                    isPressable
+                  >
+                    <CardBody>
+                      <h3 className="text-xl font-bold mb-2">Free</h3>
+                      <p className="text-2xl font-bold mb-4">
+                        $0 <span className="text-sm">KRW/월</span>
+                      </p>
+                      <ul className="list-image-none pl-6 text-sm mb-6">
+                        <li>✅ 최대 5개의 대화 스레드</li>
+                        <li>✅ 일일 요청 토큰 100개</li>
+                        <li>✅ Gemini 2.0 Flash, GPT-4o Mini</li>
+                        <li>✅ 대시보드 기능 사용가능</li>
+                        <br />
+                      </ul>
+                      <Button
+                        color="primary"
+                        className="w-full"
+                        onPress={onClose}
+                      >
+                        Free 플랜 선택
+                      </Button>
+                    </CardBody>
+                  </Card>
                   {/* 프리미엄 플랜 카드 */}
-                  <Link href="/checkout?plan=premium" passHref>
-                    <Card
-                      isPressable
-                      className="w-60 px-4 py-2 text-sm rounded-lg shadow-md transition-all hover:scale-105 cursor-pointer"
-                      onPress={onClose}
-                    >
-                      <CardBody>
-                        <h3 className="text-lg font-bold mb-2">
-                          프리미엄 플랜
-                        </h3>
-                        <p>모든 기능 제공, 우선 지원 포함</p>
-                      </CardBody>
-                    </Card>
-                  </Link>
+                  <Card
+                    className="border border-gray-200 rounded-lg shadow-md p-4 bg-gray-50 hover:border-primary-500"
+                    isPressable
+                  >
+                    <CardBody>
+                      <h3 className="text-xl font-bold mb-2">Premium</h3>
+                      <p className="text-2xl font-bold mb-4">
+                        $29,000{" "}
+                        <span className="text-small font-thin">KRW/월</span>
+                      </p>
+                      <ul className="list-image-none pl-6 text-sm mb-6">
+                        <li>✅ 무제한 대화 스레드</li>
+                        <li>✅ 무제한 일일 요청 토큰</li>
+                        <li>✅ 다양한 최신 LLM모델 사용가능</li>
+                        <li>✅ 대시보드 기능 사용가능</li>
+                        <li>✅ 추가기능 얼리엑세스</li>
+                      </ul>
+                      <Link href="/checkout" passHref>
+                        <Button
+                          color="success"
+                          className="w-full"
+                          onPress={onClose}
+                        >
+                          Premium 플랜 선택
+                        </Button>
+                      </Link>
+                    </CardBody>
+                  </Card>
                 </div>
               </ModalBody>
               <ModalFooter>
