@@ -13,9 +13,8 @@ import { AIModels } from "@/lib/chatApiHandlers/constants";
 
 // AIModels 타입은 프로젝트에 맞게 선언되어 있어야 합니다.
 export default function SchedAIChatbot() {
-  const [selectedModel, setSelectedModel] = useState<AIModels>(
-    "gemini-2.0-flash-thinking-exp"
-  );
+  const [selectedModel, setSelectedModel] =
+    useState<AIModels>("gemini-1.5-flash");
   const [recommendations, setRecommendations] = useState<string[]>([]);
 
   // heroUI의 useDisclosure 훅으로 모달 상태 관리

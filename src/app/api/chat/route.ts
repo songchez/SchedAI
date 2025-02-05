@@ -26,8 +26,8 @@ import { prisma } from "@/lib/prisma";
  * (오픈AI, PaLM 등)
  */
 const providersMap: Record<AIModels, () => LanguageModelV1> = {
-  "gemini-2.0-flash-thinking-exp": () =>
-    google("gemini-2.0-flash-thinking-exp"),
+  "gemini-1.5-flash": () => google("gemini-1.5-flash"),
+  "gemini-2.0-flash-exp": () => google("gemini-2.0-flash-exp"),
   "gpt-4o-mini": () => openai("gpt-4o-mini"),
 };
 

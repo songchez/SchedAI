@@ -89,7 +89,7 @@ export default function ChatInput({
                 <div className="relative max-w-full overflow-hidden group">
                   <span
                     className={`block truncate transition-transform duration-700 ${
-                      shouldAnimate ? "group-hover:translate-x-[-35%]" : ""
+                      shouldAnimate ? "group-hover:translate-x-[-15%]" : ""
                     }`}
                   >
                     {model}
