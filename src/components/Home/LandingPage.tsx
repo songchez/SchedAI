@@ -216,7 +216,7 @@ function FeatureCard({
 }) {
   return (
     <div className="rounded-lg shadow-lg hover:shadow-primary-400 hover:drop-shadow-2xl text-balance">
-      <GlassContainer className="hover:text-blue-400 min-h-60">
+      <GlassContainer className="min-h-60">
         <CardHeader className="flex-col md:flex-row gap-3">
           {icon}
           <h3 className="md:text-xl text-md font-semibold md:text-start text-center">

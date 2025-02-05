@@ -4,12 +4,8 @@
 import { NextRequest } from "next/server";
 import { openai } from "@ai-sdk/openai";
 import { google } from "@ai-sdk/google";
-import { streamText } from "ai";
-import {
-  Message,
-  MODEL_KEYS,
-  getModelWithProvider,
-} from "@/lib/chatApiHandlers/constants";
+import { LanguageModelV1, streamText } from "ai";
+import { AIModels, Message } from "@/lib/chatApiHandlers/constants";
 import {
   getCalendarEventsTool,
   addEventToCalendarTool,
@@ -29,9 +25,10 @@ import { prisma } from "@/lib/prisma";
  * providersMap: 모델 키 -> 실제 모델 인스턴스 생성 함수
  * (오픈AI, PaLM 등)
  */
-const providersMap = {
-  [MODEL_KEYS.GEMINI]: () => google(MODEL_KEYS.GEMINI),
-  [MODEL_KEYS.GPT4_MINI]: () => openai(MODEL_KEYS.GPT4_MINI),
+const providersMap: Record<AIModels, () => LanguageModelV1> = {
+  "gemini-2.0-flash-thinking-exp": () =>
+    google("gemini-2.0-flash-thinking-exp"),
+  "gpt-4o-mini": () => openai("gpt-4o-mini"),
 };
 
 export async function POST(req: NextRequest): Promise<Response> {
@@ -74,25 +71,27 @@ export async function POST(req: NextRequest): Promise<Response> {
     }
 
     // body 파싱
-    const { messages, model }: { messages: Message[]; model: string } =
+    const { messages, model }: { messages: Message[]; model: AIModels } =
       await req.json();
-    if (!messages || !model) {
-      return new Response("Invalid request payload", { status: 400 });
+
+    // 모델 유효성 검사
+    if (!(model in providersMap)) {
+      return new Response(`Invalid model: ${model}`, { status: 400 });
     }
-
-    // 모델 준비
-    const modelWithProvider = getModelWithProvider(model, providersMap);
-    const today = new Date();
-
     const calendars = await getCalendarList(userId);
+    // 타입 안전한 모델 인스턴스 생성
+    const modelInstance = providersMap[model]();
+
+    // 시스템 메시지 동적 생성
+    const systemMessage = `You are SchedAI (${model}). 
+      Professional schedule assistant. 
+      Current time: ${new Date().toISOString()}
+      User calendar id is ${calendars[0].id?.toString()}`;
 
     // streamText를 이용해 AI 호출
     const result = streamText({
-      model: modelWithProvider,
-      system: `You are SchedAI. 
-      you are Professional Assistant who manages people's schedules like a private secretary
-      Today is ${today.toISOString()}.
-      User calendar id is ${calendars[0].id?.toString()}`,
+      model: modelInstance,
+      system: systemMessage,
       messages,
       tools: {
         getCalendarEventsTool,

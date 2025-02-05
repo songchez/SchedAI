@@ -15,6 +15,7 @@ import { useRef } from "react";
 import { useSession, signIn } from "next-auth/react";
 import SchedAILogdo from "@/images/SchedAILogo.png";
 import Image from "next/image";
+import { AI_MODELS, AIModels } from "@/lib/chatApiHandlers/constants";
 
 interface ChatInputProps {
   input: string;
@@ -68,18 +69,38 @@ export default function ChatInput({
       className="flex gap-2 items-end"
     >
       {/* 모델 선택 */}
-      <div className="w-36 hidden md:inline-block bottom-3 ">
+      <div className="w-36 hidden md:inline-block bottom-3">
         <Select
           isRequired
           defaultSelectedKeys={[selectedModel]}
           value={selectedModel}
           color="primary"
           variant="underlined"
-          label="Select AI Model"
+          label="AI 모델 선택"
           onChange={(e) => onModelChange(e.target.value as AIModels)}
+          renderValue={() => selectedModel}
         >
-          <SelectItem key="gemini-2.0-flash-exp">Gemini 2.0</SelectItem>
-          <SelectItem key="gpt-4o-mini">GPT 4o mini</SelectItem>
+          {Object.values(AI_MODELS).map((model) => {
+            // 텍스트 길이가 17자보다 길면 애니메이션 적용
+            const shouldAnimate = model.length > 17;
+
+            return (
+              <SelectItem key={model} textValue={model}>
+                <div className="relative max-w-full overflow-hidden group">
+                  <span
+                    className={`block truncate transition-transform duration-700 ${
+                      shouldAnimate ? "group-hover:translate-x-[-35%]" : ""
+                    }`}
+                  >
+                    {model}
+                  </span>
+                  {shouldAnimate && (
+                    <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background via-background/80 to-transparent group-hover:from-transparent" />
+                  )}
+                </div>
+              </SelectItem>
+            );
+          })}
         </Select>
       </div>
 

@@ -20,6 +20,7 @@ model User {
   chats           Chat[]      // 추가된 채팅 관계
   subscription    Subscription? // 구독 정보
   availableTokens Int    @default(100)
+  Payment         Payment[]
 }
 
 model Subscription {
@@ -61,7 +62,6 @@ model Account {
   scope              String?  // 추가
   id_token           String?  // 추가
   user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   @@unique([provider, providerAccountId])
 }
 
@@ -71,4 +71,23 @@ model Session {
   userId       String
   expires      DateTime
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount       Int        // 결제 금액 (단위: 원)
+  status       String     @default("pending") // 결제 상태: pending, succeeded, failed
+  currency     String     @default("KRW")     // 통화 코드
+  tid          String?    // 나이스페이먼츠 거래 ID
+  provider     String     @default("nicepay") // 결제 제공사
+  billingKey   String?    // 빌링키 (bid)
+  description  String?    // 결제 설명 (선택사항)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([userId])
+  @@index([tid])
+  @@index([createdAt])
 }

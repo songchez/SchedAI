@@ -41,7 +41,7 @@ export function PaymentModal({ isOpen, onOpenChange }: PaymentModalProps) {
                     <ul className="list-image-none pl-6 text-sm mb-6">
                       <li>✅ 최대 5개의 대화 스레드</li>
                       <li>✅ 일일 요청 토큰 100개</li>
-                      <li>✅ 가능모델: Gemini 2.0 Flash, GPT-4o Mini</li>
+                      <li>✅ Gemini 2.0 Flash, GPT-4o Mini</li>
                       <li>✅ 대시보드 기능 사용가능</li>
                       <br />
                     </ul>
@@ -68,7 +68,7 @@ export function PaymentModal({ isOpen, onOpenChange }: PaymentModalProps) {
                     <ul className="list-image-none pl-6 text-sm mb-6">
                       <li>✅ 무제한 대화 스레드</li>
                       <li>✅ 무제한 일일 요청 토큰</li>
-                      <li>✅ 다양한 최신 LLM모델 사용가능</li>
+                      <li>✅ 다양한 최신 프리미엄모델 사용가능</li>
                       <li>✅ 대시보드 기능 사용가능</li>
                       <li>✅ 추가기능 얼리엑세스</li>
                     </ul>

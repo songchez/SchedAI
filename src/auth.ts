@@ -24,7 +24,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         where: { userId: user.id, provider: "google" },
       });
       if (
-        googleAccount?.expires_at &&
+        googleAccount.expires_at &&
         googleAccount.expires_at * 1000 < Date.now()
       ) {
         // If the access token has expired, try to refresh it
@@ -37,7 +37,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
               client_id: process.env.AUTH_GOOGLE_ID!,
               client_secret: process.env.AUTH_GOOGLE_SECRET!,
               grant_type: "refresh_token",
-              refresh_token: googleAccount.refresh_token ?? "",
+              refresh_token: googleAccount.refresh_token!,
             }),
           });
 
@@ -75,3 +75,9 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     },
   },
 });
+
+declare module "next-auth" {
+  interface Session {
+    error?: "RefreshTokenError";
+  }
+}

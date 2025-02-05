@@ -9,11 +9,12 @@ import { ScrollShadow } from "@heroui/scroll-shadow";
 import { useDisclosure } from "@heroui/react";
 import { PaymentModal } from "./Ui/PaymentModal";
 import { RecommendationList } from "./Ui/RecommendationList";
+import { AIModels } from "@/lib/chatApiHandlers/constants";
 
 // AIModels 타입은 프로젝트에 맞게 선언되어 있어야 합니다.
 export default function SchedAIChatbot() {
   const [selectedModel, setSelectedModel] = useState<AIModels>(
-    "gemini-2.0-flash-exp"
+    "gemini-2.0-flash-thinking-exp"
   );
   const [recommendations, setRecommendations] = useState<string[]>([]);
 
