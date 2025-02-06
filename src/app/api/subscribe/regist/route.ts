@@ -1,5 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { encrypt, generateAuthHeader } from "@/lib/subscribeAPI/utils";
+import {
+  encrypt,
+  generateAuthHeader,
+  MONTHLY_SUBSCRIPTION_AMOUNT,
+} from "@/lib/subscribeAPI/utils";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { auth } from "@/auth";
@@ -80,7 +84,7 @@ export async function POST(request: Request) {
       // 최초 결제 즉시 실행
       const initialPayment = await processPayment({
         bid: billing.bid,
-        amount: 10000, // 초기 결제 금액 (예시)
+        amount: MONTHLY_SUBSCRIPTION_AMOUNT, // TODO: 테스트끝나면 29000으로 변경
         goodsName: "서비스 가입비",
       });
 

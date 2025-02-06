@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { generateAuthHeader } from "./utils";
+import { generateAuthHeader, MONTHLY_SUBSCRIPTION_AMOUNT } from "./utils";
 
 export async function processPayment(params: {
   bid: string;
@@ -12,6 +12,7 @@ export async function processPayment(params: {
   if (!billing) throw new Error("Billing information not found");
 
   // NicePay API 호출
+  // const baseUrl = process.env.NICEPAY_BASE_URL; 프로덕션할때 바꾸기
   const baseUrl = process.env.NICEPAY_TEST_BASE_URL;
   const response = await fetch(`${baseUrl}/v1/subscribe/${bid}/payments`, {
     method: "POST",
@@ -29,6 +30,7 @@ export async function processPayment(params: {
   });
 
   const result = await response.json();
+  console.log("결제시도 결과:", result);
 
   // 거래 기록 업데이트
   await prisma.transaction.updateMany({
@@ -56,8 +58,8 @@ export async function handleDailyPayments() {
     try {
       await processPayment({
         bid: billing.bid,
-        amount: 10000, // 정기 결제 금액
-        goodsName: "월정액 서비스",
+        amount: MONTHLY_SUBSCRIPTION_AMOUNT, // 정기 결제 금액
+        goodsName: "SchedAI 월 정기결제",
       });
     } catch (error) {
       console.error(`결제 실패 BID: ${billing.bid}`, error);

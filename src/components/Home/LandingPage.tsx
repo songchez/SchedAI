@@ -92,7 +92,7 @@ function HeroSection() {
         transition={{ duration: 1, delay: 0.3 }}
       >
         {/* 오른쪽: 로고 + 타이틀 + CTA 버튼 */}
-        <div className="flex flex-col items-center dark:text-primary-200 text-primary-500 text-center m-36 md:m-0 order-1 md:order-2">
+        <div className="flex flex-col items-center dark:text-primary-200 text-primary-500 text-center md:m-0">
           {/* 로고 */}
           <motion.div
             className="mb-5"
