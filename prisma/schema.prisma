@@ -20,18 +20,8 @@ model User {
   chats           Chat[]      // 추가된 채팅 관계
   subscription    Subscription? // 구독 정보
   availableTokens Int    @default(5)
-  Payment         Payment[]
 }
 
-model Subscription {
-  id            String     @id @default(cuid())
-  userId        String     @unique
-  planType      String     @default("free") // "free" | "premium"
-  startDate     DateTime
-  endDate       DateTime?
-  paymentStatus String     @default("inactive") // "active", "canceled"
-  user          User       @relation(fields: [userId], references: [id])
-}
 
 model Chat {
   id           String    @id @default(cuid())
@@ -73,25 +63,15 @@ model Session {
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Payment {
-  id           String     @id @default(cuid())
-  userId       String
-  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  amount       Int        // 결제 금액 (단위: 원)
-  status       String     @default("pending") // 결제 상태: pending, succeeded, failed
-  currency     String     @default("KRW")     // 통화 코드
-  tid          String?    // 나이스페이먼츠 거래 ID
-  provider     String     @default("nicepay") // 결제 제공사
-  billingKey   String?    // 빌링키 (bid)
-  description  String?    // 결제 설명 (선택사항)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  @@index([userId])
-  @@index([tid])
-  @@index([createdAt])
+model Subscription {
+  id            String     @id @default(cuid())
+  userId        String     @unique
+  planType      String     @default("free") // "free" | "premium"
+  startDate     DateTime
+  endDate       DateTime?
+  paymentStatus String     @default("inactive") // "active", "canceled"
+  user          User       @relation(fields: [userId], references: [id])
 }
-
 
 model Billing {
   id          String    @id @default(uuid())
@@ -102,8 +82,9 @@ model Billing {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   isActive    Boolean   @default(true)
-
   Transaction Transaction[]
+  nextPaymentDate DateTime?  // Optional로 변경
+  billingInterval String?    // Optional로 변경
 }
 
 model Transaction {
@@ -111,8 +92,9 @@ model Transaction {
   billing     Billing  @relation(fields: [bid], references: [bid])
   bid         String
   amount      Int
-  status      String   // paid, failed, cancelled
+  status      String   // paid, failed, cancelled -> scheduled 추가
   tid         String?
   approvedAt  DateTime?
   createdAt   DateTime @default(now())
+  scheduledAt DateTime?  // 추가된 필드 (예약 결제용)
 }

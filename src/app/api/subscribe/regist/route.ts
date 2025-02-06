@@ -1,9 +1,9 @@
-// api/subscribe/regist/route.ts
 import { prisma } from "@/lib/prisma";
 import { encrypt, generateAuthHeader } from "@/lib/subscribeAPI/utils";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { auth } from "@/auth";
+import { processPayment } from "@/lib/subscribeAPI/paymentScheduler";
 
 export async function POST(request: Request) {
   try {
@@ -66,14 +66,27 @@ export async function POST(request: Request) {
     if (result.resultCode === "0000") {
       console.log("빌키발급성공! BID데이터를 저장합니다");
       // NICEPAY API 성공 시 Billing 정보 저장
-      await prisma.billing.create({
+      const billing = await prisma.billing.create({
         data: {
           bid: result.bid,
           userId,
           cardNumber: `${cardNo.slice(0, 4)}****${cardNo.slice(-4)}`,
           cardCompany: result.cardName,
+          nextPaymentDate: new Date(), // 최초 결제일 설정
+          billingInterval: "monthly", // 월간 결제 설정
         },
       });
+
+      // 최초 결제 즉시 실행
+      const initialPayment = await processPayment({
+        bid: billing.bid,
+        amount: 10000, // 초기 결제 금액 (예시)
+        goodsName: "서비스 가입비",
+      });
+
+      if (initialPayment.resultCode !== "0000") {
+        throw new Error("초기 결제 처리 실패");
+      }
     }
 
     return NextResponse.json(result);

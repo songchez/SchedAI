@@ -44,14 +44,24 @@ export async function POST(
 
     const result = await apiResponse.json();
 
-    // 거래 기록 저장
+    // 거래 기록 저장 (스키마에 맞게 수정)
     await prisma.transaction.create({
       data: {
         bid,
-        amount,
-        status: result.resultCode === "0000" ? "paid" : "failed",
+        amount: Number(amount),
+        status: "scheduled",
         tid: result.tid || null,
-        approvedAt: result.paidAt ? new Date(result.paidAt) : null,
+        scheduledAt: new Date(),
+      },
+    });
+
+    // 다음 결제일 업데이트 (스키마에 맞게 수정)
+    await prisma.billing.update({
+      where: { bid },
+      data: {
+        nextPaymentDate: new Date(
+          new Date().setMonth(new Date().getMonth() + 1)
+        ),
       },
     });
 
