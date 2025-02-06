@@ -19,7 +19,7 @@ model User {
   sessions        Session[]
   chats           Chat[]      // 추가된 채팅 관계
   subscription    Subscription? // 구독 정보
-  availableTokens Int    @default(100)
+  availableTokens Int    @default(5)
   Payment         Payment[]
 }
 
@@ -90,4 +90,29 @@ model Payment {
   @@index([userId])
   @@index([tid])
   @@index([createdAt])
+}
+
+
+model Billing {
+  id          String    @id @default(uuid())
+  bid         String    @unique
+  userId      String    // 사용자 식별자
+  cardNumber  String    // 마스킹된 카드번호 (예: 1234****5678)
+  cardCompany String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isActive    Boolean   @default(true)
+
+  Transaction Transaction[]
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  billing     Billing  @relation(fields: [bid], references: [bid])
+  bid         String
+  amount      Int
+  status      String   // paid, failed, cancelled
+  tid         String?
+  approvedAt  DateTime?
+  createdAt   DateTime @default(now())
 }
