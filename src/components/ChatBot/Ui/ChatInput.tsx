@@ -126,7 +126,6 @@ export default function ChatInput({
         variant="underlined"
         className="flex-1"
         size="lg"
-        rows={2} // 기본 3줄 표시
       />
       {isLoading ? (
         <Button
