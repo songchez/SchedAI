@@ -7,7 +7,7 @@ import {
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { auth } from "@/auth";
-import { processPayment } from "@/lib/subscribeAPI/paymentScheduler";
+import { executePayment } from "@/lib/subscribeAPI/paymentScheduler";
 
 export async function POST(request: Request) {
   try {
@@ -82,10 +82,10 @@ export async function POST(request: Request) {
       });
 
       // 최초 결제 즉시 실행
-      const initialPayment = await processPayment({
+      const initialPayment = await executePayment({
         bid: billing.bid,
-        amount: MONTHLY_SUBSCRIPTION_AMOUNT, // TODO: 테스트끝나면 29000으로 변경
-        goodsName: "서비스 가입비",
+        amount: MONTHLY_SUBSCRIPTION_AMOUNT,
+        goodsName: "서비스 구독료",
       });
 
       if (initialPayment.resultCode !== "0000") {

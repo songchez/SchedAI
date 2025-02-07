@@ -18,5 +18,5 @@ export const generateAuthHeader = (): string => {
   return "Basic " + Buffer.from(`${clientId}:${secretKey}`).toString("base64");
 };
 
-// 정기 결제 금액
+// 정기 결제 금액 TODO: 테스트끝나면 29000으로 변경
 export const MONTHLY_SUBSCRIPTION_AMOUNT = 1000;

@@ -1,8 +1,5 @@
-// api/subscribe/[bid]/payments/route.ts
-import { prisma } from "@/lib/prisma";
-import { generateAuthHeader } from "@/lib/subscribeAPI/utils";
 import { NextResponse } from "next/server";
-import crypto from "crypto";
+import { executePayment } from "@/lib/subscribeAPI/paymentScheduler";
 
 export async function POST(
   request: Request,
@@ -19,60 +16,20 @@ export async function POST(
       );
     }
 
-    const baseUrl = process.env.NICEPAY_BASE_URL;
-    if (!baseUrl) {
-      return NextResponse.json(
-        { resultCode: "E003", resultMsg: "NICEPAY_BASE_URL 설정 누락" },
-        { status: 500 }
-      );
-    }
-
-    const apiResponse = await fetch(`${baseUrl}/v1/subscribe/${bid}/payments`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: generateAuthHeader(),
-      },
-      body: JSON.stringify({
-        orderId: crypto.randomUUID(),
-        amount,
-        goodsName,
-        cardQuota: 0,
-        useShopInterest: false,
-      }),
-    });
-
-    const result = await apiResponse.json();
-
-    // 거래 기록 저장 (스키마에 맞게 수정)
-    await prisma.transaction.create({
-      data: {
-        bid,
-        amount: Number(amount),
-        status: "scheduled",
-        tid: result.tid || null,
-        scheduledAt: new Date(),
-      },
-    });
-
-    // 다음 결제일 업데이트 (스키마에 맞게 수정)
-    await prisma.billing.update({
-      where: { bid },
-      data: {
-        nextPaymentDate: new Date(
-          new Date().setMonth(new Date().getMonth() + 1)
-        ),
-      },
-    });
-
+    // 공통 결제 처리 함수 호출
+    const result = await executePayment({ bid, amount, goodsName });
     return NextResponse.json(result);
   } catch (error) {
     if (error instanceof Error) {
-      console.error("결제 처리 에러:", error);
+      console.error("Payment process error:", error);
       return NextResponse.json(
         { resultCode: "E500", resultMsg: error.message },
         { status: 500 }
       );
     }
+    return NextResponse.json(
+      { resultCode: "E500", resultMsg: "Unknown error" },
+      { status: 500 }
+    );
   }
 }
