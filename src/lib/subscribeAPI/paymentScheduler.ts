@@ -94,27 +94,46 @@ export async function executePayment(params: {
 /**
  * DB에서 오늘 결제일이 도래한 빌링 정보를 조회하여 결제 처리
  */
-export async function handleDailyPayments() {
-  const today = new Date();
-  const dueBillings = await prisma.billing.findMany({
-    where: {
-      nextPaymentDate: {
-        lte: today,
+async function updateUserSubscriptionStatus(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      billing: {
+        include: {
+          transactions: {
+            // 🔹 필드명 수정 (Transaction → transactions)
+            orderBy: { scheduledAt: "desc" },
+            take: 1,
+          },
+        },
       },
+      subscription: true,
     },
   });
 
-  for (const billing of dueBillings) {
-    try {
-      await executePayment({
-        bid: billing.bid,
-        amount: MONTHLY_SUBSCRIPTION_AMOUNT, // 정기 결제 금액 (utils에서 상수로 정의)
-        goodsName: "SchedAI 월 정기결제",
-      });
-    } catch (error) {
-      console.error(`Payment failed for BID ${billing.bid}:`, error);
-    }
-  }
-}
+  // Billing과 Transactions가 없는 경우 처리
+  if (!user?.billing?.length || !user.billing[0].transactions?.length) return;
 
-// TODO:prisma에서 오늘이 월 결제일인 슨생님 찾기. 맵핑해서 결제 로직 돌리기. -> 하루에 한번 실행
+  // 🔹 최신 거래 내역 가져오기 (배열이므로 [0] 추가)
+  const latestTransaction = user.billing[0].transactions[0];
+  const newStatus = latestTransaction.status === "paid" ? "active" : "inactive";
+
+  // 🔹 endDate 계산 (현재 날짜 + 1개월)
+  const nextMonthDate = new Date();
+  nextMonthDate.setMonth(nextMonthDate.getMonth() + 1);
+
+  await prisma.subscription.upsert({
+    where: { userId },
+    update: {
+      paymentStatus: newStatus,
+      endDate: nextMonthDate,
+    },
+    create: {
+      userId,
+      planType: "premium",
+      startDate: new Date(),
+      paymentStatus: newStatus,
+      endDate: nextMonthDate,
+    },
+  });
+}

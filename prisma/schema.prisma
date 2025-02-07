@@ -19,6 +19,7 @@ model User {
   sessions        Session[]
   chats           Chat[]      // 추가된 채팅 관계
   subscription    Subscription? // 구독 정보
+  billing         Billing[]    // Billing 관계 추가
   availableTokens Int    @default(5)
 }
 
@@ -73,20 +74,24 @@ model Subscription {
   user          User       @relation(fields: [userId], references: [id])
 }
 
+// 나이스페이먼츠 구현 빌링스키마
 model Billing {
   id          String    @id @default(uuid())
   bid         String    @unique
-  userId      String    // 사용자 식별자
+  userId      String    // 사용자 ID 필드 추가
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)  // 관계 정의 수정
   cardNumber  String    // 마스킹된 카드번호 (예: 1234****5678)
   cardCompany String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   isActive    Boolean   @default(true)
-  Transaction Transaction[]
+  transactions Transaction[]
   nextPaymentDate DateTime?  // Optional로 변경
   billingInterval String?    // Optional로 변경
 }
 
+
+// 빌링을 이용하여 발생한 거래들
 model Transaction {
   id          String   @id @default(uuid())
   billing     Billing  @relation(fields: [bid], references: [bid])
