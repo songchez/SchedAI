@@ -1,4 +1,4 @@
-import { auth, signIn, signOut } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import {
   Navbar,
