@@ -1,21 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import ChatMessageList from "./Ui/ChatMessageList";
-import ChatInput from "./Ui/ChatInput";
+import { useState } from "react";
+import ChatMessageList from "./ChatMessageList";
+import ChatInput from "./ChatInput";
 import { useChat } from "ai/react";
 import { SessionProvider } from "next-auth/react";
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { useDisclosure } from "@heroui/react";
-import { PaymentModal } from "./Ui/PaymentModal";
-import { RecommendationList } from "./Ui/RecommendationList";
+import { PaymentModal } from "./PaymentModal";
+import { RecommendationList } from "./RecommendationList";
 import { AIModels } from "@/lib/chatApiHandlers/constants";
 
 // AIModels 타입은 프로젝트에 맞게 선언되어 있어야 합니다.
 export default function SchedAIChatbot() {
   const [selectedModel, setSelectedModel] =
     useState<AIModels>("gemini-1.5-flash");
-  const [recommendations, setRecommendations] = useState<string[]>([]);
 
   // heroUI의 useDisclosure 훅으로 모달 상태 관리
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -29,26 +28,6 @@ export default function SchedAIChatbot() {
         }
       },
     });
-
-  useEffect(() => {
-    // 대화 시작 전 보여줄 추천 문구 (랜덤 3개 선택)
-    const allRecommendations = [
-      `"📆이번 주 스케줄 브리핑해줘"`,
-      `"🌈오늘 하루를 계획해줘"`,
-      `"🧐이번 주 스케줄 보여줘"`,
-      `"🚗주말에 갈 만한 여행지를 추천해줘."`,
-      `"🏃🏻‍♀️운동 일정을 추가해줘."`,
-      `"💁🏻나한테 어떤 도움을 줄 수 있어?"`,
-      `"💍기념일을 추가하려고 해"`,
-      `"👍저번달 스케줄을 분석해줘"`,
-      `"👔미팅일정을 잡으려하는데, 언제가 좋을까?"`,
-    ];
-
-    const randomItems = allRecommendations
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 3);
-    setRecommendations(randomItems);
-  }, []);
 
   // 추천 문구 클릭 시 input 변경 처리
   const handleRecommendationSelect = (recommendation: string) => {
@@ -71,10 +50,7 @@ export default function SchedAIChatbot() {
       {/* 입력창 및 추천 문구 영역 */}
       <div className="sticky bottom-16 flex flex-col">
         {messages.length === 0 && (
-          <RecommendationList
-            recommendations={recommendations}
-            onSelect={handleRecommendationSelect}
-          />
+          <RecommendationList onSelect={handleRecommendationSelect} />
         )}
         <SessionProvider>
           <ChatInput
