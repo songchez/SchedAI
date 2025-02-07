@@ -6,39 +6,43 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@heroui/react";
-import { Bars3Icon } from "@heroicons/react/24/outline";
 import { Session } from "next-auth";
-import { signIn, signOut } from "next-auth/react";
+import { signOut } from "next-auth/react";
+import Image from "next/image";
+import { UserCircleIcon } from "@heroicons/react/24/solid";
 
 interface Props {
   session: Session | null;
 }
 
-export default function MyDropdown({ session }: Props) {
+export default function OnLoginDropdownBtn({ session }: Props) {
   // 1. Set up your items as an array
   const items = [
-    { key: "chat", label: "✨ChatBot", href: "/chat" },
-    { key: "dashboard", label: "Dashboard", href: "/dashboard" },
-    { key: "myaccount", label: "MyAccount", href: "/myaccount" },
-    session
-      ? { key: "signOut", label: "Sign Out", className: "text-danger" }
-      : { key: "signIn", label: "Sign In", className: "text-success" },
+    { key: "myaccount", label: "My Account", href: "/myaccount" },
+    { key: "signOut", label: "Sign Out", className: "text-danger" },
   ].flat();
 
   // 2. Handle item press
   const onItemPress = async (key: string) => {
-    if (key === "signIn") {
-      signIn("google", { redirectTo: "/chat" });
-    } else if (key === "signOut") {
+    if (key === "signOut") {
       signOut({ redirectTo: "/" });
     }
   };
 
   return (
-    <Dropdown>
+    <Dropdown size="sm">
       <DropdownTrigger>
-        {/* Instead of a Button, your original icon: */}
-        <Bars3Icon className="w-9" />
+        {session?.user.image ? (
+          <Image
+            className="rounded-full cursor-pointer"
+            src={session?.user.image}
+            alt="userImage"
+            width={40}
+            height={40}
+          />
+        ) : (
+          <UserCircleIcon />
+        )}
       </DropdownTrigger>
       {/* 3. Manually map items into <DropdownItem> elements */}
       <DropdownMenu>

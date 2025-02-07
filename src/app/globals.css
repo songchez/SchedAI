@@ -9,3 +9,21 @@
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+/* 스크롤바의 배경을 없애기 */
+::-webkit-scrollbar {
+  width: 4px; /* 스크롤바의 너비 */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* 스크롤바 배경을 투명하게 설정 */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #bfbfb8; /* 스크롤바의 thumb 색상 */
+  border-radius: 10px; /* 스크롤바 thumb의 둥근 모서리 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #2d2d2a; /* hover 시 thumb 색상 */
+}

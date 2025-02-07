@@ -11,6 +11,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Logo from "@/images/SchedAILogo.png";
 import MobileDropDown from "./MobileDropdownMenu";
+import OnLoginDropdownBtn from "./OnLoginDropdownBtn";
 
 export default async function CustomNavbar() {
   const session = await auth();
@@ -34,9 +35,6 @@ export default async function CustomNavbar() {
         <Link href={"/dashboard"} className="hover:text-primary-300">
           <p>Dashboard</p>
         </Link>
-        <Link href={"/pricing"} className="hover:text-primary-300">
-          <p>Pricing</p>
-        </Link>
       </NavbarContent>
       <NavbarContent justify="end">
         <NavbarItem>
@@ -49,16 +47,7 @@ export default async function CustomNavbar() {
         <NavbarItem className="hidden md:inline-block">
           <div>
             {session ? (
-              <>
-                <form
-                  action={async () => {
-                    "use server";
-                    await signOut({ redirectTo: "/" });
-                  }}
-                >
-                  <Button type="submit">Sign Out</Button>
-                </form>
-              </>
+              <OnLoginDropdownBtn session={session} />
             ) : (
               <form
                 className="btn btn-primary"

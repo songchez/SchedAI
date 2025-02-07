@@ -67,7 +67,7 @@ function HeroSection() {
   return (
     <section className="relative w-full min-h-screen flex flex-col items-center justify-center bg-no-repeat bg-center bg-cover">
       <Image
-        className="object-cover fixed top-0 left-0 w-screen h-screen -z-10"
+        className="object-cover fixed top-0 left-0 w-screen h-screen -z-50"
         src={darkBackground}
         height={1980}
         width={1080}
@@ -75,7 +75,7 @@ function HeroSection() {
         priority
       />
       <Image
-        className="object-cover fixed top-0 left-0 w-screen h-screen -z-10 dark:hidden"
+        className="object-cover fixed top-0 left-0 w-screen h-screen -z-50 dark:hidden"
         src={lightBackground}
         height={1980}
         width={1080}
@@ -83,7 +83,6 @@ function HeroSection() {
         priority
       />
       <div className="fixed inset-0 bg-gradient-to-b dark:from-black/40 dark:to-black/20 from-white/50 to-white/20" />
-
       {/* 본문 컨테이너 */}
       <motion.div
         className="relative z-10 max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-center gap-8"
