@@ -10,7 +10,7 @@ export async function executePayment(params: {
   bid: string;
   amount: number;
   goodsName: string;
-}): Promise<any> {
+}): Promise<{ resultCode: string; resultMsg: string }> {
   const { bid, amount, goodsName } = params;
 
   // billing 정보 확인
