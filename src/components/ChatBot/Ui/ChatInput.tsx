@@ -1,5 +1,5 @@
 import {
-  Input,
+  Textarea,
   Button,
   Select,
   SelectItem,
@@ -43,10 +43,22 @@ export default function ChatInput({
 }: ChatInputProps) {
   const { data: session } = useSession();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleLoginClick = () => {
-    signIn("google");
+  // textarea에서 쉬프트엔터가 아니면 바로 입력
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // 기본 엔터 동작(새 줄 추가) 방지
+      chatSubmit();
+    }
+  };
+  // chat input submit 함수
+  const chatSubmit = () => {
+    if (!session) {
+      onOpen();
+      return;
+    }
+    onSubmit();
   };
 
   // 로딩 상태가 끝난 후 포커스 이동
@@ -58,13 +70,10 @@ export default function ChatInput({
 
   return (
     <form
+      // 버튼 눌렀을때
       onSubmit={(e) => {
         e.preventDefault();
-        if (!session) {
-          onOpen();
-          return;
-        }
-        onSubmit();
+        chatSubmit();
       }}
       className="flex gap-2 items-end"
     >
@@ -104,18 +113,20 @@ export default function ChatInput({
         </Select>
       </div>
 
-      <Input
-        ref={inputRef} // ref 연결: submit후 input에 리포커싱
+      <Textarea
+        ref={inputRef}
         isDisabled={isLoading}
         fullWidth
         color="primary"
         value={input}
         autoComplete="off"
-        placeholder="Type your message..."
+        placeholder="➤ 메시지를 적어주세요"
         onChange={onInputChange}
+        onKeyDown={handleKeyDown} // 추가
         variant="underlined"
         className="flex-1"
         size="lg"
+        rows={2} // 기본 3줄 표시
       />
       {isLoading ? (
         <Button
@@ -200,7 +211,7 @@ export default function ChatInput({
           <ModalFooter className="flex flex-col gap-3">
             <Button
               className="bg-primary-500 text-white text-lg w-full py-3 rounded-lg flex items-center justify-center hover:bg-primary-600 transition-all"
-              onPress={handleLoginClick}
+              onPress={() => signIn("google")}
               variant="flat"
               size="lg"
             >

@@ -69,7 +69,7 @@ export default function SchedAIChatbot() {
       </ScrollShadow>
 
       {/* 입력창 및 추천 문구 영역 */}
-      <div className="sticky bottom-14 flex flex-col">
+      <div className="sticky bottom-16 flex flex-col">
         {messages.length === 0 && (
           <RecommendationList
             recommendations={recommendations}
