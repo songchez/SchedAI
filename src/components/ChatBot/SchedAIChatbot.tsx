@@ -41,7 +41,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
   });
 
   // 기존에 저장된 메시지를 API로 불러오기 위한 상태
-  const [preloadedMessages, setPreloadedMessages] = useState<any[]>([]);
+  const [preloadedMessages, setPreloadedMessages] = useState([]);
   const [isPreloading, setIsPreloading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -75,7 +75,9 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
 
   // 추천 문구 클릭 시 처리
   const handleRecommendationSelect = (r: string) => {
-    handleInputChange({ target: { value: r } } as any);
+    handleInputChange({
+      target: { value: r },
+    } as React.ChangeEvent<HTMLInputElement>);
   };
 
   return (

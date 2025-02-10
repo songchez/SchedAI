@@ -78,7 +78,7 @@ export default function ChatSideBar() {
       fetchChats();
       hasFetchedChats.current = true;
     }
-  }, [fetchChats]);
+  }, [fetchChats, session?.user?.id]);
 
   // 채팅 이름 수정 제출 함수 (PUT 요청)
   const handleRenameSubmit = async (chatId: string, newTitle: string) => {
