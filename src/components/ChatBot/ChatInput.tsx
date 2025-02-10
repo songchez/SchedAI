@@ -10,8 +10,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import { ChangeEvent, useEffect } from "react";
-import { useRef } from "react";
+import { ChangeEvent, useEffect, useRef } from "react";
 import { useSession, signIn } from "next-auth/react";
 import SchedAILogdo from "@/images/SchedAILogo.png";
 import Image from "next/image";
@@ -30,7 +29,7 @@ interface ChatInputProps {
 }
 
 /**
- * 사용자가 챗 메시지를 입력하고, 모델을 선택하는 UI
+ * 사용자 입력창 + 모델 선택 UI
  */
 export default function ChatInput({
   input,
@@ -45,23 +44,25 @@ export default function ChatInput({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // textarea에서 쉬프트엔터가 아니면 바로 입력
+  // 엔터키로 전송
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // 기본 엔터 동작(새 줄 추가) 방지
+      e.preventDefault();
       chatSubmit();
     }
   };
-  // chat input submit 함수
+
+  // 실제 Submit
   const chatSubmit = () => {
     if (!session) {
+      // 비로그인 상태면 로그인 모달 열기
       onOpen();
       return;
     }
     onSubmit();
   };
 
-  // 로딩 상태가 끝난 후 포커스 이동
+  // 로딩이 끝난 후 포커스 이동
   useEffect(() => {
     if (!isLoading) {
       inputRef.current?.focus();
@@ -70,14 +71,13 @@ export default function ChatInput({
 
   return (
     <form
-      // 버튼 눌렀을때
       onSubmit={(e) => {
         e.preventDefault();
         chatSubmit();
       }}
       className="flex gap-2 items-end"
     >
-      {/* 모델 선택 */}
+      {/* 모델 선택 (PC 뷰에서만 노출) */}
       <div className="w-36 hidden md:inline-block bottom-3">
         <Select
           isRequired
@@ -90,9 +90,7 @@ export default function ChatInput({
           renderValue={() => selectedModel}
         >
           {Object.values(AI_MODELS).map((model) => {
-            // 텍스트 길이가 17자보다 길면 애니메이션 적용
             const shouldAnimate = model.length > 17;
-
             return (
               <SelectItem key={model} textValue={model}>
                 <div className="relative max-w-full overflow-hidden group">
@@ -113,6 +111,7 @@ export default function ChatInput({
         </Select>
       </div>
 
+      {/* 텍스트 입력창 */}
       <Textarea
         ref={inputRef}
         isDisabled={isLoading}
@@ -122,18 +121,18 @@ export default function ChatInput({
         autoComplete="off"
         placeholder="➤ 메시지를 적어주세요"
         onChange={onInputChange}
-        onKeyDown={handleKeyDown} // 추가
+        onKeyDown={handleKeyDown}
         variant="underlined"
         className="flex-1"
+        minRows={2}
+        maxRows={5}
         size="lg"
       />
+
+      {/* 전송 or 중지 버튼 */}
       {isLoading ? (
-        <Button
-          onPress={stop}
-          color="primary"
-          className="w-12"
-          isIconOnly={true}
-        >
+        <Button onPress={stop} color="primary" className="w-12" isIconOnly>
+          {/* 정지 버튼 아이콘 */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="primary-500"
@@ -150,12 +149,8 @@ export default function ChatInput({
           </svg>
         </Button>
       ) : (
-        <Button
-          className="w-12"
-          type="submit"
-          color="primary"
-          isIconOnly={true}
-        >
+        <Button className="w-12" type="submit" color="primary" isIconOnly>
+          {/* 전송 버튼 아이콘 */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -177,7 +172,8 @@ export default function ChatInput({
           </svg>
         </Button>
       )}
-      {/* 로그인 안되어있을때 모달 등장 */}
+
+      {/* 비로그인 상태일 때 띄우는 모달 */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalContent>
           <ModalHeader className="text-center text-xl font-bold text-primary-500 dark:text-amber-300">

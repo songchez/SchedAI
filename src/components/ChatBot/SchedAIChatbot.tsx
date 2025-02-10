@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ChatMessageList from "./ChatMessageList";
 import ChatInput from "./ChatInput";
 import { useChat } from "ai/react";
@@ -11,45 +11,83 @@ import { PaymentModal } from "./PaymentModal";
 import { RecommendationList } from "./RecommendationList";
 import { AIModels } from "@/lib/chatApiHandlers/constants";
 
-// AIModels 타입은 프로젝트에 맞게 선언되어 있어야 합니다.
-export default function SchedAIChatbot() {
+interface SchedAIChatbotProps {
+  chatId?: string;
+}
+
+export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
   const [selectedModel, setSelectedModel] =
     useState<AIModels>("gemini-1.5-flash");
-
-  // heroUI의 useDisclosure 훅으로 모달 상태 관리
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const { messages, input, handleInputChange, handleSubmit, stop, isLoading } =
-    useChat({
-      body: { model: selectedModel },
-      onResponse: (response) => {
-        if (response.status === 402) {
-          onOpen();
-        }
-      },
-    });
+  // useChat 훅에서 실시간 대화 메시지를 관리 (새 메시지, 스트리밍 등)
+  const {
+    messages: liveMessages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    stop,
+    isLoading,
+  } = useChat({
+    body: { model: selectedModel, chatId },
+    onResponse: (response) => {
+      if (response.status === 402) {
+        onOpen(); // 토큰 부족 => 결제 모달 열기
+      }
+    },
+  });
 
-  // 추천 문구 클릭 시 input 변경 처리
-  const handleRecommendationSelect = (recommendation: string) => {
-    const simulatedEvent = {
-      target: { value: recommendation },
-    } as React.ChangeEvent<HTMLInputElement>;
-    handleInputChange(simulatedEvent);
+  // 기존에 저장된 메시지를 API로 불러오기 위한 상태
+  const [preloadedMessages, setPreloadedMessages] = useState<any[]>([]);
+  const [isPreloading, setIsPreloading] = useState<boolean>(true);
+
+  useEffect(() => {
+    // chatId가 있을 경우에만 기존 메시지 불러오기
+    if (chatId) {
+      fetch(`/api/chat?chatId=${chatId}`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Failed to fetch preloaded messages");
+          }
+          return res.json();
+        })
+        .then((data) => {
+          setPreloadedMessages(data);
+          setIsPreloading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching preloaded messages:", error);
+          setIsPreloading(false);
+        });
+    } else {
+      setIsPreloading(false);
+    }
+  }, [chatId]);
+
+  // 최종 메시지 배열: 기존 저장된 메시지와 새로 추가된 메시지를 병합
+  const finalMessages = [...preloadedMessages, ...liveMessages];
+
+  // 추천 문구 클릭 시 처리
+  const handleRecommendationSelect = (r: string) => {
+    handleInputChange({ target: { value: r } } as any);
   };
 
   return (
     <div className="flex flex-col justify-end w-full max-w-3xl mx-auto p-4 rounded-lg">
-      {/* 결제 모달 */}
       <PaymentModal isOpen={isOpen} onOpenChange={onOpenChange} />
 
-      {/* 채팅 메시지 영역 */}
       <ScrollShadow hideScrollBar className="h-[82vh]">
-        <ChatMessageList messages={messages} isLoading={isLoading} />
+        {isPreloading ? (
+          <div className="p-4 text-center animate-pulse">
+            메시지 불러오는 중...
+          </div>
+        ) : (
+          <ChatMessageList messages={finalMessages} isLoading={isLoading} />
+        )}
       </ScrollShadow>
 
-      {/* 입력창 및 추천 문구 영역 */}
       <div className="sticky bottom-16 flex flex-col">
-        {messages.length === 0 && (
+        {finalMessages.length === 0 && (
           <RecommendationList onSelect={handleRecommendationSelect} />
         )}
         <SessionProvider>

@@ -1,11 +1,11 @@
-// app/api/chat/route.ts
 "use server";
 
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@ai-sdk/openai";
 import { google } from "@ai-sdk/google";
-import { LanguageModelV1, streamText } from "ai";
-import { AIModels, Message } from "@/lib/chatApiHandlers/constants";
+import { LanguageModelV1, Message, streamText } from "ai";
+
+import { AIModels } from "@/lib/chatApiHandlers/constants";
 import {
   getCalendarEventsTool,
   addEventToCalendarTool,
@@ -15,15 +15,13 @@ import {
   addTaskToListTool,
   updateTaskInListTool,
   deleteTaskFromListTool,
-  // clearCompletedTasksTool,
 } from "@/lib/chatApiHandlers/tools";
 import { auth } from "@/auth";
 import { getCalendarList } from "@/lib/googleClient";
 import { prisma } from "@/lib/prisma";
 
 /**
- * providersMap: 모델 키 -> 실제 모델 인스턴스 생성 함수
- * (오픈AI, PaLM 등)
+ * AI 모델별 실제 LanguageModelV1 인스턴스를 생성하는 함수 맵
  */
 const providersMap: Record<AIModels, () => LanguageModelV1> = {
   "gemini-1.5-flash": () => google("gemini-1.5-flash"),
@@ -31,66 +29,175 @@ const providersMap: Record<AIModels, () => LanguageModelV1> = {
   "gpt-4o-mini": () => openai("gpt-4o-mini"),
 };
 
-export async function POST(req: NextRequest): Promise<Response> {
+/** GET: 특정 chatId의 메시지(Message타입)를 반환 : 동적라우팅(page.tsx) 렌더전에 호출 */
+export async function GET(request: Request) {
   try {
-    // 사용자 인증 확인 + get userId
-    const session = await auth();
-    if (!session?.user?.id) {
-      return new Response("Unauthorized", { status: 401 });
+    console.log("[GET] 시작");
+    const { searchParams } = new URL(request.url);
+
+    // chatId 파싱
+    const chatId = searchParams.get("chatId");
+    console.log("[GET] chatId:", chatId);
+    if (!chatId) {
+      console.error("[GET] chatId 누락");
+      return NextResponse.json({ error: "Missing chatId" }, { status: 400 });
     }
-    const userId = session.user.id;
+    // messageEntities 가져오기
+    const messageEntities = await prisma.messageEntity.findMany({
+      where: { chatId },
+      orderBy: { createdAt: "asc" },
+    });
+    console.log("[GET] messageEntities:", messageEntities);
+
+    if (!messageEntities) {
+      console.error("[GET] 채팅 없음");
+      return NextResponse.json({ error: "Chat not found" }, { status: 404 });
+    }
+
+    console.log("[GET] 완료");
+    return NextResponse.json(messageEntities);
+  } catch (error) {
+    console.error("[GET] Error fetching chat:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * POST: 새 메시지 전송 (새 채팅 생성 또는 기존 채팅 업데이트) 후 AI 답변 스트리밍
+ * 요청 본문에는 유저가 보낸 메시지 배열, 사용된 AI 모델, 그리고 채팅 ID(없으면 새 채팅 생성)가 포함됩니다.
+ * AI 응답이 완전히 생성되면 최종 AI 응답 메시지를 DB에 저장합니다.
+ */
+export async function POST(req: NextRequest): Promise<Response> {
+  let userId: string | undefined;
+  console.log("[POST] 요청 시작");
+
+  try {
+    // 사용자 인증 확인
+    const session = await auth();
+    userId = session?.user.id;
+    console.log("[POST] 인증된 사용자 ID:", userId);
+    if (!userId) {
+      console.error("[POST] 사용자 ID 누락");
+      return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+    }
+
+    // 요청 본문 파싱
+    const { messages, model, chatId } = (await req.json()) as {
+      messages: Message[];
+      model: AIModels;
+      chatId: string;
+    };
+    console.log("[POST] 요청 본문 파싱 완료:", { messages, model, chatId });
+
+    // 모델 유효성 검사
+    if (!(model in providersMap)) {
+      console.error("[POST] 잘못된 모델:", model);
+      return new Response(`Invalid model: ${model}`, { status: 400 });
+    }
+    const modelInstance = providersMap[model]();
+    console.log("[POST] 모델 인스턴스 생성 완료");
+
+    // 사용자의 구글 캘린더 목록 가져오기
+    const calendars = await getCalendarList(userId);
+    console.log("[POST] 구글 캘린더 목록:", calendars);
+
+    let finalChatId = chatId;
+
+    // 새 채팅 생성 여부 확인 (chatId가 없으면 새 채팅 생성)
+    if (!chatId) {
+      console.log("[POST] 새 채팅 생성 시작");
+      const newChat = await prisma.chat.create({
+        data: {
+          userId,
+          title: "새 채팅",
+          aiModel: modelInstance.modelId,
+          messageCount: messages.length, // 유저 메시지 개수로 초기화
+          isArchived: false,
+        },
+      });
+      finalChatId = newChat.id;
+      console.log("[POST] 새 채팅 생성 완료, chatId:", finalChatId);
+
+      // 첫 번째 유저 메시지를 DB에 저장 (예: messages[0])
+      if (messages.length > 0) {
+        const firstMessage = messages[0];
+        console.log("[POST] 첫 번째 유저 메시지 저장 시작");
+        await prisma.messageEntity.create({
+          data: {
+            content: firstMessage.content,
+            role: firstMessage.role,
+            chatId: newChat.id,
+            createdAt: firstMessage.createdAt
+              ? new Date(firstMessage.createdAt)
+              : new Date(),
+          },
+        });
+        console.log("[POST] 첫 번째 유저 메시지 저장 완료");
+      }
+    } else {
+      console.log("[POST] 기존 채팅에 메시지 추가, chatId:", chatId);
+      // 기존 채팅에 새 메시지 추가: 마지막 유저 메시지를 추가하는 예시
+      if (messages.length > 0) {
+        const userMessage = messages[messages.length - 1];
+        console.log("[POST] 새 유저 메시지 저장 시작");
+        await prisma.messageEntity.create({
+          data: {
+            content: userMessage.content,
+            role: userMessage.role,
+            chatId: chatId,
+            createdAt: userMessage.createdAt
+              ? new Date(userMessage.createdAt)
+              : new Date(),
+          },
+        });
+        console.log("[POST] 새 유저 메시지 저장 완료");
+      }
+    }
 
     // 토큰 및 구독 상태 확인
+    console.log("[POST] 토큰 및 구독 상태 확인 시작");
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: { subscription: true },
     });
-
     if (!user) {
+      console.error("[POST] 사용자 없음");
       return new Response("User not found", { status: 404 });
     }
-
-    // 프리미엄 아닌 경우 토큰 체크
     if (user.subscription?.planType !== "premium") {
       if (user.availableTokens <= 0) {
-        return new Response(
-          "토큰이 부족합니다. 프리미엄으로 업그레이드하고 무제한으로 사용해보세요!",
-          {
-            status: 402,
-          }
-        );
+        const errMsg =
+          "토큰이 부족합니다. 프리미엄으로 업그레이드 후 무제한 사용 가능합니다.";
+        console.error("[POST] 토큰 부족:", errMsg);
+        return new Response(errMsg, { status: 402 });
       }
-
-      // 토큰 차감
       await prisma.user.update({
         where: { id: userId },
         data: { availableTokens: { decrement: 1 } },
       });
+      console.log("[POST] 토큰 차감 완료");
     }
+    console.log("[POST] 토큰 및 구독 상태 확인 완료");
 
-    // body 파싱
-    const { messages, model }: { messages: Message[]; model: AIModels } =
-      await req.json();
+    // 시스템 프롬프트 메시지 생성
+    const systemMessage = `You are SchedAI (${model}).
+Professional schedule assistant.
+Current time: ${new Date().toISOString()}
+User calendar id is: ${calendars?.[0]?.id?.toString() ?? "(No calendar id)"} `;
+    console.log("[POST] 시스템 메시지 생성:", systemMessage);
 
-    // 모델 유효성 검사
-    if (!(model in providersMap)) {
-      return new Response(`Invalid model: ${model}`, { status: 400 });
-    }
-    const calendars = await getCalendarList(userId);
-    // 타입 안전한 모델 인스턴스 생성
-    const modelInstance = providersMap[model]();
+    // AI에 보낼 메시지
+    console.log("[POST] AI에 보낼 메시지:", messages);
 
-    // 시스템 메시지 동적 생성
-    const systemMessage = `You are SchedAI (${model}). 
-      Professional schedule assistant. 
-      Current time: ${new Date().toISOString()}
-      User calendar id is ${calendars[0].id?.toString()}`;
-
-    // streamText를 이용해 AI 호출
+    // AI 호출: streamText를 통해 스트리밍 결과를 받습니다.
+    console.log("[POST] AI 호출 시작");
     const result = streamText({
       model: modelInstance,
       system: systemMessage,
-      messages,
+      messages: messages,
       tools: {
         getCalendarEventsTool,
         addEventToCalendarTool,
@@ -103,25 +210,50 @@ export async function POST(req: NextRequest): Promise<Response> {
       },
     });
 
-    // 스트리밍 응답
-    return result.toDataStreamResponse();
+    for await (const textPart of result.textStream) {
+      console.log("[POST] AI 스트리밍 객체 생성됨", textPart);
+    }
+
+    // AI 응답 최종 텍스트를 기다립니다.
+    const finalText = await result.text;
+    console.log("[POST] AI 응답 최종 텍스트 수신:", finalText);
+
+    // 최종 AI 응답 메시지를 DB에 저장합니다.
+    console.log("[POST] AI 응답 메시지 DB 저장 시작");
+    await prisma.messageEntity.create({
+      data: {
+        content: finalText,
+        role: "assistant", // AI 응답의 역할
+        chatId: finalChatId!,
+        createdAt: new Date(),
+      },
+    });
+
+    console.log("[POST] AI 응답 메시지 DB 저장 완료");
+
+    // 채팅의 messageCount 업데이트 (옵션)
+    console.log("[POST] 채팅의 messageCount 업데이트 시작");
+    await prisma.chat.update({
+      where: { id: finalChatId },
+      data: { messageCount: { increment: 1 } },
+    });
+    console.log("[POST] 채팅의 messageCount 업데이트 완료");
+
+    // 스트리밍 응답을 클라이언트로 전달합니다.
+    console.log("[POST] 스트리밍 응답 클라이언트 전달");
+    return result.toDataStreamResponse({
+      headers: {
+        "X-New-Chat-Id": finalChatId,
+      },
+    });
   } catch (err) {
-    const session = await auth();
-    const userId = session?.user.id;
-    if (err instanceof Error) {
-      if (userId) {
-        // 에러발생시 토큰 복구
-        await prisma.user.update({
-          where: { id: userId },
-          data: { availableTokens: { increment: 1 } },
-        });
-      }
-      console.error("/api/chat POST Error:", err);
+    if (userId && err instanceof Error) {
+      console.error("[POST] /api/chat POST Error:", err);
       return new Response(err.message || "Internal Server Error", {
         status: 500,
       });
-    } else {
-      throw new Error("알수없는 오류");
     }
+    console.error("[POST] Unknown Error:", err);
+    return new Response("Internal Server Error", { status: 500 });
   }
 }

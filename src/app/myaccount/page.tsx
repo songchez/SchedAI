@@ -2,7 +2,6 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { Button, Card, CardBody, CardHeader } from "@heroui/react";
 import Image from "next/image";
-import Link from "next/link";
 
 export default async function MyAccount() {
   const session = await auth();

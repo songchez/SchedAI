@@ -1,3 +1,4 @@
+// src/components/ChatBot/PaymentModal.tsx
 "use client";
 
 import {
