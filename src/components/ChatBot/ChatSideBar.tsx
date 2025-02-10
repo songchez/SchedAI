@@ -113,7 +113,13 @@ export default function ChatSideBar() {
   const groupedChats = groupChatsByDate(chats);
 
   return (
-    <div className="w-64 flex flex-col bg-background border-r">
+    <div
+      className={
+        pathname === "/chat"
+          ? "w-64 flex flex-col bg-background border-r"
+          : "hidden"
+      }
+    >
       {/* 상단 헤더 (고정) */}
       <div className="p-4 flex-shrink-0 sticky top-0 bg-background z-10 border-b">
         <div className="flex justify-between items-center">

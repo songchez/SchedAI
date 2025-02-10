@@ -1,5 +1,3 @@
-import ChatSideBar from "@/components/ChatBot/ChatSideBar";
-import CustomNavbar from "@/components/Navbar/CustomNavbar";
 import { SessionProvider } from "next-auth/react";
 
 /**
@@ -13,13 +11,8 @@ export default function RootLayout({
   return (
     <SessionProvider>
       <div className="flex">
-        {/* 사이드바 */}
-        <ChatSideBar />
         {/* 페이지 내용 */}
-        <div className="flex-1">
-          <CustomNavbar />
-          {children}
-        </div>
+        <div className="flex-1">{children}</div>
       </div>
     </SessionProvider>
   );

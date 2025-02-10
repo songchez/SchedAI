@@ -1,6 +1,9 @@
 import { Gowun_Batang } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
+import CustomNavbar from "@/components/Navbar/CustomNavbar";
+import ChatSideBar from "@/components/ChatBot/ChatSideBar";
+import { SessionProvider } from "next-auth/react";
 
 const gowunBatang = Gowun_Batang({
   display: "swap",
@@ -16,6 +19,14 @@ export default function RootLayout({
   return (
     <html lang="ko" className="dark">
       <body className={gowunBatang.className}>
+        <div className="flex">
+          <SessionProvider>
+            <ChatSideBar />
+          </SessionProvider>
+          <div className="flex-1">
+            <CustomNavbar />
+          </div>
+        </div>
         <Providers>{children}</Providers>
       </body>
     </html>
