@@ -1,4 +1,5 @@
 import SchedAIChatbot from "@/components/ChatBot/SchedAIChatbot";
+import { ChatProvider } from "@/components/context/ChatContext";
 import { SessionProvider } from "next-auth/react";
 
 interface PageProps {
