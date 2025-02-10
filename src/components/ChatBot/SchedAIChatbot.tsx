@@ -11,7 +11,7 @@ import { useDisclosure } from "@heroui/react";
 import { PaymentModal } from "./PaymentModal";
 import { RecommendationList } from "./RecommendationList";
 import { AIModels } from "@/lib/chatApiHandlers/constants";
-import { useChatContext } from "../context/ChatContext";
+import { useChatStore } from "@/lib/store/ChatStore";
 
 interface SchedAIChatbotProps {
   chatId?: string;
@@ -21,9 +21,10 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
   const [selectedModel, setSelectedModel] =
     useState<AIModels>("gemini-1.5-flash");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { messages: contextMessages } = useChatContext();
+  // Zustand 스토어에서 저장된 메시지 읽기
+  const storedMessages = useChatStore((state) => state.messages);
 
-  // useChat 훅에서 실시간 대화 메시지를 관리 (새 메시지, 스트리밍 등)
+  // useChat 훅으로 실시간 대화 메시지 관리 (새 메시지, 스트리밍 등)
   const {
     messages: liveMessages,
     input,
@@ -67,10 +68,10 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
     }
   }, [chatId]);
 
-  // Context에 저장된 메시지가 있다면 우선 사용하고, 없으면 API로 불러온 메시지를 사용
+  // 저장된 메시지가 있다면 우선 사용, 없으면 API로 불러온 메시지를 사용
   const baseMessages =
-    contextMessages.length > 0 ? contextMessages : preloadedMessages;
-  // 최종 메시지 배열: 기존 저장된 메시지와 새로 추가된 실시간 메시지를 병합
+    storedMessages.length > 0 ? storedMessages : preloadedMessages;
+  // 최종 메시지 배열: 기존 메시지와 실시간 메시지를 병합
   const finalMessages = [...baseMessages, ...liveMessages];
 
   // 추천 문구 클릭 시 처리

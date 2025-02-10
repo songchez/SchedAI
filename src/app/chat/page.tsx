@@ -9,14 +9,14 @@ import { AIModels } from "@/lib/chatApiHandlers/constants";
 import { useChat } from "ai/react";
 import { PaymentModal } from "@/components/ChatBot/PaymentModal";
 import { useDisclosure } from "@heroui/react";
-import { useChatContext } from "@/components/context/ChatContext";
+import { useChatStore } from "@/lib/store/ChatStore";
 
 export default function FirstPage() {
   const router = useRouter();
   const [selectedModel, setSelectedModel] =
     useState<AIModels>("gemini-1.5-flash");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { setMessages } = useChatContext();
+  const setMessages = useChatStore((state) => state.setMessages);
 
   // useChat 훅을 사용하여 새 채팅 생성 엔드포인트 호출
   const { input, handleInputChange, handleSubmit, isLoading, messages } =
@@ -33,9 +33,9 @@ export default function FirstPage() {
         const newChatId = response.headers.get("X-New-Chat-Id");
         console.log("[useChat onResponse] 새 채팅 ID:", newChatId);
         if (newChatId) {
-          // 현재까지의 메시지를 전역 Context에 저장
+          // 현재까지의 메시지를 Zustand 스토어에 저장
           setMessages(messages);
-          // 채팅 응답 스트리밍이 완료되면 해당 채팅 ID로 라우팅
+          // 채팅 응답 스트리밍이 완료되면 해당 채팅 ID로 동적 라우팅
           router.push(`chat/${newChatId}`);
         } else {
           console.error(
@@ -47,7 +47,9 @@ export default function FirstPage() {
 
   // 추천 문구 클릭 시 처리
   const handleRecommendationSelect = (r: string) => {
-    handleInputChange({ target: { value: r } } as any);
+    handleInputChange({
+      target: { value: r },
+    } as React.ChangeEvent<HTMLInputElement>);
   };
 
   // onSubmit: useChat 훅 내의 handleSubmit를 호출하면 POST 요청이 전송됩니다.
