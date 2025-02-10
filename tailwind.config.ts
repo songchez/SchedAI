@@ -18,7 +18,14 @@ module.exports = {
         700: "#1A1A0D",
       },
     },
-    extend: {},
+    extend: {
+      colors: {
+        text: {
+          DEFAULT: "#1a202c", // 라이트 모드 기본값 (gray-900)
+          dark: "#ffffff", // 다크 모드 기본값 (white)
+        },
+      },
+    },
     fontFamily: { GowunBatang: ["gowunBatang"] },
   },
   darkMode: "class",

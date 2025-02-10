@@ -9,14 +9,14 @@ import { AIModels } from "@/lib/chatApiHandlers/constants";
 import { useChat } from "ai/react";
 import { PaymentModal } from "@/components/ChatBot/PaymentModal";
 import { useDisclosure } from "@heroui/react";
-import { useChatStore } from "@/lib/store/ChatStore";
+import { useMessageStore } from "@/lib/store/MessageStore";
 
 export default function FirstPage() {
   const router = useRouter();
   const [selectedModel, setSelectedModel] =
     useState<AIModels>("gemini-1.5-flash");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const setMessages = useChatStore((state) => state.setMessages);
+  const setMessages = useMessageStore((state) => state.setMessages);
 
   // useChat 훅을 사용하여 새 채팅 생성 엔드포인트 호출
   const { input, handleInputChange, handleSubmit, isLoading, messages } =
@@ -58,9 +58,9 @@ export default function FirstPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full p-4">
+    <div className="flex flex-col items-center justify-center h-full p-4 mt-20">
       <PaymentModal isOpen={isOpen} onOpenChange={onOpenChange} />
-      <div className="w-full max-w-xl">
+      <div className="w-full max-w-3xl">
         <RecommendationList onSelect={handleRecommendationSelect} />
         <ChatInput
           input={input}

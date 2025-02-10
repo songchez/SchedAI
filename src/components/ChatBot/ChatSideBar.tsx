@@ -4,17 +4,22 @@ import { Button, Spinner } from "@heroui/react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState, useCallback } from "react";
 import { Chat } from "@prisma/client";
-import {
-  ChevronLeftIcon,
-  PencilIcon,
-  TrashIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { useRouter, usePathname } from "next/navigation";
-import { useRef } from "react";
 
-/**
- * 채팅 목록을 날짜 범위별로 그룹화
- */
+// Zustand 스토어
+import { useChatStore } from "@/lib/store/ChatStore";
+import ChatGroup from "./ChatSideBar/ChatGroup";
+
+/** 편집 상태 타입 */
+interface EditingChat {
+  chatId: string;
+  title: string;
+}
+
+/** -----------------------------------------
+ * 날짜 범위별 그룹화 함수
+ * ---------------------------------------- */
 function groupChatsByDate(chats: Chat[]): Record<string, Chat[]> {
   const today = new Date();
 
@@ -38,204 +43,115 @@ function groupChatsByDate(chats: Chat[]): Record<string, Chat[]> {
   }, {} as Record<string, Chat[]>);
 }
 
+/** 사이드바 메인 컴포넌트 */
 export default function ChatSideBar() {
   const { data: session } = useSession();
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [loading, setLoading] = useState(false);
-  // editingChat: 현재 편집 중인 채팅의 id와 편집 중인 제목을 저장
-  const [editingChat, setEditingChat] = useState<{
-    chatId: string;
-    title: string;
-  } | null>(null);
   const router = useRouter();
   const pathname = usePathname();
-  const hasFetchedChats = useRef(false);
 
-  // 현재 활성 채팅 ID 추출 (/chat/[chatId] 형태)
+  // Zustand 스토어에서 state 및 actions 가져오기
+  const { chats, fetchChats, renameChat, deleteChat } = useChatStore();
+
+  // 로딩 상태
+  const [loading, setLoading] = useState(false);
+
+  // 편집 중인 채팅 ID/제목
+  const [editingChat, setEditingChat] = useState<EditingChat | null>(null);
+
+  // 현재 활성화된 채팅 ID ("/chat/[id]" 경로)
   const activeChatId = pathname.split("/chat/")[1];
 
-  // 채팅 목록 불러오기
-  const fetchChats = useCallback(async () => {
-    if (!session?.user?.id) return;
-    setLoading(true);
-    try {
-      const response = await fetch("/api/chat-handler");
-      if (response.ok) {
-        const data = await response.json();
-        setChats(data);
-      } else {
-        console.error("채팅 목록 불러오기 실패:", await response.text());
-      }
-    } catch (error) {
-      console.error("채팅 목록 불러오기 실패:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [session]);
-
+  /** 사이드바 최초 로드 (또는 session 변경) 시 채팅 목록 가져오기 */
   useEffect(() => {
-    if (session?.user?.id && !hasFetchedChats.current) {
-      fetchChats();
-      hasFetchedChats.current = true;
-    }
-  }, [fetchChats, session?.user?.id]);
+    if (!session?.user?.id) return;
+    (async () => {
+      setLoading(true);
+      await fetchChats(session.user.id);
+      setLoading(false);
+    })();
+  }, [session?.user?.id, fetchChats]);
 
-  // 채팅 이름 수정 제출 함수 (PUT 요청)
-  const handleRenameSubmit = async (chatId: string, newTitle: string) => {
-    try {
-      const res = await fetch(`/api/chat-handler?chatId=${chatId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ newTitle }),
-      });
-      if (res.ok) {
-        fetchChats();
-        setEditingChat(null);
-      } else {
-        console.error("채팅 이름 변경 실패:", await res.text());
-      }
-    } catch (error) {
-      console.error("채팅 이름 변경 오류:", error);
-    }
-  };
+  /** 채팅 선택 -> 라우팅 */
+  const handleSelectChat = useCallback(
+    (chatId: string) => {
+      router.push(`/chat/${chatId}`);
+    },
+    [router]
+  );
 
-  // 채팅 삭제 함수 (DELETE 요청)
-  const handleDelete = async (chatId: string) => {
-    if (!window.confirm("정말로 이 채팅을 삭제하시겠습니까?")) return;
-    try {
-      const res = await fetch(`/api/chat-handler?chatId=${chatId}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        fetchChats();
-        if (activeChatId === chatId) {
-          router.push("/chat");
-        }
-      } else {
-        console.error("채팅 삭제 실패:", await res.text());
+  /** 채팅 편집 모드 진입 */
+  const handleSetEditingChat = useCallback((chatId: string, title: string) => {
+    setEditingChat({ chatId, title });
+  }, []);
+
+  /** 채팅 제목 수정 요청 */
+  const handleRenameSubmit = useCallback(
+    async (chatId: string, newTitle: string) => {
+      setEditingChat(null);
+      setLoading(true);
+      await renameChat(chatId, newTitle);
+      setLoading(false);
+    },
+    [renameChat]
+  );
+
+  /** 채팅 삭제 요청 */
+  const handleDelete = useCallback(
+    async (chatId: string) => {
+      setLoading(true);
+      await deleteChat(chatId);
+      setLoading(false);
+      // 현재 열려있는 채팅을 지웠다면 /chat 기본 경로로
+      if (activeChatId === chatId) {
+        router.push("/chat");
       }
-    } catch (error) {
-      console.error("채팅 삭제 오류:", error);
-    }
-  };
+    },
+    [deleteChat, activeChatId, router]
+  );
+
+  // 날짜별 그룹화
+  const groupedChats = groupChatsByDate(chats);
 
   return (
-    <div className="w-64 h-screen bg-background p-4 border-r">
-      {/* 사이드바 헤더 */}
-      <div className="flex justify-between items-center mb-4">
-        <Button
-          onPress={() => router.push("/chat")}
-          color="primary"
-          size="sm"
-          className="dark:text-black"
-        >
-          + 새 대화
-        </Button>
-        <Button variant="light" size="sm" isIconOnly>
-          <ChevronLeftIcon className="w-4 h-4" />
-        </Button>
+    <div className="w-64 flex flex-col bg-background border-r">
+      {/* 상단 헤더 (고정) */}
+      <div className="p-4 flex-shrink-0 sticky top-0 bg-background z-10 border-b">
+        <div className="flex justify-between items-center">
+          <Button
+            onPress={() => router.push("/chat")}
+            color="primary"
+            size="sm"
+            className="dark:text-black"
+          >
+            + 새 대화
+          </Button>
+          <Button variant="light" size="sm" isIconOnly>
+            <ChevronLeftIcon className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
-      {/* 채팅 목록 */}
-      {loading ? (
-        <Spinner />
-      ) : (
-        <div className="space-y-4">
-          {Object.entries(groupChatsByDate(chats)).map(
-            ([group, groupChats]) => (
-              <div key={group}>
-                <h3 className="text-xs font-medium text-gray-500 mb-2">
-                  {group}
-                </h3>
-                <div className="space-y-1">
-                  {groupChats.map((chat) => (
-                    <Button
-                      key={chat.id}
-                      variant={activeChatId === chat.id ? "solid" : "light"}
-                      color="primary"
-                      className={`w-full text-left justify-between ${
-                        activeChatId === chat.id ? "dark:text-black" : ""
-                      }`}
-                      onPress={() => {
-                        // 편집 중이 아닐 때만 채팅 이동
-                        if (!editingChat || editingChat.chatId !== chat.id) {
-                          router.push(`/chat/${chat.id}`);
-                        }
-                      }}
-                    >
-                      {/* 채팅 제목 영역: 편집 중이면 input, 아니면 텍스트 표시 */}
-                      {editingChat && editingChat.chatId === chat.id ? (
-                        <input
-                          type="text"
-                          value={editingChat.title}
-                          autoFocus
-                          onChange={(e) =>
-                            setEditingChat({
-                              chatId: chat.id,
-                              title: e.target.value,
-                            })
-                          }
-                          onBlur={() => {
-                            if (editingChat) {
-                              handleRenameSubmit(chat.id, editingChat.title);
-                            }
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              handleRenameSubmit(chat.id, editingChat.title);
-                            }
-                          }}
-                          className="w-full bg-transparent text-left outline-none"
-                        />
-                      ) : (
-                        <span className="truncate">{chat.title}</span>
-                      )}
-
-                      {/* 오른쪽 영역을 별도의 div로 감싸 hover 이벤트를 처리 */}
-                      <div className="relative flex items-center">
-                        {/* 기본 상태: 생성시간 표시 */}
-                        <span className="text-xs text-gray-500 transition-opacity duration-200 group-hover:opacity-0">
-                          {new Date(chat.createdAt).toLocaleTimeString(
-                            "ko-KR",
-                            {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
-                        </span>
-                        {/* Hover 상태: 편집 및 삭제 아이콘 */}
-                        <span className="absolute right-0 flex items-center space-x-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingChat({
-                                chatId: chat.id,
-                                title: chat.title,
-                              });
-                            }}
-                            className="hover:text-green-600"
-                          >
-                            <PencilIcon className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(chat.id);
-                            }}
-                            className="hover:text-red-600"
-                          >
-                            <TrashIcon className="w-4 h-4" />
-                          </button>
-                        </span>
-                      </div>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )
-          )}
-        </div>
-      )}
+      {/* 채팅 목록 스크롤 영역 */}
+      <div className="overflow-y-auto flex-grow p-4">
+        {/* 로딩중이면 Spinner 표시, 아니면 그룹별 채팅 목록 */}
+        {loading ? (
+          <Spinner />
+        ) : (
+          Object.entries(groupedChats).map(([group, groupChats]) => (
+            <ChatGroup
+              key={group}
+              groupTitle={group}
+              chats={groupChats}
+              activeChatId={activeChatId}
+              editingChat={editingChat}
+              onSelectChat={handleSelectChat}
+              onSetEditingChat={handleSetEditingChat}
+              onRenameSubmit={handleRenameSubmit}
+              onDeleteChat={handleDelete}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 }

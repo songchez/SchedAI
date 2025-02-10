@@ -1,4 +1,3 @@
-import CustomNavbar from "@/components/Navbar/CustomNavbar";
 import { Gowun_Batang } from "next/font/google";
 import { Providers } from "./providers";
 import "./globals.css";
@@ -17,10 +16,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className="dark">
       <body className={gowunBatang.className}>
-        <Providers>
-          <CustomNavbar />
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

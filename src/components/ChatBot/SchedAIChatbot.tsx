@@ -11,7 +11,7 @@ import { useDisclosure } from "@heroui/react";
 import { PaymentModal } from "./PaymentModal";
 import { RecommendationList } from "./RecommendationList";
 import { AIModels } from "@/lib/chatApiHandlers/constants";
-import { useChatStore } from "@/lib/store/ChatStore";
+import { useMessageStore } from "@/lib/store/MessageStore";
 
 interface SchedAIChatbotProps {
   chatId?: string;
@@ -22,7 +22,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
     useState<AIModels>("gemini-1.5-flash");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   // Zustand 스토어에서 저장된 메시지 읽기
-  const storedMessages = useChatStore((state) => state.messages);
+  const storedMessages = useMessageStore((state) => state.messages);
 
   // useChat 훅으로 실시간 대화 메시지 관리 (새 메시지, 스트리밍 등)
   const {
