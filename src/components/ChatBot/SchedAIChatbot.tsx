@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import ChatMessageList from "./ChatMessageList";
 import ChatInput from "./ChatInput";
 import { useChat } from "ai/react";
@@ -10,7 +10,7 @@ import { useDisclosure } from "@heroui/react";
 import { PaymentModal } from "./PaymentModal";
 import { RecommendationList } from "./RecommendationList";
 import { AIModels } from "@/lib/chatApiHandlers/constants";
-import { useMessageStore } from "@/lib/store/MessageStore";
+import { useChatInputStore } from "@/lib/store/ChatInputStore";
 
 interface SchedAIChatbotProps {
   chatId?: string;
@@ -19,10 +19,13 @@ interface SchedAIChatbotProps {
 export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
   const [selectedModel, setSelectedModel] =
     useState<AIModels>("gemini-1.5-flash");
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const storedMessages = useMessageStore((state) => state.messages);
+
+  const storedChatInput = useChatInputStore((state) => state.value);
 
   // AI 스트리밍 요청 (채팅 시작)
+
   const {
     messages: liveMessages,
     input,
@@ -43,12 +46,39 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
     },
   });
 
+  // 동일 메시지에 대해 중복 제출을 막기 위한 ref
+
+  const lastSubmittedUserMessage = useRef<string>("");
+
+  const formRef = useRef<HTMLFormElement>(null);
+  // storedMessages가 첫 메시지 일 때(챗시작) 응답요청하기
+  useEffect(() => {
+    if (
+      storedChatInput &&
+      storedChatInput !== lastSubmittedUserMessage.current
+    ) {
+      console.log("Zustand로 저장된 메시지", storedChatInput);
+      // input에 마지막 메시지 내용을 넣기
+      lastSubmittedUserMessage.current = storedChatInput;
+      handleInputChange({
+        target: { value: storedChatInput },
+      } as React.ChangeEvent<HTMLInputElement>);
+      // submit 실행
+      setTimeout(() => {
+        if (formRef.current) {
+          formRef.current.dispatchEvent(
+            new Event("submit", { bubbles: true, cancelable: true })
+          );
+        }
+      }, 0);
+    }
+  }, [storedChatInput, handleInputChange, handleSubmit]);
   const [preloadedMessages, setPreloadedMessages] = useState([]);
   const [isPreloading, setIsPreloading] = useState<boolean>(true);
-
   useEffect(() => {
+    // [GET]: 기존 메시지들 가져오기
     if (chatId) {
-      fetch(`/api/chat?chatId=${chatId}`)
+      fetch(`/api/chat/stream?chatId=${chatId}`)
         .then((res) => {
           if (!res.ok) {
             throw new Error("Failed to fetch preloaded messages");
@@ -57,15 +87,8 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
         })
         .then((data) => {
           setPreloadedMessages(data);
-          setIsPreloading(false);
 
-          // ✅ 사용자의 첫 번째 메시지(role: "user")가 있을 경우 AI 응답 요청
-          const hasUserMessage = data.some(
-            (msg: { role: string }) => msg.role === "user"
-          );
-          if (hasUserMessage) {
-            handleSubmit();
-          }
+          setIsPreloading(false);
         })
         .catch((error) => {
           console.error("Error fetching preloaded messages:", error);
@@ -75,11 +98,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
       setIsPreloading(false);
     }
   }, [chatId]);
-
-  const baseMessages =
-    storedMessages.length > 0 ? storedMessages : preloadedMessages;
-  const finalMessages = [...baseMessages, ...liveMessages];
-
+  const finalMessages = [...preloadedMessages, ...liveMessages];
   const handleRecommendationSelect = (r: string) => {
     handleInputChange({
       target: { value: r },
@@ -104,16 +123,19 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
         {finalMessages.length === 0 && (
           <RecommendationList onSelect={handleRecommendationSelect} />
         )}
+
         <SessionProvider>
-          <ChatInput
-            input={input}
-            selectedModel={selectedModel}
-            onInputChange={handleInputChange}
-            onModelChange={setSelectedModel}
-            onSubmit={handleSubmit}
-            stop={stop}
-            isLoading={isLoading}
-          />
+          <form ref={formRef} onSubmit={handleSubmit}>
+            <ChatInput
+              input={input}
+              selectedModel={selectedModel}
+              onInputChange={handleInputChange}
+              onModelChange={setSelectedModel}
+              onSubmit={handleSubmit}
+              stop={stop}
+              isLoading={isLoading}
+            />
+          </form>
         </SessionProvider>
       </div>
     </div>

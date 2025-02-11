@@ -1,18 +1,13 @@
 // /src/app/api/chat/start.ts
 "use server";
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
-import { Message } from "ai";
 
-export async function POST(req: NextRequest): Promise<Response> {
+export async function POST(): Promise<Response> {
   const session = await auth();
   const userId = session?.user.id;
-
-  const { messages } = (await req.json()) as {
-    messages: Message[];
-  };
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -52,22 +47,6 @@ export async function POST(req: NextRequest): Promise<Response> {
       isArchived: false,
     },
   });
-  // 첫 번째 유저 메시지를 DB에 저장 (예: messages[0])
-  if (messages.length > 0) {
-    const firstMessage = messages[0];
-    console.log("[POST] 첫 번째 유저 메시지 저장 시작");
-    await prisma.messageEntity.create({
-      data: {
-        content: firstMessage.content,
-        role: firstMessage.role,
-        chatId: newChat.id,
-        createdAt: firstMessage.createdAt
-          ? new Date(firstMessage.createdAt)
-          : new Date(),
-      },
-    });
-    console.log("[POST] 첫 번째 유저 메시지 저장 완료");
-  }
 
   return NextResponse.json({ newChatId: newChat.id }); // 채팅 ID만 반환
 }
