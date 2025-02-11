@@ -1,4 +1,3 @@
-// /src/components/ChatBot/SchedAIChatbot.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -21,10 +20,9 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
   const [selectedModel, setSelectedModel] =
     useState<AIModels>("gemini-1.5-flash");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  // Zustand 스토어에서 저장된 메시지 읽기
   const storedMessages = useMessageStore((state) => state.messages);
 
-  // useChat 훅으로 실시간 대화 메시지 관리 (새 메시지, 스트리밍 등)
+  // AI 스트리밍 요청 (채팅 시작)
   const {
     messages: liveMessages,
     input,
@@ -33,20 +31,22 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
     stop,
     isLoading,
   } = useChat({
-    body: { model: selectedModel, chatId },
+    api: "/api/chat/stream",
+    body: {
+      chatId,
+      model: selectedModel,
+    },
     onResponse: (response) => {
       if (response.status === 402) {
-        onOpen(); // 토큰 부족 => 결제 모달 열기
+        onOpen();
       }
     },
   });
 
-  // 기존에 저장된 메시지를 API로 불러오기 위한 상태
   const [preloadedMessages, setPreloadedMessages] = useState([]);
   const [isPreloading, setIsPreloading] = useState<boolean>(true);
 
   useEffect(() => {
-    // chatId가 있을 경우에만 기존 메시지 불러오기
     if (chatId) {
       fetch(`/api/chat?chatId=${chatId}`)
         .then((res) => {
@@ -58,6 +58,14 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
         .then((data) => {
           setPreloadedMessages(data);
           setIsPreloading(false);
+
+          // ✅ 사용자의 첫 번째 메시지(role: "user")가 있을 경우 AI 응답 요청
+          const hasUserMessage = data.some(
+            (msg: { role: string }) => msg.role === "user"
+          );
+          if (hasUserMessage) {
+            handleSubmit();
+          }
         })
         .catch((error) => {
           console.error("Error fetching preloaded messages:", error);
@@ -68,13 +76,10 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
     }
   }, [chatId]);
 
-  // 저장된 메시지가 있다면 우선 사용, 없으면 API로 불러온 메시지를 사용
   const baseMessages =
     storedMessages.length > 0 ? storedMessages : preloadedMessages;
-  // 최종 메시지 배열: 기존 메시지와 실시간 메시지를 병합
   const finalMessages = [...baseMessages, ...liveMessages];
 
-  // 추천 문구 클릭 시 처리
   const handleRecommendationSelect = (r: string) => {
     handleInputChange({
       target: { value: r },

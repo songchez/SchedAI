@@ -21,6 +21,7 @@ export default function FirstPage() {
   // useChat 훅을 사용하여 새 채팅 생성 엔드포인트 호출
   const { input, handleInputChange, handleSubmit, isLoading, messages } =
     useChat({
+      api: "api/chat/start",
       body: {
         model: selectedModel,
       },
@@ -30,21 +31,11 @@ export default function FirstPage() {
           onOpen();
         }
         // 응답 헤더에서 새 채팅 ID 추출
-        const newChatId = response.headers.get("X-New-Chat-Id");
-        console.log("[useChat onResponse] 새 채팅 ID:", newChatId);
-        if (newChatId) {
-          // 현재까지의 메시지를 Zustand 스토어에 저장
-          setMessages(messages);
-          // 채팅 응답 스트리밍이 완료되면 해당 채팅 ID로 동적 라우팅
-          router.push(`chat/${newChatId}`);
-        } else {
-          console.error(
-            "[useChat onResponse] 새 채팅 ID가 응답 헤더에 없습니다."
-          );
-        }
+        const { newChatId }: { newChatId: string } = await response.json();
+        setMessages(messages);
+        router.push(`chat/${newChatId}`);
       },
     });
-
   // 추천 문구 클릭 시 처리
   const handleRecommendationSelect = (r: string) => {
     handleInputChange({

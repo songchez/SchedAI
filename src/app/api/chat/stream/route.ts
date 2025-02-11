@@ -104,57 +104,22 @@ export async function POST(req: NextRequest): Promise<Response> {
     const calendars = await getCalendarList(userId);
     console.log("[POST] 구글 캘린더 목록:", calendars);
 
-    let finalChatId = chatId;
-
-    // 새 채팅 생성 여부 확인 (chatId가 없으면 새 채팅 생성)
-    if (!chatId) {
-      console.log("[POST] 새 채팅 생성 시작");
-      const newChat = await prisma.chat.create({
+    console.log("[POST] 기존 채팅에 메시지 추가, chatId:", chatId);
+    // 기존 채팅에 새 메시지 추가: 마지막 유저 메시지를 추가하는 예시
+    if (messages.length > 0) {
+      const userMessage = messages[messages.length - 1];
+      console.log("[POST] 새 유저 메시지 저장 시작");
+      await prisma.messageEntity.create({
         data: {
-          userId,
-          title: "새 채팅",
-          aiModel: modelInstance.modelId,
-          messageCount: messages.length, // 유저 메시지 개수로 초기화
-          isArchived: false,
+          content: userMessage.content,
+          role: userMessage.role,
+          chatId: chatId,
+          createdAt: userMessage.createdAt
+            ? new Date(userMessage.createdAt)
+            : new Date(),
         },
       });
-      finalChatId = newChat.id;
-      console.log("[POST] 새 채팅 생성 완료, chatId:", finalChatId);
-
-      // 첫 번째 유저 메시지를 DB에 저장 (예: messages[0])
-      if (messages.length > 0) {
-        const firstMessage = messages[0];
-        console.log("[POST] 첫 번째 유저 메시지 저장 시작");
-        await prisma.messageEntity.create({
-          data: {
-            content: firstMessage.content,
-            role: firstMessage.role,
-            chatId: newChat.id,
-            createdAt: firstMessage.createdAt
-              ? new Date(firstMessage.createdAt)
-              : new Date(),
-          },
-        });
-        console.log("[POST] 첫 번째 유저 메시지 저장 완료");
-      }
-    } else {
-      console.log("[POST] 기존 채팅에 메시지 추가, chatId:", chatId);
-      // 기존 채팅에 새 메시지 추가: 마지막 유저 메시지를 추가하는 예시
-      if (messages.length > 0) {
-        const userMessage = messages[messages.length - 1];
-        console.log("[POST] 새 유저 메시지 저장 시작");
-        await prisma.messageEntity.create({
-          data: {
-            content: userMessage.content,
-            role: userMessage.role,
-            chatId: chatId,
-            createdAt: userMessage.createdAt
-              ? new Date(userMessage.createdAt)
-              : new Date(),
-          },
-        });
-        console.log("[POST] 새 유저 메시지 저장 완료");
-      }
+      console.log("[POST] 새 유저 메시지 저장 완료");
     }
 
     // 토큰 및 구독 상태 확인
@@ -210,42 +175,32 @@ User calendar id is: ${calendars?.[0]?.id?.toString() ?? "(No calendar id)"} `;
       },
     });
 
-    for await (const textPart of result.textStream) {
-      console.log("[POST] AI 스트리밍 객체 생성됨", textPart);
-    }
+    // 🛠️ **비동기적으로 DB 저장 (스트리밍 반환 후 실행)**
+    result.text.then(async (fullText) => {
+      try {
+        await prisma.messageEntity.create({
+          data: {
+            content: fullText,
+            role: "assistant",
+            chatId: chatId!,
+            createdAt: new Date(),
+          },
+        });
 
-    // AI 응답 최종 텍스트를 기다립니다.
-    const finalText = await result.text;
-    console.log("[POST] AI 응답 최종 텍스트 수신:", finalText);
-
-    // 최종 AI 응답 메시지를 DB에 저장합니다.
-    console.log("[POST] AI 응답 메시지 DB 저장 시작");
-    await prisma.messageEntity.create({
-      data: {
-        content: finalText,
-        role: "assistant", // AI 응답의 역할
-        chatId: finalChatId!,
-        createdAt: new Date(),
-      },
+        // 채팅의 messageCount 업데이트
+        await prisma.chat.update({
+          where: { id: chatId },
+          data: { messageCount: { increment: 1 } },
+        });
+        console.log("[POST] AI 응답 메시지 DB 저장 완료");
+      } catch (err) {
+        console.error("[POST] DB 저장 중 오류 발생:", err);
+      }
     });
-
-    console.log("[POST] AI 응답 메시지 DB 저장 완료");
-
-    // 채팅의 messageCount 업데이트 (옵션)
-    console.log("[POST] 채팅의 messageCount 업데이트 시작");
-    await prisma.chat.update({
-      where: { id: finalChatId },
-      data: { messageCount: { increment: 1 } },
-    });
-    console.log("[POST] 채팅의 messageCount 업데이트 완료");
 
     // 스트리밍 응답을 클라이언트로 전달합니다.
     console.log("[POST] 스트리밍 응답 클라이언트 전달");
-    return result.toDataStreamResponse({
-      headers: {
-        "X-New-Chat-Id": finalChatId,
-      },
-    });
+    return result.toDataStreamResponse();
   } catch (err) {
     if (userId && err instanceof Error) {
       console.error("[POST] /api/chat POST Error:", err);
