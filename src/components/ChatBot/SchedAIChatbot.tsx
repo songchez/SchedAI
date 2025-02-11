@@ -82,10 +82,10 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
   };
 
   return (
-    <div className="flex flex-col justify-end w-full max-w-3xl mx-auto p-4 rounded-lg">
+    <div className="flex flex-col justify-end w-full max-w-3xl mx-auto rounded-lg">
       <PaymentModal isOpen={isOpen} onOpenChange={onOpenChange} />
 
-      <ScrollShadow hideScrollBar className="h-[82vh]">
+      <ScrollShadow hideScrollBar className="h-[74vh]">
         {isPreloading ? (
           <div className="p-4 text-center animate-pulse">
             메시지 불러오는 중...

@@ -10,10 +10,7 @@ export default function RootLayout({
 }) {
   return (
     <SessionProvider>
-      <div className="flex">
-        {/* 페이지 내용 */}
-        <div className="flex-1">{children}</div>
-      </div>
+      <div className="flex-1">{children}</div>
     </SessionProvider>
   );
 }

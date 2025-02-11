@@ -58,7 +58,7 @@ export default function FirstPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-full p-4 mt-20">
+    <div className="flex flex-col items-center justify-center p-4 mt-20">
       <PaymentModal isOpen={isOpen} onOpenChange={onOpenChange} />
       <div className="w-full max-w-3xl">
         <RecommendationList onSelect={handleRecommendationSelect} />

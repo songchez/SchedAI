@@ -20,15 +20,15 @@ export default function RootLayout({
     <html lang="ko" className="dark">
       <body className={gowunBatang.className}>
         <Providers>
-          <div className="flex">
+          <div className="flex w-screen">
             <SessionProvider>
               <ChatSideBar />
             </SessionProvider>
-            <div className="flex-1">
+            <div className="w-full">
               <CustomNavbar />
+              {children}
             </div>
           </div>
-          {children}
         </Providers>
       </body>
     </html>

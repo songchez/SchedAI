@@ -9,7 +9,7 @@ export default async function ChatPage({ params }: PageProps) {
   const { chatId } = params;
 
   return (
-    <div className="h-full">
+    <div>
       <SessionProvider>
         <SchedAIChatbot chatId={chatId} />
       </SessionProvider>
