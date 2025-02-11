@@ -19,15 +19,17 @@ export default function RootLayout({
   return (
     <html lang="ko" className="dark">
       <body className={gowunBatang.className}>
-        <div className="flex">
-          <SessionProvider>
-            <ChatSideBar />
-          </SessionProvider>
-          <div className="flex-1">
-            <CustomNavbar />
+        <Providers>
+          <div className="flex">
+            <SessionProvider>
+              <ChatSideBar />
+            </SessionProvider>
+            <div className="flex-1">
+              <CustomNavbar />
+            </div>
           </div>
-        </div>
-        <Providers>{children}</Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
