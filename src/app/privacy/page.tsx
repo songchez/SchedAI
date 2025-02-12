@@ -87,10 +87,7 @@ export default function PrivacyPolicy() {
         <ul className="list-disc pl-5">
           <li>개인정보 열람, 정정, 삭제 요청 가능</li>
           <li>동의 철회 가능</li>
-          <li>
-            고객센터를 통해 요청 가능 (이메일: tama4840@gmail.com, 전화:
-            010-8226-9616)
-          </li>
+          <li>고객센터를 통해 요청 가능 (이메일: tama4840@gmail.com)</li>
         </ul>
       </section>
 
