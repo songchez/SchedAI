@@ -116,7 +116,7 @@ export default function ChatSideBar() {
     <div
       className={
         pathname.startsWith("/chat")
-          ? "w-80 flex flex-col bg-background border-r"
+          ? "w-80 flex flex-col bg-background border-r min-h-screen"
           : "hidden"
       }
     >
