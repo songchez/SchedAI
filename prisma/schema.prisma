@@ -46,7 +46,7 @@ model MessageEntity {
   content         String
   role            String    // 'system' | 'user' | 'assistant' | 'data'
   chat            Chat?     @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  chatId          String?
+  chatId          String
 }
 
 

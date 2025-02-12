@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Textarea,
   Button,
@@ -10,7 +12,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/react";
-import { ChangeEvent, useEffect, useRef } from "react";
+import { ChangeEvent, useEffect, useRef, useCallback } from "react";
 import { useSession, signIn } from "next-auth/react";
 import SchedAILogdo from "@/images/SchedAILogo.png";
 import Image from "next/image";
@@ -30,6 +32,7 @@ interface ChatInputProps {
 
 /**
  * 사용자 입력창 + 모델 선택 UI
+ * form 태그 없이 구현하여 하이드레이션 오류를 피함.
  */
 export default function ChatInput({
   input,
@@ -44,7 +47,18 @@ export default function ChatInput({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // 엔터키로 전송
+  // 실제 제출 함수: 로그인하지 않은 경우 모달을 열고, 그렇지 않으면 onSubmit 호출
+  const chatSubmit = useCallback(() => {
+    if (!session) {
+      // 모달을 열기 전에 입력창의 포커스를 제거합니다.
+      inputRef.current?.blur();
+      onOpen();
+      return;
+    }
+    onSubmit();
+  }, [session, onOpen, onSubmit]);
+
+  // 엔터키로 전송 처리 (Shift+Enter는 줄바꿈 허용)
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -52,17 +66,7 @@ export default function ChatInput({
     }
   };
 
-  // 실제 Submit
-  const chatSubmit = () => {
-    if (!session) {
-      // 비로그인 상태면 로그인 모달 열기
-      onOpen();
-      return;
-    }
-    onSubmit();
-  };
-
-  // 로딩이 끝난 후 포커스 이동
+  // 로딩이 끝난 후 입력창에 포커스 이동
   useEffect(() => {
     if (!isLoading) {
       inputRef.current?.focus();
@@ -70,15 +74,9 @@ export default function ChatInput({
   }, [isLoading]);
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        chatSubmit();
-      }}
-      className="flex gap-2 items-end"
-    >
+    <div className="flex gap-2 items-end">
       {/* 모델 선택 (PC 뷰에서만 노출) */}
-      <div className="w-36 hidden md:inline-block bottom-3">
+      <div className="w-36 hidden md:inline-block">
         <Select
           isRequired
           defaultSelectedKeys={[selectedModel]}
@@ -113,6 +111,7 @@ export default function ChatInput({
 
       {/* 텍스트 입력창 */}
       <Textarea
+        aria-label="메시지를 입력하세요"
         ref={inputRef}
         isDisabled={isLoading}
         fullWidth
@@ -129,10 +128,9 @@ export default function ChatInput({
         size="lg"
       />
 
-      {/* 전송 or 중지 버튼 */}
+      {/* 전송 또는 중지 버튼 */}
       {isLoading ? (
         <Button onPress={stop} color="primary" className="w-12" isIconOnly>
-          {/* 정지 버튼 아이콘 */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="primary-500"
@@ -149,8 +147,13 @@ export default function ChatInput({
           </svg>
         </Button>
       ) : (
-        <Button className="w-12" type="submit" color="primary" isIconOnly>
-          {/* 전송 버튼 아이콘 */}
+        <Button
+          className="w-12"
+          type="button"
+          color="primary"
+          isIconOnly
+          onPress={chatSubmit}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -223,6 +226,6 @@ export default function ChatInput({
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </form>
+    </div>
   );
 }

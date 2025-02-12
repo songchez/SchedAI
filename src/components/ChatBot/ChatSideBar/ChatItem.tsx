@@ -98,7 +98,7 @@ export default function ChatItem({
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             className={`
-              w-full bg-transparent outline-none
+              w-full bg-transparent outline-none text-sm
               ${
                 isActive
                   ? "text-white dark:text-black"
@@ -108,7 +108,7 @@ export default function ChatItem({
           />
         ) : (
           <span
-            className={`truncate ${
+            className={`truncate text-sm ${
               isActive
                 ? "text-white dark:text-black/90"
                 : "text-black dark:text-white/40"
@@ -142,7 +142,7 @@ export default function ChatItem({
               opacity-0 group-hover:opacity-100 transition-opacity
             `}
           >
-            <button
+            <span
               onClick={handleEditClick}
               className={`hover:text-green-600 ${
                 isActive
@@ -151,8 +151,8 @@ export default function ChatItem({
               }`}
             >
               <PencilIcon className="w-4 h-4" />
-            </button>
-            <button
+            </span>
+            <span
               onClick={handleDeleteClick}
               className={`hover:text-red-600 ${
                 isActive
@@ -161,7 +161,7 @@ export default function ChatItem({
               }`}
             >
               <TrashIcon className="w-4 h-4" />
-            </button>
+            </span>
           </div>
         </div>
       </button>

@@ -26,6 +26,7 @@ export function ThemeSwitcher() {
     <div>
       {theme && (
         <Select
+          aria-label="테마 선택"
           className="w-24 md:inline-block hidden"
           placeholder={theme}
           value={theme}
