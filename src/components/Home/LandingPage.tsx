@@ -427,17 +427,20 @@ function DeveloperSection() {
 -----------------------------------*/
 function FooterSection() {
   return (
-    <footer className="w-full py-6 bg-gray-900 text-gray-300">
+    <footer className="relative w-full py-6 bg-gray-900 text-gray-300">
       <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between">
         {/* 로고 (간단히 텍스트로 처리) */}
         <div className="flex items-center gap-3">
-          {/* 원한다면 여기서 Image 로고로 교체 가능 */}
-          <div className="text-xl font-bold">SchedAI</div>
+          <Link href="/" className="text-xl font-bold">
+            SchedAI
+          </Link>
         </div>
         <Link href="/privacy">개인정보 처리방침</Link>
+
         <p className="mt-3 md:mt-0 text-sm">
           © 2025 SchedAI. All rights reserved.
         </p>
+
         {/* 소셜 링크가 있다면 추가 */}
         {/* 예) <div>소셜 아이콘...</div> */}
       </div>
