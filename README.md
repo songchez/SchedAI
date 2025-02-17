@@ -14,8 +14,8 @@ SchedAI is your smart companion, offering more than just schedule management—i
 
 ## 프로젝트 개요
 
-- **백엔드**: Next.js v14
-- **스타일링**: Tailwind CSS 및 HeroUI
+- **FrameWork**: Next.js v14
+- **Style**: Tailwind CSS 및 HeroUI
 - **핵심 기능**:
   - Google 계정을 통한 사용자 로그인 및 인증
   - OpenAI API를 활용한 대화형 채팅 기능
@@ -43,17 +43,12 @@ SchedAI is your smart companion, offering more than just schedule management—i
 - 변경사항 로그 페이지 제공
 - 필터 및 검색 기능 추가
 
-### 4. AI 기반 메모리 및 학습
-
-- 대화 내용 및 Google Calendar 데이터를 클라우드에 아카이브
-- 개인화된 일정 추천 및 자동화 기능 제공
-
 ## 설치 방법
 
 1. **레포지토리 클론**
 
    ```bash
-   git clone https://github.com/yourusername/schedai.git
+   git clone https://github.com/songchez/SchedAI.git
    cd schedai
    ```
 
@@ -90,8 +85,9 @@ SchedAI is your smart companion, offering more than just schedule management—i
 ## 기술 스택
 
 - **프론트엔드**: Next.js, Tailwind CSS
-- **백엔드**: OpenAI API, Google Calendar API, JWT
-- **데이터베이스**: SQLite (개발 및 테스트), PostgreSQL (프로덕션)
+- **상태관리**: Zustand
+- **백엔드**: Nextjs Api Route, OpenAI API, Google Calendar API
+- **데이터베이스**: PostgreSQL (프로덕션), prisma
 
 ## 기여
 
@@ -108,3 +104,4 @@ SchedAI is your smart companion, offering more than just schedule management—i
 
 - [ ] 속도 최적화, 로딩 최적화
 - [ ] 삭제할때 자꾸 버튼눌려서 라우팅 됨. 제목편집할때도 마찬가지
+- [ ] 이미지 인풋 구현.

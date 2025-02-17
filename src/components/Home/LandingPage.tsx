@@ -434,6 +434,7 @@ function FooterSection() {
           {/* 원한다면 여기서 Image 로고로 교체 가능 */}
           <div className="text-xl font-bold">SchedAI</div>
         </div>
+        <Link href="/privacy">개인정보 처리방침</Link>
         <p className="mt-3 md:mt-0 text-sm">
           © 2025 SchedAI. All rights reserved.
         </p>
