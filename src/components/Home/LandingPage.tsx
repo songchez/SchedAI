@@ -435,11 +435,12 @@ function FooterSection() {
             SchedAI
           </Link>
         </div>
-        <Link href="/privacy">개인정보 처리방침</Link>
-
-        <p className="mt-3 md:mt-0 text-sm">
-          © 2025 SchedAI. All rights reserved.
-        </p>
+        <div className="flex flex-col items-end text-sm">
+          <p className="mt-3 md:mt-0">© 2025 SchedAI. All rights reserved.</p>
+          <Link href="/privacy" className="text-orange-300 font-bold">
+            개인정보 처리방침
+          </Link>
+        </div>
 
         {/* 소셜 링크가 있다면 추가 */}
         {/* 예) <div>소셜 아이콘...</div> */}
