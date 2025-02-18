@@ -19,6 +19,7 @@ export default function OnLoginDropdownBtn({ session }: Props) {
   // 1. Set up your items as an array
   const items = [
     { key: "myaccount", label: "My Account", href: "/myaccount" },
+    { key: "checkout", label: "✨프리미엄구독", href: "/checkout" },
     { key: "signOut", label: "Sign Out", className: "text-danger" },
   ].flat();
 
