@@ -4,6 +4,7 @@ import "./globals.css";
 import CustomNavbar from "@/components/Navbar/CustomNavbar";
 import ChatSideBar from "@/components/ChatBot/ChatSideBar";
 import { SessionProvider } from "next-auth/react";
+import { auth } from "@/auth";
 
 const gowunBatang = Gowun_Batang({
   display: "swap",
@@ -11,17 +12,18 @@ const gowunBatang = Gowun_Batang({
   weight: ["400", "700"],
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
   return (
     <html lang="ko" className="dark">
       <body className={gowunBatang.className}>
         <Providers>
           <div className="flex w-screen">
-            <SessionProvider>
+            <SessionProvider session={session}>
               <ChatSideBar />
             </SessionProvider>
             <div className="w-full">

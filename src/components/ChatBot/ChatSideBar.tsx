@@ -1,7 +1,7 @@
 "use client";
 
 import { Button, Spinner } from "@heroui/react";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useEffect, useState, useCallback } from "react";
 import { Chat } from "@prisma/client";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
@@ -60,6 +60,18 @@ export default function ChatSideBar() {
 
   // 현재 활성화된 채팅 ID ("/chat/[id]" 경로)
   const activeChatId = pathname.split("/chat/")[1];
+
+  useEffect(() => {
+    if (session?.error === "RefreshTokenError") {
+      // 1. 에러 안내 메시지
+      alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+
+      // 2. 로그아웃 실행
+      signOut({
+        callbackUrl: "/", // 로그아웃 후 이동할 페이지
+      });
+    }
+  }, [session]);
 
   /** 사이드바 최초 로드 (또는 session 변경) 시 채팅 목록 가져오기 */
   useEffect(() => {
