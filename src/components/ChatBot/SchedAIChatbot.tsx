@@ -16,8 +16,9 @@ interface SchedAIChatbotProps {
 }
 
 export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
-  const [selectedModel, setSelectedModel] =
-    useState<AIModels>("gemini-1.5-flash");
+  const [selectedModel, setSelectedModel] = useState<AIModels>(
+    "gemini-2.0-flash-001"
+  );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const storedChatInput = useChatInputStore((state) => state.value);
   const { clearInput } = useChatInputStore();

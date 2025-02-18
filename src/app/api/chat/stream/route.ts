@@ -25,7 +25,7 @@ import { prisma } from "@/lib/prisma";
  */
 const providersMap: Record<AIModels, () => LanguageModelV1> = {
   "gemini-1.5-flash": () => google("gemini-1.5-flash"),
-  "gemini-2.0-flash-exp": () => google("gemini-2.0-flash-exp"),
+  "gemini-2.0-flash-001": () => google("gemini-2.0-flash-001"),
   "gpt-4o-mini": () => openai("gpt-4o-mini"),
 };
 

@@ -1,6 +1,6 @@
 // 객체로 사용하기 위해 상수로 정의
 export const AI_MODELS = {
-  GEMINI_20_FLASH: "gemini-2.0-flash-exp",
+  GEMINI_20_FLASH: "gemini-2.0-flash-001",
   GEMINI_15_FLASH: "gemini-1.5-flash",
   GPT_4O_MINI: "gpt-4o-mini",
 } as const;

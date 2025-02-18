@@ -30,7 +30,7 @@ model Chat {
   userId       String
   title        String    @default("새 채팅")  // AI가 생성한 제목
   messages     MessageEntity[]    // 대화 내용 저장 [{role: "user"|"assistant", content: "..."}]
-  aiModel      String    @default("gemini-2.0-flash") // 사용된 AI 모델
+  aiModel      String    @default("gemini-2.0-flash-001") // 사용된 AI 모델
   messageCount Int       @default(0)         // 총 메시지 수
   isArchived   Boolean   @default(false)     // 채팅 숨김 여부
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -13,8 +13,9 @@ import { useChatInputStore } from "@/lib/store/ChatInputStore";
 
 export default function FirstPage() {
   const router = useRouter();
-  const [selectedModel, setSelectedModel] =
-    useState<AIModels>("gemini-1.5-flash");
+  const [selectedModel, setSelectedModel] = useState<AIModels>(
+    "gemini-2.0-flash-001"
+  );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { setInput } = useChatInputStore();
 
