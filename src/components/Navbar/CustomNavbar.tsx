@@ -50,13 +50,18 @@ export default async function CustomNavbar() {
               <OnLoginDropdownBtn session={session} />
             ) : (
               <form
-                className="btn btn-primary"
                 action={async () => {
                   "use server";
                   await signIn("google");
                 }}
               >
-                <Button type="submit">Sign in</Button>
+                <Button
+                  type="submit"
+                  variant="bordered"
+                  className="border-black-500 shadow-sm hover:shadow-emerald-400"
+                >
+                  Sign In
+                </Button>
               </form>
             )}
           </div>

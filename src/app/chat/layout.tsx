@@ -1,15 +1,17 @@
 import { SessionProvider } from "next-auth/react";
+import { auth } from "@/auth";
 
 /**
  * /chat/* 에 대한 공통 Layout
  */
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
   return (
-    <SessionProvider>
+    <SessionProvider session={session}>
       <div className="flex-1">{children}</div>
     </SessionProvider>
   );
