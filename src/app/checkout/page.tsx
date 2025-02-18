@@ -16,7 +16,7 @@ import {
 } from "@heroui/react";
 import { CreditCardIcon } from "@heroicons/react/24/solid";
 import { calculatePrices } from "@/lib/utils/priceCalculator";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface CardInfo {
   cardNo: string; // ex. 1233-2312-1231-1231
