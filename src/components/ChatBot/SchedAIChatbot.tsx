@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import ChatMessageList from "./ChatMessageList";
 import ChatInput from "./ChatInput";
 import { Message, useChat } from "ai/react";
-import { SessionProvider } from "next-auth/react";
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { useDisclosure } from "@heroui/react";
 import { PaymentModal } from "./PaymentModal";
@@ -130,19 +129,17 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
       </ScrollShadow>
 
       <div className="sticky bottom-16 flex flex-col">
-        <SessionProvider>
-          <form ref={formRef} onSubmit={handleSubmit}>
-            <ChatInput
-              input={input}
-              selectedModel={selectedModel}
-              onInputChange={handleInputChange}
-              onModelChange={setSelectedModel}
-              onSubmit={handleSubmit}
-              stop={stop}
-              isLoading={isLoading}
-            />
-          </form>
-        </SessionProvider>
+        <form ref={formRef} onSubmit={handleSubmit}>
+          <ChatInput
+            input={input}
+            selectedModel={selectedModel}
+            onInputChange={handleInputChange}
+            onModelChange={setSelectedModel}
+            onSubmit={handleSubmit}
+            stop={stop}
+            isLoading={isLoading}
+          />
+        </form>
       </div>
     </div>
   );

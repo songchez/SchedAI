@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import SchedAIChatbot from "@/components/ChatBot/SchedAIChatbot";
 import { SessionProvider } from "next-auth/react";
 
@@ -7,12 +8,11 @@ interface PageProps {
 
 export default async function ChatPage({ params }: PageProps) {
   const { chatId } = params;
+  const session = await auth();
 
   return (
-    <div>
-      <SessionProvider>
-        <SchedAIChatbot chatId={chatId} />
-      </SessionProvider>
-    </div>
+    <SessionProvider session={session}>
+      <SchedAIChatbot chatId={chatId} />
+    </SessionProvider>
   );
 }
