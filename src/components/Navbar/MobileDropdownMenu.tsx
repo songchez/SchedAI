@@ -20,9 +20,11 @@ export default function MyDropdown({ session }: Props) {
     { key: "chat", label: "✨ChatBot", href: "/chat" },
     { key: "dashboard", label: "Dashboard", href: "/dashboard" },
     { key: "myaccount", label: "MyAccount", href: "/myaccount" },
-    { key: "checkout", label: "✨프리미엄구독", href: "/checkout" },
     session
-      ? { key: "signOut", label: "Sign Out", className: "text-danger" }
+      ? [
+          { key: "signOut", label: "Sign Out", className: "text-danger" },
+          { key: "checkout", label: "✨프리미엄구독", href: "/checkout" },
+        ]
       : { key: "signIn", label: "Sign In", className: "text-success" },
   ].flat();
 

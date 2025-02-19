@@ -30,11 +30,11 @@ export default function HomePage() {
           1. Hero 섹션
       ======================= */}
       <HeroSection />
-      <BluePrintSection />
 
       {/* =======================
           2. Feature 섹션
       ======================= */}
+
       <FeatureSection />
 
       {/* =======================
@@ -153,11 +153,10 @@ function HeroSection() {
 -----------------------------------*/
 function FeatureSection() {
   return (
-    <section className="w-full py-20">
-      <div className="flex items-center justify-center">
-        {/* 왼쪽 Feature Cards 목록 */}
-        <FeatureCards />
-      </div>
+    <section className="flex md:flex-row flex-col gap-5 items-center justify-center my-32">
+      {/* BluePrint + Feature Cards*/}
+      <BluePrintSection />
+      <FeatureCards />
     </section>
   );
 }

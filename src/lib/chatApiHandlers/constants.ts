@@ -1,10 +1,10 @@
 // 객체로 사용하기 위해 상수로 정의
 export const AI_MODELS = {
-  GEMINI_20_FLASH: "gemini-2.0-flash-001",
-  GEMINI_15_FLASH: "gemini-1.5-flash",
-  GPT_4O_MINI: "gpt-4o-mini",
+  GEMINI_20_FLASH: { value: "gemini-2.0-flash-001", key: "Gemini2.0" },
+  GEMINI_15_FLASH: { value: "gemini-1.5-flash", key: "Gemini1.5" },
+  GPT_4O_MINI: { value: "gpt-4o-mini", key: "GPT4o" },
 } as const;
-export type AIModels = (typeof AI_MODELS)[keyof typeof AI_MODELS];
+export type AIModels = (typeof AI_MODELS)[keyof typeof AI_MODELS]["value"];
 
 /** 최대 스트리밍 시간 (초) */
 export const MAX_DURATION = 30;

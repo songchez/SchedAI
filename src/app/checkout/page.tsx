@@ -126,7 +126,7 @@ export default function BillingForm() {
             <li>✓ 대시보드 기능 사용가능</li>
             <li>✓ 추가기능 얼리엑세스</li>
           </ul>
-          <span className="text-lg font-bold text-green-600 p-5">
+          <span className="text-lg font-bold text-primary-500 pt-4">
             👉 지금 결제하고 모든 기능을 누리세요!
           </span>
         </CardBody>

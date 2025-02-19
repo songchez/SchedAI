@@ -1,3 +1,4 @@
+import { ArrowUpCircleIcon } from "@heroicons/react/24/solid";
 import { Button } from "@heroui/react";
 import { motion, useCycle } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -96,8 +97,8 @@ export default function BluePrintSection() {
   }, [chatLog, displayText]);
 
   return (
-    <motion.div className="flex justify-center items-center dark:text-primary-300 text-primary-500 m-3">
-      <div className="p-6 rounded-2xl backdrop-blur-lg bg-opacity-20 w-full max-w-2xl h-[550px] flex flex-col">
+    <motion.div className="w-[500px] flex justify-center items-center dark:text-primary-300 text-primary-500">
+      <div className="p-6 rounded-2xl w-full backdrop-blur-lg bg-opacity-20 h-[500px] flex flex-col">
         {/* 채팅 기록 영역 – 스크롤은 가능하지만 스크롤바는 숨김 */}
         <div
           className="flex-1 overflow-y-auto space-y-2 hide-scrollbar"
@@ -117,9 +118,7 @@ export default function BluePrintSection() {
                     : "bg-gray-100/30 dark:bg-gray-800/30"
                 }`}
               >
-                <pre className="whitespace-pre-wrap font-sans">
-                  {msg.content}
-                </pre>
+                <pre className="whitespace-pre-wrap">{msg.content}</pre>
               </div>
             </div>
           ))}
@@ -141,9 +140,7 @@ export default function BluePrintSection() {
                     : "bg-gray-100/30 dark:bg-gray-800/30"
                 }`}
               >
-                <pre className="whitespace-pre-wrap font-sans">
-                  {displayText}
-                </pre>
+                <pre className="whitespace-pre-wrap">{displayText}</pre>
               </div>
             </motion.div>
           )}
@@ -155,11 +152,10 @@ export default function BluePrintSection() {
             메시지 입력 중...
           </div>
           <Button
-            color="primary"
-            variant="shadow"
-            className="dark:text-primary-500 font-bold"
+            isIconOnly
+            className="bg-transparent dark:text-primary-100 w-11"
           >
-            전송
+            <ArrowUpCircleIcon />
           </Button>
         </div>
       </div>

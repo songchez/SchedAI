@@ -31,17 +31,22 @@ export function RecommendationList({ onSelect }: RecommendationListProps) {
   }, []);
 
   return (
-    <div className="flex gap-4 flex-wrap justify-center items-center mb-32">
-      {recommendations.map((recommendation) => (
-        <Card
-          key={recommendation}
-          isPressable
-          onPress={() => onSelect(recommendation)}
-          className="px-4 py-2 text-sm text-clip rounded-lg shadow-md transition-all hover:scale-105 max-w-44"
-        >
-          <CardBody>{recommendation}</CardBody>
-        </Card>
-      ))}
+    <div className="pb-5">
+      <div className="flex gap-4 flex-wrap justify-center items-center mb-32">
+        {recommendations.map((recommendation) => (
+          <Card
+            key={recommendation}
+            isPressable
+            onPress={() => onSelect(recommendation)}
+            className="px-4 py-2 text-sm text-clip rounded-lg shadow-md transition-all hover:scale-105 max-w-44"
+          >
+            <CardBody>{recommendation}</CardBody>
+          </Card>
+        ))}
+      </div>
+      <span className="p-5 text-2xl text-primary-500 dark:text-white">
+        무엇을 도와드릴까요?
+      </span>
     </div>
   );
 }

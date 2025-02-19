@@ -17,6 +17,7 @@ import { useSession, signIn } from "next-auth/react";
 import SchedAILogdo from "@/images/SchedAILogo.png";
 import Image from "next/image";
 import { AI_MODELS, AIModels } from "@/lib/chatApiHandlers/constants";
+import { ArrowUpCircleIcon } from "@heroicons/react/24/solid";
 
 interface ChatInputProps {
   input: string;
@@ -75,43 +76,10 @@ export default function ChatInput({
 
   return (
     <div className="flex gap-2 items-end">
-      {/* 모델 선택 (PC 뷰에서만 노출) */}
-      <div className="w-36 hidden md:inline-block">
-        <Select
-          isRequired
-          defaultSelectedKeys={[selectedModel]}
-          value={selectedModel}
-          color="primary"
-          variant="underlined"
-          label="AI 모델 선택"
-          onChange={(e) => onModelChange(e.target.value as AIModels)}
-          renderValue={() => selectedModel}
-        >
-          {Object.values(AI_MODELS).map((model) => {
-            const shouldAnimate = model.length > 17;
-            return (
-              <SelectItem key={model} textValue={model}>
-                <div className="relative max-w-full overflow-hidden group">
-                  <span
-                    className={`block truncate transition-transform duration-700 ${
-                      shouldAnimate ? "group-hover:translate-x-[-15%]" : ""
-                    }`}
-                  >
-                    {model}
-                  </span>
-                  {shouldAnimate && (
-                    <div className="absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background via-background/80 to-transparent group-hover:from-transparent" />
-                  )}
-                </div>
-              </SelectItem>
-            );
-          })}
-        </Select>
-      </div>
-
       {/* 텍스트 입력창 */}
       <Textarea
         aria-label="메시지를 입력하세요"
+        classNames={{ inputWrapper: "pl-5 pt-5" }}
         ref={inputRef}
         isDisabled={isLoading}
         fullWidth
@@ -121,60 +89,73 @@ export default function ChatInput({
         placeholder="➤ 메시지를 적어주세요"
         onChange={onInputChange}
         onKeyDown={handleKeyDown}
-        variant="underlined"
+        variant="bordered"
         className="flex-1"
-        minRows={2}
-        maxRows={5}
+        minRows={4}
+        maxRows={6}
         size="lg"
+        endContent={
+          <div className="flex self-end">
+            <div>
+              <Select
+                className="w-28"
+                isRequired
+                value={selectedModel}
+                color="primary"
+                aria-label="aiModels"
+                defaultSelectedKeys={["Gemini2.0"]}
+                variant="underlined"
+                onChange={(e) => onModelChange(e.target.value as AIModels)}
+                renderValue={(items) => {
+                  return items.map((item) => (
+                    <span key={item.key}>{item.key}</span>
+                  ));
+                }}
+              >
+                {Object.values(AI_MODELS).map((model) => {
+                  return (
+                    <SelectItem key={model.key} textValue={model.value}>
+                      <span className="hover:text-blue-500">{model.key}</span>
+                    </SelectItem>
+                  );
+                })}
+              </Select>
+            </div>
+            {/* 전송 또는 중지 버튼 */}
+            {isLoading ? (
+              <Button
+                onPress={stop}
+                color="primary"
+                className="w-12"
+                isIconOnly
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="primary-500"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-6 dark:text-black"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z"
+                  />
+                </svg>
+              </Button>
+            ) : (
+              <Button
+                className="w-12 rounded-full bg-transparent"
+                isIconOnly
+                onPress={chatSubmit}
+              >
+                <ArrowUpCircleIcon />
+              </Button>
+            )}
+          </div>
+        }
       />
-
-      {/* 전송 또는 중지 버튼 */}
-      {isLoading ? (
-        <Button onPress={stop} color="primary" className="w-12" isIconOnly>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="primary-500"
-            viewBox="0 0 24 24"
-            strokeWidth={1.5}
-            stroke="currentColor"
-            className="size-6 dark:text-black"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z"
-            />
-          </svg>
-        </Button>
-      ) : (
-        <Button
-          className="w-12"
-          type="button"
-          color="primary"
-          isIconOnly
-          onPress={chatSubmit}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth={2}
-            stroke="currentColor"
-            className="size-6 dark:text-black"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m4.5 18.75 7.5-7.5 7.5 7.5"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="m4.5 12.75 7.5-7.5 7.5 7.5"
-            />
-          </svg>
-        </Button>
-      )}
 
       {/* 비로그인 상태일 때 띄우는 모달 */}
       <Modal isOpen={isOpen} onClose={onClose}>
