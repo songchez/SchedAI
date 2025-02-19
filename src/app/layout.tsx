@@ -26,7 +26,7 @@ export default async function RootLayout({
             <SessionProvider session={session}>
               <ChatSideBar />
             </SessionProvider>
-            <div className="w-full">
+            <div className="w-full relative h-screen">
               <CustomNavbar />
               {children}
             </div>

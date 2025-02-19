@@ -104,9 +104,9 @@ export default function BillingForm() {
   };
 
   return (
-    <div className="flex md:flex-row flex-col justify-center text-sm gap-5 mt-5">
+    <div className="flex md:flex-row md:items-start flex-col justify-center items-center text-sm gap-5 mt-5">
       <Card
-        className="shadow-lg rounded-xl backdrop-blur-lg bg-white/5 p-5 md:my-5 md:mx-0 mx-5 min-w-96"
+        className="shadow-lg rounded-xl backdrop-blur-lg bg-white/5 p-10 md:my-5 md:mx-0 mx-5"
         isPressable
       >
         <CardHeader>
@@ -132,7 +132,7 @@ export default function BillingForm() {
         </CardBody>
       </Card>
       <Form onSubmit={handleSubmit}>
-        <div className="relative md:w-[500px] aspect-[16/9] flex flex-col m-5">
+        <div className="md:w-[500px] md:aspect-[16/9] flex flex-col m-5">
           <Card className="p-5 shadow-lg rounded-xl backdrop-blur-lg bg-white/60 gap-4">
             <CardHeader className="gap-2">
               <CreditCardIcon className="w-6" />

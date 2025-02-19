@@ -12,8 +12,9 @@ export default async function RootLayout({
 
   return session ? (
     <SessionProvider session={session}>
+      <div className="absolute w-[500px] h-[500px] bg-gradient-to-r from-blue-500 to-green-500 rounded-full blur-3xl opacity-20 bottom-[0px] right-[0px]"></div>
       <div className="absolute w-[600px] h-[600px] bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full blur-3xl opacity-20 top-[-200px] left-[-200px]"></div>
-      <div className="absolute w-[500px] h-[500px] bg-gradient-to-r from-blue-500 to-green-500 rounded-full blur-3xl opacity-20 bottom-[-150px] right-[-150px]"></div>
+
       {children}
     </SessionProvider>
   ) : (
