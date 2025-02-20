@@ -95,7 +95,7 @@ export default function ChatInput({
         maxRows={6}
         size="lg"
         endContent={
-          <div className="flex self-end">
+          <div className="flex bottom-2 right-2 absolute">
             <div>
               <Select
                 className="w-28"

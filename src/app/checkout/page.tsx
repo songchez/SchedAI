@@ -104,36 +104,43 @@ export default function BillingForm() {
   };
 
   return (
-    <div className="flex md:flex-row md:items-start flex-col justify-center items-center text-sm gap-5 mt-5">
-      <Card
-        className="shadow-lg rounded-xl backdrop-blur-lg bg-white/5 p-10 md:my-5 md:mx-0 mx-5"
-        isPressable
-      >
-        <CardHeader>
-          <h3 className="md:text-2xl text-lg font-bold mb-2">
-            PREMIUM <span className="text-sm">프리미엄 플랜</span>
-          </h3>
-        </CardHeader>
-        <CardBody>
-          <Divider />
-          <p className="md:text-3xl text-xl font-bold mb-4 mt-5">
-            $29,000 <span className="text-small font-thin">KRW/월</span>
-          </p>
-          <ul className="list-image-none md:text-lg text-medium">
-            <li>✓ 무제한 대화 스레드</li>
-            <li>✓ 무제한 일일 요청 토큰</li>
-            <li>✓ 다양한 최신 프리미엄모델 사용가능</li>
-            <li>✓ 대시보드 기능 사용가능</li>
-            <li>✓ 추가기능 얼리엑세스</li>
-          </ul>
-          <span className="text-lg font-bold text-primary-500 pt-4">
-            👉 지금 결제하고 모든 기능을 누리세요!
-          </span>
-        </CardBody>
-      </Card>
-      <Form onSubmit={handleSubmit}>
-        <div className="md:w-[500px] md:aspect-[16/9] flex flex-col m-5">
-          <Card className="p-5 shadow-lg rounded-xl backdrop-blur-lg bg-white/60 gap-4">
+    <div>
+      <div className="absolute w-[500px] h-[500px] bg-gradient-to-r from-blue-500 to-green-500 rounded-full blur-3xl opacity-20 bottom-[0px] right-[0px]"></div>
+      <div className="absolute w-[600px] h-[600px] bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full blur-3xl opacity-20 top-[-200px] left-[-200px]"></div>
+
+      <div className="flex flex-wrap w-full justify-center p-5 gap-6 mt-5">
+        <Card
+          className="shadow-lg rounded-xl backdrop-blur-lg bg-white/5 p-10"
+          isPressable
+        >
+          <CardHeader>
+            <h3 className="md:text-2xl text-lg font-bold mb-2">
+              PREMIUM <span className="text-sm">프리미엄 플랜</span>
+            </h3>
+          </CardHeader>
+          <CardBody>
+            <Divider />
+            <p className="md:text-3xl text-xl font-bold mb-4 mt-5">
+              $29,000 <span className="text-small font-thin">KRW/월</span>
+            </p>
+            <ul className="list-image-none md:text-lg text-medium">
+              <li>✓ 무제한 대화 스레드</li>
+              <li>✓ 무제한 일일 요청 토큰</li>
+              <li>✓ 다양한 최신 프리미엄모델 사용가능</li>
+              <li>✓ 대시보드 기능 사용가능</li>
+              <li>✓ 추가기능 얼리엑세스</li>
+            </ul>
+            <span className="text-lg font-bold text-primary-500 pt-4">
+              👉 지금 결제하고 모든 기능을 누리세요!
+            </span>
+          </CardBody>
+        </Card>
+
+        <Form
+          onSubmit={handleSubmit}
+          className="md:w-auto w-full flex justify-center items-center"
+        >
+          <Card className="md:w-[500px] w-full p-5 shadow-lg rounded-xl backdrop-blur-lg bg-white/60 gap-4">
             <CardHeader className="gap-2">
               <CreditCardIcon className="w-6" />
               <h1 className="text-lg font-bold">구독결제하기</h1>
@@ -255,8 +262,8 @@ export default function BillingForm() {
               </Button>
             </CardFooter>
           </Card>
-        </div>
-      </Form>
+        </Form>
+      </div>
     </div>
   );
 }

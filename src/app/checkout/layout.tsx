@@ -11,12 +11,7 @@ export default async function RootLayout({
   const session = await auth();
 
   return session ? (
-    <SessionProvider session={session}>
-      <div className="absolute w-[500px] h-[500px] bg-gradient-to-r from-blue-500 to-green-500 rounded-full blur-3xl opacity-20 bottom-[0px] right-[0px]"></div>
-      <div className="absolute w-[600px] h-[600px] bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full blur-3xl opacity-20 top-[-200px] left-[-200px]"></div>
-
-      {children}
-    </SessionProvider>
+    <SessionProvider session={session}>{children}</SessionProvider>
   ) : (
     <div className="flex flex-col items-center gap-5">
       <Image
@@ -27,7 +22,7 @@ export default async function RootLayout({
         width={512}
       ></Image>
 
-      <p className="md:text-3xl text-xl font-bold">로그인 해주세요</p>
+      <p className="md:text-3xl text-xl font-bold">로그인 필요합니다</p>
       <a
         href="https://www.flaticon.com/"
         title="로켓 아이콘"

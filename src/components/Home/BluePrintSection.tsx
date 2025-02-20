@@ -97,7 +97,7 @@ export default function BluePrintSection() {
   }, [chatLog, displayText]);
 
   return (
-    <motion.div className="w-[500px] flex justify-center items-center dark:text-primary-300 text-primary-500">
+    <motion.div className="w-[500px] flex justify-center items-center dark:text-primary-300 text-primary-500 p-5">
       <div className="p-6 rounded-2xl w-full backdrop-blur-lg bg-opacity-20 h-[500px] flex flex-col">
         {/* 채팅 기록 영역 – 스크롤은 가능하지만 스크롤바는 숨김 */}
         <div
