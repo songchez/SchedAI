@@ -43,7 +43,7 @@ export default async function CustomNavbar() {
         </NavbarItem>
         <NavbarItem className="md:hidden">
           {/* client component 모바일 전용 메뉴 */}
-          <SessionProvider>
+          <SessionProvider session={session}>
             <MobileDropDown />
           </SessionProvider>
         </NavbarItem>
