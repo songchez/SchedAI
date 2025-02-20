@@ -75,7 +75,7 @@ export default function ChatInput({
   }, [isLoading]);
 
   return (
-    <div className="flex gap-2 items-end">
+    <div className="flex gap-2 items-end justify-center">
       {/* 텍스트 입력창 */}
       <Textarea
         aria-label="메시지를 입력하세요"
@@ -90,7 +90,7 @@ export default function ChatInput({
         onChange={onInputChange}
         onKeyDown={handleKeyDown}
         variant="bordered"
-        className="flex-1"
+        className="flex-1 max-w-2xl"
         minRows={4}
         maxRows={6}
         size="lg"
@@ -146,7 +146,7 @@ export default function ChatInput({
               </Button>
             ) : (
               <Button
-                className="w-12 rounded-full bg-transparent"
+                className="w-10 rounded-full bg-transparent"
                 isIconOnly
                 onPress={chatSubmit}
               >

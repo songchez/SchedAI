@@ -12,6 +12,7 @@ import Image from "next/image";
 import Logo from "@/images/SchedAILogo.png";
 import MobileDropDown from "./MobileDropdownMenu";
 import OnLoginDropdownBtn from "./OnLoginDropdownBtn";
+import { SessionProvider } from "next-auth/react";
 
 export default async function CustomNavbar() {
   const session = await auth();
@@ -19,7 +20,7 @@ export default async function CustomNavbar() {
   return (
     <Navbar
       shouldHideOnScroll
-      classNames={{ base: "bg-white/40 dark:bg-black/10" }}
+      classNames={{ base: "bg-white/10 dark:bg-black/10" }}
     >
       <NavbarBrand>
         <Link href="/" className="flex gap-2 items-center">
@@ -42,7 +43,9 @@ export default async function CustomNavbar() {
         </NavbarItem>
         <NavbarItem className="md:hidden">
           {/* client component 모바일 전용 메뉴 */}
-          <MobileDropDown session={session} />
+          <SessionProvider>
+            <MobileDropDown />
+          </SessionProvider>
         </NavbarItem>
         <NavbarItem className="hidden md:inline-block">
           <div>

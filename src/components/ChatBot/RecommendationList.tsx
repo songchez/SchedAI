@@ -44,9 +44,12 @@ export function RecommendationList({ onSelect }: RecommendationListProps) {
           </Card>
         ))}
       </div>
-      <span className="p-5 text-2xl text-primary-500 dark:text-white">
-        무엇을 도와드릴까요?
-      </span>
+      {/* 시작 문구 */}
+      <div className="flex justify-center">
+        <span className="md:text-2xl text-xl text-primary-500 dark:text-white">
+          무엇을 도와드릴까요?
+        </span>
+      </div>
     </div>
   );
 }

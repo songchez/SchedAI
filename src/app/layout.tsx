@@ -5,6 +5,7 @@ import CustomNavbar from "@/components/Navbar/CustomNavbar";
 import ChatSideBar from "@/components/ChatBot/ChatSideBar";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
+import SideBarHandleBtn from "@/components/Navbar/SideBarHandleBtn";
 
 const gowunBatang = Gowun_Batang({
   display: "swap",
@@ -26,8 +27,11 @@ export default async function RootLayout({
             <SessionProvider session={session}>
               <ChatSideBar />
             </SessionProvider>
-            <div className="w-full relative h-screen">
-              <CustomNavbar />
+            <div className="w-full transition-width duration-300">
+              <div className="flex">
+                <SideBarHandleBtn />
+                <CustomNavbar />
+              </div>
               {children}
             </div>
           </div>
