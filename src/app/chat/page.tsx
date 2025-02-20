@@ -10,6 +10,7 @@ import { useChat } from "ai/react";
 import { PaymentModal } from "@/components/ChatBot/PaymentModal";
 import { useDisclosure } from "@heroui/react";
 import { useChatInputStore } from "@/lib/store/ChatInputStore";
+import { useChatStore } from "@/lib/store/ChatStore";
 
 export default function FirstPage() {
   const router = useRouter();
@@ -18,13 +19,15 @@ export default function FirstPage() {
   );
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { setInput } = useChatInputStore();
+  const { createChat } = useChatStore();
 
   // useChat 훅을 사용하여 새 채팅 생성 엔드포인트 호출
   const { input, handleInputChange, handleSubmit, isLoading, messages } =
     useChat({
       api: "api/chat/start",
       body: {
-        model: selectedModel,
+        title: "새 채팅",
+        aiModel: selectedModel,
       },
       onResponse: async (response) => {
         // 토큰 부족 상태 처리
@@ -32,8 +35,9 @@ export default function FirstPage() {
           onOpen();
         }
         // 응답 헤더에서 새 채팅 ID 추출
-        const { newChatId }: { newChatId: string } = await response.json();
-        router.push(`chat/${newChatId}`);
+        const { newChat }: { newChat: Chat } = await response.json();
+        await createChat(newChat);
+        router.push(`chat/${newChat.id}`);
       },
     });
 
@@ -43,7 +47,8 @@ export default function FirstPage() {
       console.log(messages);
       setInput(messages[0].content);
     }
-  }, [messages, setInput]);
+    console.log(selectedModel);
+  }, [messages, setInput, selectedModel]);
 
   // 추천 문구 클릭 시 처리
   const handleRecommendationSelect = (r: string) => {

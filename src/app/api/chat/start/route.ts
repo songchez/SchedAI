@@ -5,9 +5,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/auth";
 
-export async function POST(): Promise<Response> {
+export async function POST(req: Request): Promise<Response> {
   const session = await auth();
   const userId = session?.user.id;
+  const { title, aiModel } = await req.json();
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -41,12 +42,12 @@ export async function POST(): Promise<Response> {
   const newChat = await prisma.chat.create({
     data: {
       userId,
-      title: "새 채팅",
-      aiModel: "gemini-1.5-flash", // 기본 모델 설정 (프론트에서 변경 가능)
+      title,
+      aiModel, // 기본 모델 설정 (프론트에서 변경 가능)
       messageCount: 0,
       isArchived: false,
     },
   });
 
-  return NextResponse.json({ newChatId: newChat.id }); // 채팅 ID만 반환
+  return NextResponse.json({ newChat });
 }

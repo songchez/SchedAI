@@ -15,6 +15,7 @@ interface ChatGroupProps {
   chats: Chat[];
   activeChatId?: string;
   editingChat: EditingChat | null;
+  loadingChatIds?: string[]; // 로딩 중인 채팅 ID 목록
 
   // 이벤트 핸들러
   onSelectChat: (chatId: string) => void;
@@ -29,6 +30,7 @@ export default function ChatGroup({
   chats,
   activeChatId,
   editingChat,
+  loadingChatIds = [],
   onSelectChat,
   onSetEditingChat,
   onRenameSubmit,
@@ -41,6 +43,7 @@ export default function ChatGroup({
         {chats.map((chat) => {
           const isActive = activeChatId === chat.id;
           const isEditing = editingChat?.chatId === chat.id;
+          const isLoading = loadingChatIds.includes(chat.id);
           return (
             <ChatItem
               key={chat.id}
@@ -52,6 +55,7 @@ export default function ChatGroup({
               onSetEditingChat={onSetEditingChat}
               onRenameSubmit={onRenameSubmit}
               onDelete={onDeleteChat}
+              isLoading={isLoading} // 각 항목별 로딩 상태 전달
             />
           );
         })}

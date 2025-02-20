@@ -3,6 +3,7 @@
 import { Chat } from "@prisma/client";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { MouseEvent, KeyboardEvent } from "react";
+import { Spinner } from "@heroui/react";
 
 /** 편집 상태 타입 */
 interface EditingChat {
@@ -16,6 +17,7 @@ interface ChatItemProps {
   isActive: boolean; // 현재 경로의 채팅과 일치하는지 여부
   isEditing: boolean; // 현재 편집 중인 채팅인지 여부
   editingChat?: EditingChat | null;
+  isLoading?: boolean; // 개별 로딩 상태
 
   // 이벤트 핸들러
   onSelect: (chatId: string) => void; // 채팅 선택
@@ -29,6 +31,7 @@ export default function ChatItem({
   isActive,
   isEditing,
   editingChat,
+  isLoading = false,
   onSelect,
   onSetEditingChat,
   onRenameSubmit,
@@ -75,7 +78,7 @@ export default function ChatItem({
 
   return (
     <div className="relative rounded-md ">
-      {/* 여기서 group 클래스를 넣어야 내부에서 group-hover를 감지 가능 */}
+      {/* group 클래스를 추가해야 내부에서 group-hover가 작동 */}
       <button
         onClick={handleClick}
         className={`
@@ -88,24 +91,27 @@ export default function ChatItem({
           transition-colors
         `}
       >
-        {/* 편집 중이면 input, 아니면 제목 */}
+        {/* 편집 중이면 input과 로딩 스피너를 함께 렌더링 */}
         {isEditing ? (
-          <input
-            type="text"
-            autoFocus
-            value={editingChat?.title || ""}
-            onChange={(e) => onSetEditingChat(chat.id, e.target.value)}
-            onBlur={handleBlur}
-            onKeyDown={handleKeyDown}
-            className={`
-              w-full bg-transparent outline-none text-sm
-              ${
-                isActive
-                  ? "text-white dark:text-black"
-                  : "text-black dark:text-white"
-              }
-            `}
-          />
+          <div className="flex items-center w-full">
+            <input
+              type="text"
+              autoFocus
+              value={editingChat?.title || ""}
+              onChange={(e) => onSetEditingChat(chat.id, e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={handleKeyDown}
+              className={`
+                flex-1 bg-transparent outline-none text-sm
+                ${
+                  isActive
+                    ? "text-white dark:text-black"
+                    : "text-black dark:text-white"
+                }
+              `}
+            />
+            {isLoading && <Spinner size="sm" className="ml-2" />}
+          </div>
         ) : (
           <span
             className={`truncate text-sm ${
@@ -118,9 +124,9 @@ export default function ChatItem({
           </span>
         )}
 
-        {/* 오른쪽 영역: 시간(기본) / 아이콘(Hover) */}
+        {/* 오른쪽 영역: 시간 또는 로딩 스피너 / 아이콘(Hover) */}
         <div className="ml-2 flex items-center relative">
-          {/* 시간: hover시 사라짐 (group-hover:opacity-0) */}
+          {/* 시간 또는 스피너: hover시 사라짐 (isLoading이면 항상 보임) */}
           <span
             className={`
               text-xs transition-opacity
@@ -129,10 +135,18 @@ export default function ChatItem({
                   ? "text-white/80 dark:text-black/90"
                   : "text-gray-500 dark:text-white/40"
               }
-              group-hover:opacity-0
+              ${!isLoading ? "group-hover:opacity-0" : ""}
             `}
           >
-            {createdTime}
+            {!isEditing && isLoading ? (
+              <Spinner
+                size="sm"
+                className="inline-block"
+                color={`${isActive ? "white" : "default"}`}
+              />
+            ) : (
+              createdTime
+            )}
           </span>
 
           {/* 아이콘들: 기본은 투명, Hover시 나타남 */}
@@ -147,7 +161,7 @@ export default function ChatItem({
               className={`hover:text-green-600 ${
                 isActive
                   ? "text-white hover:text-green-200 dark:text-black/90 dark:hover:text-green-600"
-                  : "text-gray-500 "
+                  : "text-gray-500"
               }`}
             >
               <PencilIcon className="w-4 h-4" />

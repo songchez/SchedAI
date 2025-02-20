@@ -61,11 +61,12 @@ export async function DELETE(req: NextRequest): Promise<Response> {
 }
 
 /**
- * PUT: 채팅 제목 변경
+ * POST: 채팅 업데이트
  * 요청 URL: /api/chat-handler?chatId=...
- * 요청 본문: { newTitle: string }
+ * 요청 본문: { title?: string, aiModel?: string, messageCount?: number, isArchived?: boolean, ... }
+ *  - body에 포함된 필드만 업데이트합니다.
  */
-export async function PUT(req: NextRequest): Promise<Response> {
+export async function POST(req: NextRequest): Promise<Response> {
   try {
     // URL에서 chatId 추출
     const { searchParams } = new URL(req.url);
@@ -74,11 +75,13 @@ export async function PUT(req: NextRequest): Promise<Response> {
       return NextResponse.json({ error: "Missing chatId" }, { status: 400 });
     }
 
-    // 요청 본문에서 newTitle 추출
+    // 요청 본문에서 업데이트할 필드 추출
     const body = await req.json();
-    const { newTitle } = body;
-    if (!newTitle) {
-      return NextResponse.json({ error: "Missing newTitle" }, { status: 400 });
+    if (!body || Object.keys(body).length === 0) {
+      return NextResponse.json(
+        { error: "No update fields provided" },
+        { status: 400 }
+      );
     }
 
     // 사용자 인증 확인
@@ -96,18 +99,35 @@ export async function PUT(req: NextRequest): Promise<Response> {
       return NextResponse.json({ error: "Not allowed" }, { status: 403 });
     }
 
-    // 채팅 제목 업데이트
+    // 업데이트할 수 있는 필드 목록 (원하는 필드를 추가/제한)
+    const allowedFields = ["title", "aiModel", "messageCount", "isArchived"];
+    const updateData: Record<string, Chat> = {};
+
+    for (const field of allowedFields) {
+      if (body[field] !== undefined) {
+        updateData[field] = body[field];
+      }
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json(
+        { error: "No valid update fields provided" },
+        { status: 400 }
+      );
+    }
+
+    // 채팅 업데이트
     const updatedChat = await prisma.chat.update({
       where: { id: chatId },
-      data: { title: newTitle },
+      data: updateData,
     });
 
     return NextResponse.json({
-      message: "Chat title updated successfully",
+      message: "Chat updated successfully",
       chat: updatedChat,
     });
   } catch (error) {
-    console.error("PUT /api/chat-handler Error:", error);
+    console.error("POST /api/chat-handler Error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

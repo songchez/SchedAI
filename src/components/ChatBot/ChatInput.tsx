@@ -48,6 +48,10 @@ export default function ChatInput({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  const currentAIModel = Object.values(AI_MODELS).find(
+    (model) => model.value === selectedModel
+  );
+
   // 실제 제출 함수: 로그인하지 않은 경우 모달을 열고, 그렇지 않으면 onSubmit 호출
   const chatSubmit = useCallback(() => {
     if (!session) {
@@ -103,9 +107,17 @@ export default function ChatInput({
                 value={selectedModel}
                 color="primary"
                 aria-label="aiModels"
-                defaultSelectedKeys={["Gemini2.0"]}
+                defaultSelectedKeys={currentAIModel && [currentAIModel?.key]}
                 variant="underlined"
-                onChange={(e) => onModelChange(e.target.value as AIModels)}
+                onChange={(e) => {
+                  const key = e.target.value;
+                  const modelSelected = Object.values(AI_MODELS).find(
+                    (model) => {
+                      return model.key === key;
+                    }
+                  );
+                  onModelChange(modelSelected?.value as AIModels);
+                }}
                 renderValue={(items) => {
                   return items.map((item) => (
                     <span key={item.key}>{item.key}</span>

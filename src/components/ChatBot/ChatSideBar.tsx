@@ -1,22 +1,14 @@
 "use client";
 
 import { signOut, useSession } from "next-auth/react";
-import { useEffect, useCallback, useState } from "react";
-import { Chat } from "@prisma/client";
 import { useRouter, usePathname } from "next/navigation";
-
-// Zustand 스토어
-import { useChatStore } from "@/lib/store/ChatStore";
+import { useEffect, useState, useCallback } from "react";
 import { useBreakpoint } from "@/lib/hooks/useBreakPoint";
+import { Chat } from "@prisma/client";
+import { useChatStore } from "@/lib/store/ChatStore";
+import { useSidebarStore } from "@/lib/store/SideBarHandleStore";
 import DesktopChatSideBar from "./ChatSideBar/DesktopChatSideBar";
 import MobileChatSideBar from "./ChatSideBar/MobileChatSideBar";
-import { useSidebarStore } from "@/lib/store/SideBarHandleStore";
-
-/** 편집 상태 타입 */
-interface EditingChat {
-  chatId: string;
-  title: string;
-}
 
 /** 날짜별 그룹화 함수 */
 function groupChatsByDate(chats: Chat[]): Record<string, Chat[]> {
@@ -39,23 +31,32 @@ function groupChatsByDate(chats: Chat[]): Record<string, Chat[]> {
   }, {} as Record<string, Chat[]>);
 }
 
-/** 상위 ChatSideBar 컴포넌트
- * - 공통 상태 및 액션을 관리하고, 화면 크기에 따라 데스크탑/모바일 버전을 렌더링
+/**
+ * ChatSideBar 컴포넌트
+ * - Desktop과 Mobile 버전을 모두 지원하며,
+ *   채팅 생성, 업데이트, 삭제 시 개별 로딩 상태를 관리합니다.
  */
-export default function ChatSideBarWrapper() {
+export default function ChatSideBar() {
   const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const isDesktop = useBreakpoint("(min-width: 768px)");
 
-  const { chats, fetchChats, renameChat, deleteChat } = useChatStore();
-  const [loading, setLoading] = useState(false);
-  const [editingChat, setEditingChat] = useState<EditingChat | null>(null);
-  const activeChatId = pathname.split("/chat/")[1];
-
-  // Zustand를 통한 사이드바 상태 관리
+  // updateChat를 포함하여 zustand 스토어에서 필요한 함수를 가져옵니다.
+  const { chats, fetchChats, deleteChat, updateChat } = useChatStore();
   const { isSidebarOpen, closeSidebar } = useSidebarStore();
 
+  // 편집 중인 채팅 상태
+  const [editingChat, setEditingChat] = useState<{
+    chatId: string;
+    title: string;
+  } | null>(null);
+  // 개별 채팅 업데이트 시 로딩 상태 관리 배열
+  const [loadingChatIds, setLoadingChatIds] = useState<string[]>([]);
+
+  const activeChatId = pathname.split("/chat/")[1];
+
+  // 세션 에러 처리
   useEffect(() => {
     if (session?.error === "RefreshTokenError") {
       alert("세션이 만료되었습니다. 다시 로그인해주세요.");
@@ -63,15 +64,15 @@ export default function ChatSideBarWrapper() {
     }
   }, [session]);
 
+  // 채팅 데이터 fetch (세션 사용자 ID가 있을 때)
   useEffect(() => {
     if (!session?.user?.id) return;
     (async () => {
-      setLoading(true);
       await fetchChats(session.user.id);
-      setLoading(false);
     })();
   }, [session?.user?.id, fetchChats]);
 
+  // 채팅 선택
   const handleSelectChat = useCallback(
     (chatId: string) => {
       router.push(`/chat/${chatId}`);
@@ -79,27 +80,41 @@ export default function ChatSideBarWrapper() {
     [router]
   );
 
+  // 편집 상태 설정
   const handleSetEditingChat = useCallback((chatId: string, title: string) => {
     setEditingChat({ chatId, title });
   }, []);
 
+  // 채팅 업데이트 (제목 변경 예시, 다른 필드는 updateChat 함수 사용 시 확장 가능)
   const handleRenameSubmit = useCallback(
     async (chatId: string, newTitle: string) => {
       setEditingChat(null);
-      setLoading(true);
-      await renameChat(chatId, newTitle);
-      setLoading(false);
+      setLoadingChatIds((prev) => [...prev, chatId]);
+      try {
+        // updateChat을 호출하여 title 업데이트 (필요에 따라 다른 필드도 업데이트 가능)
+        await updateChat(chatId, { title: newTitle });
+      } catch (error) {
+        if (error instanceof Error) alert("채팅 제목 변경에 실패했습니다.");
+      } finally {
+        setLoadingChatIds((prev) => prev.filter((id) => id !== chatId));
+      }
     },
-    [renameChat]
+    [updateChat]
   );
 
+  // 채팅 삭제
   const handleDelete = useCallback(
     async (chatId: string) => {
-      setLoading(true);
-      await deleteChat(chatId);
-      setLoading(false);
-      if (activeChatId === chatId) {
-        router.push("/chat");
+      setLoadingChatIds((prev) => [...prev, chatId]);
+      try {
+        await deleteChat(chatId);
+        if (activeChatId === chatId) {
+          router.push("/chat");
+        }
+      } catch (error) {
+        if (error instanceof Error) alert("채팅 삭제에 실패했습니다.");
+      } finally {
+        setLoadingChatIds((prev) => prev.filter((id) => id !== chatId));
       }
     },
     [deleteChat, activeChatId, router]
@@ -114,7 +129,6 @@ export default function ChatSideBarWrapper() {
       {isSidebarOpen && isDesktop ? (
         <DesktopChatSideBar
           groupedChats={groupedChats}
-          loading={loading}
           activeChatId={activeChatId}
           editingChat={editingChat}
           onSelectChat={handleSelectChat}
@@ -122,12 +136,12 @@ export default function ChatSideBarWrapper() {
           onRenameSubmit={handleRenameSubmit}
           onDeleteChat={handleDelete}
           router={router}
-          setIsSidebarOpen={closeSidebar} // 데스크탑 닫기 시 closeSidebar 사용
+          setIsSidebarOpen={closeSidebar}
+          loadingChatIds={loadingChatIds}
         />
       ) : (
         <MobileChatSideBar
           groupedChats={groupedChats}
-          loading={loading}
           activeChatId={activeChatId}
           editingChat={editingChat}
           onSelectChat={handleSelectChat}
@@ -137,6 +151,7 @@ export default function ChatSideBarWrapper() {
           router={router}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={closeSidebar}
+          loadingChatIds={loadingChatIds}
         />
       )}
     </>

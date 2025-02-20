@@ -1,8 +1,9 @@
 import { ChevronLeftIcon } from "@heroicons/react/24/solid";
-import { Button, Spinner } from "@heroui/react";
+import { Button } from "@heroui/react";
 import { Chat } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import ChatGroup from "./ChatGroup";
+import Link from "next/link";
 
 /** 편집 상태 타입 */
 interface EditingChat {
@@ -10,21 +11,12 @@ interface EditingChat {
   title: string;
 }
 
-/** 데스크탑용 사이드바 컴포넌트 (UI 변경 없이 기존 모양 유지) */
-export default function DesktopChatSideBar({
-  groupedChats,
-  loading,
-  activeChatId,
-  editingChat,
-  onSelectChat,
-  onSetEditingChat,
-  onRenameSubmit,
-  onDeleteChat,
-  router,
-  setIsSidebarOpen,
-}: {
+/**
+ * 데스크탑용 사이드바 컴포넌트
+ * - 각 채팅 항목의 로딩 상태에 따라 스피너를 개별적으로 표시합니다.
+ */
+interface DesktopChatSideBarProps {
   groupedChats: Record<string, Chat[]>;
-  loading: boolean;
   activeChatId: string;
   editingChat: EditingChat | null;
   onSelectChat: (chatId: string) => void;
@@ -33,20 +25,35 @@ export default function DesktopChatSideBar({
   onDeleteChat: (chatId: string) => Promise<void>;
   router: ReturnType<typeof useRouter>;
   setIsSidebarOpen: (open: boolean) => void;
-}) {
+  loadingChatIds: string[];
+}
+
+export default function DesktopChatSideBar({
+  groupedChats,
+  activeChatId,
+  editingChat,
+  onSelectChat,
+  onSetEditingChat,
+  onRenameSubmit,
+  onDeleteChat,
+  setIsSidebarOpen,
+  loadingChatIds,
+}: DesktopChatSideBarProps) {
   return (
     <div className="w-80 flex flex-col bg-background border-r min-h-screen">
       {/* 상단 헤더 */}
       <div className="p-4 flex-shrink-0 sticky top-0 bg-background z-10 border-b">
         <div className="flex justify-between items-center">
-          <Button
-            onPress={() => router.push("/chat")}
-            color="primary"
-            size="sm"
-            className="dark:text-black"
-          >
-            + 새 대화
-          </Button>
+          <Link href={"/chat"}>
+            <Button
+              // 새 대화 생성 핸들러 호출
+              color="primary"
+              size="sm"
+              className="dark:text-black"
+            >
+              + 새 대화
+            </Button>
+          </Link>
           {/* 닫기 버튼 */}
           <Button
             variant="light"
@@ -58,25 +65,22 @@ export default function DesktopChatSideBar({
           </Button>
         </div>
       </div>
-      {/* 채팅 목록 */}
+      {/* 채팅 목록 (각 그룹 및 채팅 항목에서 개별 스피너 표시) */}
       <div className="overflow-y-auto flex-grow p-4">
-        {loading ? (
-          <Spinner />
-        ) : (
-          Object.entries(groupedChats).map(([group, groupChats]) => (
-            <ChatGroup
-              key={group}
-              groupTitle={group}
-              chats={groupChats}
-              activeChatId={activeChatId}
-              editingChat={editingChat}
-              onSelectChat={onSelectChat}
-              onSetEditingChat={onSetEditingChat}
-              onRenameSubmit={onRenameSubmit}
-              onDeleteChat={onDeleteChat}
-            />
-          ))
-        )}
+        {Object.entries(groupedChats).map(([group, groupChats]) => (
+          <ChatGroup
+            key={group}
+            groupTitle={group}
+            chats={groupChats}
+            activeChatId={activeChatId}
+            editingChat={editingChat}
+            onSelectChat={onSelectChat}
+            onSetEditingChat={onSetEditingChat}
+            onRenameSubmit={onRenameSubmit}
+            onDeleteChat={onDeleteChat}
+            loadingChatIds={loadingChatIds}
+          />
+        ))}
       </div>
     </div>
   );

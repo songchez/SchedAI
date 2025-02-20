@@ -2,12 +2,20 @@
 
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { Chat } from "@prisma/client";
 
 interface ChatStore {
   chats: Chat[];
   fetchChats: (userId?: string) => Promise<void>;
-  renameChat: (chatId: string, newTitle: string) => Promise<void>;
+  createChat: (newChat: Chat) => Promise<Chat>;
+  updateChat: (
+    chatId: string,
+    updateData: Partial<{
+      title: string;
+      aiModel: string;
+      messageCount: number;
+      isArchived: boolean;
+    }>
+  ) => Promise<void>;
   deleteChat: (chatId: string) => Promise<void>;
   setChats: (chats: Chat[]) => void;
 }
@@ -34,27 +42,43 @@ export const useChatStore = create<ChatStore>()(
     },
 
     /** -----------------------------------------
-     * 채팅 이름 수정
+     * 새로운 채팅 생성 (옵티미스틱 업데이트)
      * ---------------------------------------- */
-    renameChat: async (chatId, newTitle) => {
+    createChat: async (newChat) => {
+      try {
+        set((state) => ({
+          chats: [newChat, ...state.chats],
+        }));
+        console.log("New Chat 생성 완료!");
+        return newChat;
+      } catch (error) {
+        console.error("채팅 생성 오류:", error);
+        return null;
+      }
+    },
+
+    /** -----------------------------------------
+     * 채팅 업데이트 (title, aiModel, messageCount, isArchived 등 동적 업데이트)
+     * ---------------------------------------- */
+    updateChat: async (chatId, updateData) => {
       try {
         const res = await fetch(`/api/chat-handler?chatId=${chatId}`, {
-          method: "PUT",
+          method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ newTitle }),
+          body: JSON.stringify(updateData),
         });
         if (!res.ok) {
-          console.error("채팅 이름 변경 실패:", await res.text());
+          console.error("채팅 업데이트 실패:", await res.text());
           return;
         }
-        // 수정 후 전체 목록 다시 불러오기
+        // 업데이트 후 전체 목록 다시 불러오기
         const updatedList = await fetch(`/api/chat-handler`);
         if (updatedList.ok) {
           const data = await updatedList.json();
           set({ chats: data });
         }
       } catch (error) {
-        console.error("채팅 이름 변경 오류:", error);
+        console.error("채팅 업데이트 오류:", error);
       }
     },
 

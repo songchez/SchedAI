@@ -9,18 +9,24 @@ import { useDisclosure } from "@heroui/react";
 import { PaymentModal } from "./PaymentModal";
 import { AIModels } from "@/lib/chatApiHandlers/constants";
 import { useChatInputStore } from "@/lib/store/ChatInputStore";
+import { useChatStore } from "@/lib/store/ChatStore";
 
 interface SchedAIChatbotProps {
   chatId?: string;
 }
 
 export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
+  // zustand의 Chats를 가져와서 chatId로 find -> selectedModel의 기본값으로 할당
+  const { chats, updateChat } = useChatStore();
+  const currentChat = chats.find((chat) => chat.id === chatId);
   const [selectedModel, setSelectedModel] = useState<AIModels>(
-    "gemini-2.0-flash-001"
+    currentChat?.aiModel
   );
+
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const storedChatInput = useChatInputStore((state) => state.value);
   const { clearInput } = useChatInputStore();
+
   // AI 스트리밍 요청 (채팅 시작)
   const {
     messages: liveMessages,
@@ -36,7 +42,10 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
       chatId,
       model: selectedModel,
     },
-    onResponse: (response) => {
+    onResponse: async (response) => {
+      if (chatId && currentChat?.aiModel !== selectedModel) {
+        await updateChat(chatId, { aiModel: selectedModel });
+      }
       if (response.status === 402) {
         onOpen();
       }
@@ -55,7 +64,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
       storedChatInput &&
       storedChatInput !== lastSubmittedUserMessage.current
     ) {
-      console.log("Zustand로 저장된 메시지", storedChatInput);
+      console.log("Store에 저장된 메시지", storedChatInput);
       lastSubmittedUserMessage.current = storedChatInput;
       handleInputChange({
         target: { value: storedChatInput },
