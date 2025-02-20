@@ -222,7 +222,7 @@ export default function ChatMessageList({
   }, [messages]);
 
   return (
-    <div className="flex flex-col gap-4 overflow-y-auto p-6 mb-28">
+    <div className="flex flex-col gap-4 overflow-y-auto p-6">
       {messages.map((msg) => (
         <MessageCard key={msg.id} message={msg} />
       ))}

@@ -124,7 +124,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
     <div className="flex flex-col justify-end w-full max-w-3xl mx-auto rounded-lg px-2">
       <PaymentModal isOpen={isOpen} onOpenChange={onOpenChange} />
 
-      <ScrollShadow hideScrollBar className="h-[74vh]">
+      <ScrollShadow hideScrollBar className="h-[65vh]">
         {isPreloading ? (
           <div className="p-4 text-center animate-pulse">
             메시지 불러오는 중...
@@ -134,7 +134,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
         )}
       </ScrollShadow>
 
-      <div className="sticky bottom-6 flex flex-col">
+      <div className="isolate flex flex-col">
         <form ref={formRef} onSubmit={handleSubmit}>
           <ChatInput
             input={input}

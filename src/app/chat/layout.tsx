@@ -10,9 +10,5 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  return (
-    <SessionProvider session={session}>
-      <div className="flex-1">{children}</div>
-    </SessionProvider>
-  );
+  return <SessionProvider session={session}>{children}</SessionProvider>;
 }
