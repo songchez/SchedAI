@@ -7,9 +7,11 @@ import {
   Spinner,
 } from "@heroui/react";
 import ChatGroup from "./ChatGroup";
+import { Chat } from "@prisma/client";
+import { useRouter } from "next/navigation";
 
 interface MobileChatSideBarProps {
-  groupedChats: Record<string, any>;
+  groupedChats: Record<string, Chat[]>;
   loading: boolean;
   activeChatId: string;
   editingChat: { chatId: string; title: string } | null;
@@ -17,7 +19,7 @@ interface MobileChatSideBarProps {
   onSetEditingChat: (chatId: string, title: string) => void;
   onRenameSubmit: (chatId: string, newTitle: string) => Promise<void>;
   onDeleteChat: (chatId: string) => Promise<void>;
-  router: any; // useRouter의 반환값 타입
+  router: ReturnType<typeof useRouter>;
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
 }
