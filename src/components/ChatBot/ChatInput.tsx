@@ -94,7 +94,7 @@ export default function ChatInput({
         onChange={onInputChange}
         onKeyDown={handleKeyDown}
         variant="bordered"
-        className="flex-1 max-w-2xl"
+        className="flex-1 max-w-2xl bg-white dark:bg-black rounded-2xl"
         minRows={4}
         maxRows={6}
         size="lg"

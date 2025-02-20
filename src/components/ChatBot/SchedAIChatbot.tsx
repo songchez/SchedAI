@@ -118,10 +118,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
     setMessages(uniqueMessages);
   }, [preloadedMessages, liveMessages, setMessages]);
 
-  // 최종 렌더링할 메시지는 store에 있는 메시지입니다.
-  // (이미 중복 제거되어 업데이트되었음)
-  // 만약 ChatMessageList가 직접 store의 messages를 사용하지 않고,
-  // 여기서 따로 합친 결과를 넘기고 싶다면 아래와 같이 할 수 있습니다.
+  // 최종 렌더링할 메시지는 store에 있는 메시지입니다. (이미 중복 제거되어 업데이트되었음)
 
   return (
     <div className="flex flex-col justify-end w-full max-w-3xl mx-auto rounded-lg px-2">
@@ -137,7 +134,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
         )}
       </ScrollShadow>
 
-      <div className="sticky bottom-16 flex flex-col">
+      <div className="sticky bottom-6 flex flex-col">
         <form ref={formRef} onSubmit={handleSubmit}>
           <ChatInput
             input={input}

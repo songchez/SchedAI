@@ -1,76 +1,51 @@
-"use client";
-
 import { Chat } from "@prisma/client";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { MouseEvent, KeyboardEvent } from "react";
 import { Spinner } from "@heroui/react";
+import { useChatUIStore } from "@/lib/store/ChatUIStore";
+import { useChatActions } from "@/lib/hooks/useChatAction";
 
-/** 편집 상태 타입 */
-interface EditingChat {
-  chatId: string;
-  title: string;
-}
-
-/** ChatItem에 필요한 Prop들 */
 interface ChatItemProps {
-  chat: Chat; // 채팅 데이터
-  isActive: boolean; // 현재 경로의 채팅과 일치하는지 여부
-  isEditing: boolean; // 현재 편집 중인 채팅인지 여부
-  editingChat?: EditingChat | null;
-  isLoading?: boolean; // 개별 로딩 상태
-
-  // 이벤트 핸들러
-  onSelect: (chatId: string) => void; // 채팅 선택
-  onSetEditingChat: (chatId: string, title: string) => void; // 편집 모드로 전환
-  onRenameSubmit: (chatId: string, newTitle: string) => void; // 실제 수정 API 호출
-  onDelete: (chatId: string) => void; // 삭제
+  chat: Chat;
+  isActive: boolean;
+  onSelect: (chatId: string) => void;
 }
 
-export default function ChatItem({
-  chat,
-  isActive,
-  isEditing,
-  editingChat,
-  isLoading = false,
-  onSelect,
-  onSetEditingChat,
-  onRenameSubmit,
-  onDelete,
-}: ChatItemProps) {
-  /** 전체 영역 클릭: 편집 중이 아닐 때만 onSelect */
+export default function ChatItem({ chat, isActive, onSelect }: ChatItemProps) {
+  const { editingChat, setEditingChat, loadingChatIds } = useChatUIStore();
+  const { handleRenameSubmit, handleDelete } = useChatActions();
+
+  const isEditing = editingChat?.chatId === chat.id;
+  const isLoading = loadingChatIds.includes(chat.id);
+
   const handleClick = () => {
     if (!isEditing) {
       onSelect(chat.id);
     }
   };
 
-  /** 연필 아이콘 클릭 -> 편집 모드 진입 */
   const handleEditClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation(); // 부모 클릭(라우팅) 막기
-    onSetEditingChat(chat.id, chat.title);
+    e.stopPropagation();
+    setEditingChat({ chatId: chat.id, title: chat.title });
   };
 
-  /** 휴지통 아이콘 클릭 -> 삭제 */
   const handleDeleteClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation(); // 부모 클릭(라우팅) 막기
-    onDelete(chat.id);
+    e.stopPropagation();
+    handleDelete(chat.id);
   };
 
-  /** input에서 포커스 이탈 시 => 제목 수정 */
   const handleBlur = () => {
     if (editingChat) {
-      onRenameSubmit(chat.id, editingChat.title);
+      handleRenameSubmit(chat.id, editingChat.title);
     }
   };
 
-  /** input에서 Enter 입력 시 => 제목 수정 */
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && editingChat) {
-      onRenameSubmit(chat.id, editingChat.title);
+      handleRenameSubmit(chat.id, editingChat.title);
     }
   };
 
-  /** 채팅 생성 시간 표시 */
   const createdTime = new Date(chat.createdAt).toLocaleTimeString("ko-KR", {
     hour: "2-digit",
     minute: "2-digit",
@@ -78,37 +53,30 @@ export default function ChatItem({
 
   return (
     <div className="relative rounded-md ">
-      {/* group 클래스를 추가해야 내부에서 group-hover가 작동 */}
       <button
         onClick={handleClick}
-        className={`
-          group w-full px-3 py-2 text-left flex items-center justify-between rounded-xl 
-          ${
-            isActive
-              ? "bg-primary text-white"
-              : "hover:bg-gray-100 dark:hover:bg-gray-700"
-          }
-          transition-colors
-        `}
+        className={`group w-full px-3 py-2 text-left flex items-center justify-between rounded-xl ${
+          isActive
+            ? "bg-primary text-white"
+            : "hover:bg-gray-100 dark:hover:bg-gray-700"
+        } transition-colors`}
       >
-        {/* 편집 중이면 input과 로딩 스피너를 함께 렌더링 */}
         {isEditing ? (
           <div className="flex items-center w-full">
             <input
               type="text"
               autoFocus
               value={editingChat?.title || ""}
-              onChange={(e) => onSetEditingChat(chat.id, e.target.value)}
+              onChange={(e) =>
+                setEditingChat({ chatId: chat.id, title: e.target.value })
+              }
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
-              className={`
-                flex-1 bg-transparent outline-none text-sm
-                ${
-                  isActive
-                    ? "text-white dark:text-black"
-                    : "text-black dark:text-white"
-                }
-              `}
+              className={`flex-1 bg-transparent outline-none text-sm ${
+                isActive
+                  ? "text-white dark:text-black"
+                  : "text-black dark:text-white"
+              }`}
             />
             {isLoading && <Spinner size="sm" className="ml-2" />}
           </div>
@@ -123,39 +91,25 @@ export default function ChatItem({
             {chat.title}
           </span>
         )}
-
-        {/* 오른쪽 영역: 시간 또는 로딩 스피너 / 아이콘(Hover) */}
         <div className="ml-2 flex items-center relative">
-          {/* 시간 또는 스피너: hover시 사라짐 (isLoading이면 항상 보임) */}
           <span
-            className={`
-              text-xs transition-opacity
-              ${
-                isActive
-                  ? "text-white/80 dark:text-black/90"
-                  : "text-gray-500 dark:text-white/40"
-              }
-              ${!isLoading ? "group-hover:opacity-0" : ""}
-            `}
+            className={`text-xs transition-opacity ${
+              isActive
+                ? "text-white/80 dark:text-black/90"
+                : "text-gray-500 dark:text-white/40"
+            } ${!isLoading ? "group-hover:opacity-0" : ""}`}
           >
             {!isEditing && isLoading ? (
               <Spinner
                 size="sm"
                 className="inline-block"
-                color={`${isActive ? "white" : "default"}`}
+                color={isActive ? "white" : "default"}
               />
             ) : (
               createdTime
             )}
           </span>
-
-          {/* 아이콘들: 기본은 투명, Hover시 나타남 */}
-          <div
-            className={`
-              absolute right-0 flex items-center space-x-2
-              opacity-0 group-hover:opacity-100 transition-opacity
-            `}
-          >
+          <div className="absolute right-0 flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <span
               onClick={handleEditClick}
               className={`hover:text-green-600 ${

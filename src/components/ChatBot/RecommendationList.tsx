@@ -32,7 +32,7 @@ export function RecommendationList({ onSelect }: RecommendationListProps) {
 
   return (
     <div className="pb-5">
-      <div className="flex gap-4 flex-wrap justify-center items-center mb-32">
+      <div className="flex gap-4 flex-wrap justify-center items-center mb-10">
         {recommendations.map((recommendation) => (
           <Card
             key={recommendation}
