@@ -3,7 +3,6 @@ import {
   Drawer,
   DrawerBody,
   DrawerContent,
-  DrawerFooter,
   DrawerHeader,
   Spinner,
 } from "@heroui/react";

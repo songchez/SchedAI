@@ -54,7 +54,7 @@ export default function ChatSideBarWrapper() {
   const activeChatId = pathname.split("/chat/")[1];
 
   // Zustand를 통한 사이드바 상태 관리
-  const { isSidebarOpen, openSidebar, closeSidebar } = useSidebarStore();
+  const { isSidebarOpen, closeSidebar } = useSidebarStore();
 
   useEffect(() => {
     if (session?.error === "RefreshTokenError") {
