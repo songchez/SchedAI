@@ -6,7 +6,6 @@ import {
   DrawerHeader,
 } from "@heroui/react";
 import ChatGroup from "./ChatGroup";
-import Link from "next/link";
 import { Chat } from "@prisma/client";
 import { useRouter } from "next/navigation";
 
@@ -37,19 +36,17 @@ export default function MobileChatSideBar({
         {(onClose) => (
           <>
             <DrawerHeader className="p-4 border-b flex justify-between items-center">
-              <Link href={"/chat"}>
-                <Button
-                  onPress={async () => {
-                    router.push(`/chat`);
-                    onClose();
-                  }}
-                  color="primary"
-                  size="sm"
-                  className="dark:text-black"
-                >
-                  + 새 대화
-                </Button>
-              </Link>
+              <Button
+                onPress={async () => {
+                  router.push(`/chat`);
+                  onClose();
+                }}
+                color="primary"
+                size="sm"
+                className="dark:text-black"
+              >
+                + 새 대화
+              </Button>
             </DrawerHeader>
             <DrawerBody className="overflow-y-auto max-h-[70vh] p-4">
               {Object.entries(groupedChats).map(([group, groupChats]) => (

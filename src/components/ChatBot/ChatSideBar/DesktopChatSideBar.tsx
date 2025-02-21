@@ -21,7 +21,7 @@ export default function DesktopChatSideBar({
     <div className="w-80 flex flex-col bg-background border-r min-h-screen">
       <div className="p-4 flex-shrink-0 sticky top-0 bg-background z-10 border-b">
         <div className="flex justify-between items-center">
-          <Link href={"/chat"}>
+          <Link href="/chat">
             <Button color="primary" size="sm" className="dark:text-black">
               + 새 대화
             </Button>
