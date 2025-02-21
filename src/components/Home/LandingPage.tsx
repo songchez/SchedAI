@@ -439,6 +439,9 @@ function FooterSection() {
           <Link href="/privacy" className="text-orange-300 font-bold">
             개인정보 처리방침
           </Link>
+          <Link href="/terms" className="text-orange-300 font-bold">
+            SchedAI 이용약관
+          </Link>
         </div>
 
         {/* 소셜 링크가 있다면 추가 */}
