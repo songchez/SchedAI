@@ -19,6 +19,9 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-ibm-sans)"],
+      },
       colors: {
         text: {
           DEFAULT: "#1a202c", // 라이트 모드 기본값 (gray-900)
@@ -26,7 +29,6 @@ module.exports = {
         },
       },
     },
-    fontFamily: { GowunBatang: ["gowunBatang"] },
   },
   darkMode: "class",
   plugins: [

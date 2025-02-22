@@ -27,3 +27,12 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: #2d2d2a; /* hover 시 thumb 색상 */
 }
+
+@layer utilities {
+  /* 랜딩페이지 뉴모피즘 시계: components/Home/Clock.tsx */
+  .shadow-neumorphism {
+    box-shadow: 4px 4px 8px rgba(25, 25, 23, 0.1), -4px -4px 8px #fffaee,
+      inset 4px 4px 8px rgba(25, 25, 23, 0.1),
+      /* 내부 그림자 추가 */ inset -4px -4px 8px #fffaee; /* 내부 하이라이트 추가 */
+  }
+}

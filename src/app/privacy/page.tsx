@@ -1,7 +1,7 @@
 export default function PrivacyPolicy() {
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">ShedAI 개인정보 처리방침</h1>
+    <div className="max-w-4xl mx-auto p-6 font-sans">
+      <h1 className="text-3xl font-semibold mb-6">ShedAI 개인정보 처리방침</h1>
       <p className="text-sm text-gray-500 mb-4">최종 시행일: 2025년 2월 12일</p>
 
       {/* 제1조 (개인정보의 처리 목적) */}
@@ -154,7 +154,7 @@ export default function PrivacyPolicy() {
         </h2>
         <ul className="list-disc pl-5">
           <li>개인정보 보호책임자: [담당자명 또는 부서]</li>
-          <li>연락처: 이메일 privacy@shedai.com, 전화번호 010-1234-5678</li>
+          <li>연락처: 이메일 tama4840@gmail.com</li>
         </ul>
       </section>
 

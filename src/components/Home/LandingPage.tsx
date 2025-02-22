@@ -4,11 +4,7 @@ import { useRef } from "react";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
-import SchedAILogo from "@/images/SchedAILogo.png";
-import darkBackground from "@/images/dark_dashboard_background.png";
-import lightBackground from "@/images/light_dashboard_background.png";
-import { Button, CardBody, CardHeader } from "@heroui/react";
-import GlassContainer from "../GlassContainer";
+import { Card, CardBody, CardHeader, Divider } from "@heroui/react";
 import GoolgleIcon from "@/images/google-icon-logo.svg";
 import usageCard1 from "@/images/usageCard_1.png";
 import usageCard2 from "@/images/usageCard_2.png";
@@ -16,12 +12,15 @@ import usageCard3 from "@/images/usageCard_3.png";
 import profileImage from "@/images/profileimage.jpeg";
 
 import {
-  CalendarDaysIcon,
-  ChatBubbleOvalLeftEllipsisIcon,
   BeakerIcon,
+  ChatBubbleBottomCenterIcon,
+  LightBulbIcon,
 } from "@heroicons/react/24/solid";
-import GithubLogo from "./GithubLogo";
+import { GithubLogo } from "./SVGAssets";
+import { FeatureBackground } from "./SVGAssets";
 import BluePrintSection from "./BluePrintSection";
+import CTASection from "./CTASection";
+import NeumorphicClock from "./Clock";
 
 export default function HomePage() {
   return (
@@ -34,8 +33,9 @@ export default function HomePage() {
       {/* =======================
           2. Feature 섹션
       ======================= */}
-
-      <FeatureSection />
+      <FeatureSection1 />
+      <BluePrintSection />
+      <FeatureSection2 />
 
       {/* =======================
           3. CTA 섹션
@@ -65,85 +65,47 @@ export default function HomePage() {
 -----------------------------------*/
 function HeroSection() {
   return (
-    <section className="relative w-full min-h-screen flex flex-col items-center justify-center bg-no-repeat bg-center bg-cover">
-      <Image
-        className="object-cover fixed top-0 left-0 w-screen h-screen -z-50"
-        src={darkBackground}
-        height={1980}
-        width={1080}
-        alt="backgroundimage"
-        priority
-      />
-      <Image
-        className="object-cover fixed top-0 left-0 w-screen h-screen -z-50 dark:hidden"
-        src={lightBackground}
-        height={1980}
-        width={1080}
-        alt="backgroundimage"
-        priority
-      />
-      <div className="fixed inset-0 bg-gradient-to-b dark:from-black/40 dark:to-black/20 from-white/50 to-white/20" />
+    <section className="w-full min-h-screen flex md:flex-row flex-col items-center justify-start mt-14 md:-mt-10">
       {/* 본문 컨테이너 */}
       <motion.div
-        className="relative z-10 max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-center gap-8"
+        className="flex flex-col gap-8 order-2 md:order-1"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.3 }}
       >
-        {/* 오른쪽: 로고 + 타이틀 + CTA 버튼 */}
-        <div className="flex flex-col items-center dark:text-primary-200 text-primary-500 text-center md:m-0">
-          {/* 로고 */}
-          <motion.div
-            className="mb-5"
-            initial={{ rotate: 0 }}
-            animate={{ rotate: 360 }}
-            transition={{ duration: 5, ease: "easeOut" }}
-          >
-            <Image
-              src={SchedAILogo}
-              alt="SchedAI Logo"
-              width={100}
-              height={100}
-            />
-          </motion.div>
-
+        <div className="text-black drop-shadow-lg w-full backdrop-blur-sm">
           {/* 메인 타이틀 */}
-          <motion.h1
-            className="text-4xl md:text-6xl font-bold drop-shadow-lg mb-6"
-            initial={{ y: -50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1 }}
-          >
-            SchedAI
-          </motion.h1>
-
-          {/* 서브 텍스트 */}
-          <motion.p
-            className="text-lg md:text-xl opacity-90 mb-8"
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1, delay: 0.3 }}
-          >
-            AI 기반 스케줄링 비서
-          </motion.p>
-
-          {/* Hero CTA 버튼 */}
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 1 }}
-          >
-            <Link href="/chat">
-              <Button
-                variant="shadow"
-                className="dark:bg-primary-500 bg-yellow-400 dark:text-white px-6 py-3 rounded-full shadow-lg dark:hover:bg-primary-600"
-              >
-                SchedAI 시작하기
-              </Button>
+          <div className="flex flex-col gap-7 p-10 md:mx-20">
+            <h2 className="md:text-7xl text-3xl mb-5">
+              <span className="text-[#07090F] px-3 border-1 border-primary-500 rounded-lg">
+                시간
+              </span>
+              을{" "}
+              <span className="text-[#07090F] border-b border-primary-500">
+                디자인
+              </span>
+              하세요
+            </h2>
+            <h1 className="md:text-3xl text-xl">
+              쉽고 편해지는 구글 캘린더 관리
+            </h1>
+            <h1 className="md:text-3xl text-xl">
+              나만의 AI일정관리 비서,{" "}
+              <span className="text-orange-500">SchedAI</span>.
+            </h1>
+            <Link
+              href="/chat"
+              className="text-lg text-white bg-primary-500 w-40 drop-shadow-md p-2 rounded-lg"
+              role="button"
+            >
+              <span className="flex justify-center">지금 대화시작하기</span>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </motion.div>
+      <div className="order-1 md:order-2">
+        <NeumorphicClock />
+      </div>
     </section>
   );
 }
@@ -151,12 +113,71 @@ function HeroSection() {
 /* --------------------------------
    Feature Section
 -----------------------------------*/
-function FeatureSection() {
+
+// FeatureSection1 : 문제와 솔루션 연결
+function FeatureSection1() {
   return (
-    <section className="flex md:flex-row flex-col gap-5 items-center justify-center my-32">
-      {/* BluePrint + Feature Cards*/}
-      <BluePrintSection />
-      <FeatureCards />
+    <section className="w-full h-full flex justify-center md:text-3xl text-xl">
+      <div className="flex flex-col gap-5 md:py-16 py-10 mx-10">
+        <div>🧐 “이 일정, 어디에 저장했더라?”</div>
+        <div>산더미처럼 쌓인 업무, 하나하나 수정하고 계신가요?</div>
+        <div>일정이 쌓일수록 스트레스가 커지시나요?</div>
+        <Divider />
+        <div>
+          <span className="text-orange-500">SchedAI</span>와 함께하면 모두
+          해결할 수 있어요.
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// FeatureSection2
+function FeatureSection2() {
+  return (
+    <section className="relative my-32 mx-5 flex justify-center gap-5 w-screen h-screen">
+      <FeatureBackground />
+
+      <div className="flex flex-col gap-10 justify-center items-start">
+        <Card className="backdrop-blur-md bg-white/5 shadow-lg p-5">
+          <CardHeader className="flex gap-5">
+            <Image src={GoolgleIcon} alt="googleLogo" className="md:w-9 w-6" />
+            <h3 className="text-xl">Google Calendar & Task 완벽연동</h3>
+          </CardHeader>
+          <CardBody>
+            <div>
+              SchedAI는 Google Calendar & Task에 완벽하게 연동되어있습니다.
+              여러분이 로그인한 구글계정에 적용된 일정을 확인해보세요!
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="backdrop-blur-md bg-white/5 shadow-lg p-5">
+          <CardHeader className="flex gap-5">
+            <LightBulbIcon className="md:w-10 w-6" />
+            <h3 className="text-xl">스마트 일정 관리</h3>
+          </CardHeader>
+          <CardBody>
+            <div>
+              일일이 찾을 필요없이, 중요한 일정과 약속을 AI에게 물어보고 가장
+              좋은 날로 새로운 일정을 잡아보세요.
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="backdrop-blur-md bg-white/5 shadow-lg p-5">
+          <CardHeader className="flex gap-5">
+            <BeakerIcon className="md:w-10 w-6" />
+            <h3 className="text-xl">다양한 최신 LLM 모델 지원</h3>
+          </CardHeader>
+          <CardBody>
+            <div>
+              ChatGPT 4o mini, Gemini 2.0 flash 등 다양한 언어모델 지원으로
+              선호에 맞게 커스텀 가능
+            </div>
+          </CardBody>
+        </Card>
+      </div>
     </section>
   );
 }
@@ -164,20 +185,22 @@ function FeatureSection() {
 function FeatureCards() {
   const features = [
     {
-      icon: <CalendarDaysIcon className="md:w-10 w-6" />,
-      title: "스마트 일정 관리",
+      imageSrc: <ChatBubbleBottomCenterIcon className="md:w-10 w-6" />,
+      title: "AI ChatBot 기반 일정 관리",
       description:
-        "AI 기반 패턴 분석으로 당신의 일정 패턴을 학습해 최적의 스케줄을 제안합니다.",
+        "편리한 대화형 인터페이스로 쉽고 빠르게 일정을 조정해보세요.",
     },
     {
-      icon: <ChatBubbleOvalLeftEllipsisIcon className="md:w-10 w-6" />,
-      title: "직관적인 명령이해",
+      imageSrc: <LightBulbIcon className="md:w-10 w-6" />,
+      title: "스마트 일정 검색",
       description:
-        '"내일 저녁 7시 회의 잡아줘"처럼 자연어 명령으로 손쉽게 스케줄을 생성합니다.',
+        "일일이 찾을 필요없이, 중요한 일정과 약속을 손쉽게 AI에게 물어보세요.",
     },
     {
-      icon: <Image src={GoolgleIcon} alt="googleLogo" className="md:w-9 w-6" />,
-      title: "Google Calendar 완벽 연동",
+      imageSrc: (
+        <Image src={GoolgleIcon} alt="googleLogo" className="md:w-9 w-6" />
+      ),
+      title: "Google Calendar & Task 완벽 연동",
       description:
         "구글 캘린더와 자동 동기화로 한 곳에서 모든 일정을 관리하세요.",
     },
@@ -190,7 +213,7 @@ function FeatureCards() {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-4 max-w-xl px-5">
+    <div className="grid grid-cols-2 gap-5">
       {features.map((feature, index) => (
         <FeatureCard
           key={index}
@@ -213,65 +236,17 @@ function FeatureCard({
   description: string;
 }) {
   return (
-    <div className="rounded-lg shadow-lg hover:shadow-primary-400 hover:drop-shadow-2xl text-balance">
-      <GlassContainer className="min-h-60">
-        <CardHeader className="flex-col md:flex-row gap-3">
-          {icon}
-          <h3 className="md:text-xl text-md font-semibold md:text-start text-center">
-            {title}
-          </h3>
-        </CardHeader>
-        <CardBody>
-          <p className="md:text-base text-xs">{description}</p>
-        </CardBody>
-      </GlassContainer>
-    </div>
-  );
-}
-
-/* --------------------------------
-   CTA Section
------------------------------------*/
-function CTASection() {
-  return (
-    <section className="relative w-full py-20 bg-gradient-to-br dark:from-primary-500 dark:to-primary-600 from-white to-primary-100">
-      <div className="max-w-4xl mx-auto px-4 flex flex-col items-center text-center">
-        <Link href="/chat">
-          <motion.div
-            initial={{
-              backgroundSize: "150% 150%",
-              backgroundPosition: "center center", // 초기 중심 위치 설정
-            }}
-            whileHover={{
-              backgroundSize: "450% 450%",
-              transition: { duration: 0.5, ease: "linear" },
-            }}
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at center, #FFF8E7, #2D2D2A, transparent 80%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundRepeat: "no-repeat",
-              backgroundClip: "text",
-            }}
-          >
-            <div className="flex flex-col md:flex-row items-center gap-2 mb-6">
-              <h2 className="text-3xl md:text-4xl font-bold">무료로 SchedAI</h2>
-              <Image
-                src={SchedAILogo}
-                alt="SchedAI Logo"
-                width={40}
-                height={40}
-              />
-              <h2 className="text-3xl md:text-4xl font-bold">사용해보기</h2>
-            </div>
-            <p className="text-lg md:text-xl">
-              지금 바로 AI 스케줄링 비서를 체험해보세요.
-            </p>
-          </motion.div>
-        </Link>
-      </div>
-    </section>
+    <Card className="bg-transparent md:py-4 md:px-4 p-2 shadow-md" isPressable>
+      <CardBody>
+        <div className="flex gap-5 justify-start items-center">
+          <div>{icon}</div>
+          <div>
+            <h3 className="md:text-lg text-md text-start">{title}</h3>
+            <p className="md:text-base text-xs">{description}</p>
+          </div>
+        </div>
+      </CardBody>
+    </Card>
   );
 }
 
@@ -403,7 +378,7 @@ function DeveloperSection() {
               >
                 <p className="text-xl">🍔</p>
                 <span className="ml-2 text-md font-bold text-primary-500">
-                  Buy Me A Coffee
+                  Buy Me A BigMac
                 </span>
               </a>
               <a
