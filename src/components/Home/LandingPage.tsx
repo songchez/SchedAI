@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
-import { Button, Card, CardBody, CardHeader, Divider } from "@heroui/react";
+import { Card, CardBody, CardHeader, Divider } from "@heroui/react";
 import GoolgleIcon from "@/images/google-icon-logo.svg";
 import usageCard1 from "@/images/usageCard_1.png";
 import usageCard2 from "@/images/usageCard_2.png";
