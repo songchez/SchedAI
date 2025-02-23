@@ -98,7 +98,7 @@ export function SideBarIcon() {
     >
       <g
         transform="translate(0,300) scale(0.1,-0.1)"
-        fill="#000000"
+        className="fill-gray-800 dark:fill-white"
         stroke="none"
       >
         <path

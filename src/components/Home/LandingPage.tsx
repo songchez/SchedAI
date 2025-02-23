@@ -89,10 +89,11 @@ function HeroSection() {
               나만의 AI일정관리 비서,{" "}
               <span className="text-orange-500">SchedAI</span>.
             </h1>
-            <Link href="/chat">
-              <Button className="text-lg text-white bg-primary-500 w-40 drop-shadow-md p-2 rounded-lg hover:bg-orange-500">
-                지금 대화시작하기
-              </Button>
+            <Link
+              href="/chat"
+              className="text-lg text-white bg-primary-500 w-40 drop-shadow-md p-3 rounded-lg hover:bg-orange-500 transition-all"
+            >
+              지금 대화시작하기
             </Link>
           </div>
         </div>
