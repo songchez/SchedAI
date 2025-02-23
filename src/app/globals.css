@@ -35,4 +35,10 @@
       inset 4px 4px 8px rgba(25, 25, 23, 0.1),
       /* 내부 그림자 추가 */ inset -4px -4px 8px #fffaee; /* 내부 하이라이트 추가 */
   }
+  .dark-shadow-neumorphism {
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.6),
+      -4px -4px 8px rgba(255, 255, 255, 0.1),
+      inset 4px 4px 8px rgba(0, 0, 0, 0.6),
+      inset -4px -4px 8px rgba(255, 255, 255, 0.1);
+  }
 }

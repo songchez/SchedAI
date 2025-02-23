@@ -4,6 +4,7 @@ import { Bars3BottomRightIcon } from "@heroicons/react/24/solid";
 import { Button } from "@heroui/react";
 import { useSidebarStore } from "@/lib/store/SideBarHandleStore";
 import { usePathname } from "next/navigation";
+import { SideBarIcon } from "../SVGAssets";
 
 export default function SideBarHandleBtn() {
   const { openSidebar, isSidebarOpen } = useSidebarStore();
@@ -12,14 +13,9 @@ export default function SideBarHandleBtn() {
   return (
     !isSidebarOpen &&
     pathname.includes("/chat") && (
-      <div className="m-3">
-        <Button
-          variant="light"
-          isIconOnly
-          onPress={openSidebar}
-          className="bg-background rounded-full p-2 shadow"
-        >
-          <Bars3BottomRightIcon className="w-8 h-8" />
+      <div className="m-4">
+        <Button isIconOnly onPress={openSidebar} className="bg-background">
+          <SideBarIcon />
         </Button>
       </div>
     )

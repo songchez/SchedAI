@@ -9,7 +9,14 @@ import {
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
-import { UserCircleIcon } from "@heroicons/react/24/solid";
+import {
+  ChatBubbleOvalLeftEllipsisIcon,
+  CreditCardIcon,
+  HomeIcon,
+  PowerIcon,
+  UserCircleIcon,
+  UserIcon,
+} from "@heroicons/react/24/solid";
 
 interface Props {
   session: Session | null;
@@ -18,9 +25,36 @@ interface Props {
 export default function OnLoginDropdownBtn({ session }: Props) {
   // 1. Set up your items as an array
   const items = [
-    { key: "myaccount", label: "My Account", href: "/myaccount" },
-    { key: "checkout", label: "✨프리미엄구독", href: "/checkout" },
-    { key: "signOut", label: "Sign Out", className: "text-danger" },
+    {
+      key: "home",
+      label: "Home",
+      href: "/",
+      icon: <HomeIcon />,
+    },
+    {
+      key: "chat",
+      label: "ChatBot✨",
+      href: "/chat",
+      icon: <ChatBubbleOvalLeftEllipsisIcon />,
+    },
+    {
+      key: "myaccount",
+      label: "My Account",
+      href: "/myaccount",
+      icon: <UserIcon />,
+    },
+    {
+      key: "checkout",
+      label: "프리미엄구독✨",
+      href: "/checkout",
+      icon: <CreditCardIcon />,
+    },
+    {
+      key: "signOut",
+      label: "Sign Out",
+      className: "text-danger",
+      icon: <PowerIcon />,
+    },
   ].flat();
 
   // 2. Handle item press
@@ -45,7 +79,6 @@ export default function OnLoginDropdownBtn({ session }: Props) {
           <UserCircleIcon />
         )}
       </DropdownTrigger>
-      {/* 3. Manually map items into <DropdownItem> elements */}
       <DropdownMenu>
         {items.map((item) => (
           <DropdownItem
@@ -53,6 +86,7 @@ export default function OnLoginDropdownBtn({ session }: Props) {
             className={item.className ?? ""}
             href={item.href}
             onPress={() => onItemPress(item.key)}
+            startContent={<div className="w-4 h-4">{item.icon}</div>}
           >
             {item.label}
           </DropdownItem>

@@ -4,20 +4,16 @@ import { useRef } from "react";
 import Image, { StaticImageData } from "next/image";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
-import { Card, CardBody, CardHeader, Divider } from "@heroui/react";
+import { Button, Card, CardBody, CardHeader, Divider } from "@heroui/react";
 import GoolgleIcon from "@/images/google-icon-logo.svg";
 import usageCard1 from "@/images/usageCard_1.png";
 import usageCard2 from "@/images/usageCard_2.png";
 import usageCard3 from "@/images/usageCard_3.png";
 import profileImage from "@/images/profileimage.jpeg";
 
-import {
-  BeakerIcon,
-  ChatBubbleBottomCenterIcon,
-  LightBulbIcon,
-} from "@heroicons/react/24/solid";
-import { GithubLogo } from "./SVGAssets";
-import { FeatureBackground } from "./SVGAssets";
+import { BeakerIcon, LightBulbIcon } from "@heroicons/react/24/solid";
+import { GithubLogo } from "@/components/SVGAssets";
+import { FeatureBackground } from "@/components/SVGAssets";
 import BluePrintSection from "./BluePrintSection";
 import CTASection from "./CTASection";
 import NeumorphicClock from "./Clock";
@@ -76,29 +72,27 @@ function HeroSection() {
         <div className="text-black drop-shadow-lg w-full backdrop-blur-sm">
           {/* 메인 타이틀 */}
           <div className="flex flex-col gap-7 p-10 md:mx-20">
-            <h2 className="md:text-7xl text-3xl mb-5">
-              <span className="text-[#07090F] px-3 border-1 border-primary-500 rounded-lg">
+            <h2 className="md:text-7xl text-3xl mb-5 dark:text-white">
+              <span className="text-[#07090F] dark:text-[#FFF8E7] px-3 border-1 border-primary-500 rounded-lg">
                 시간
               </span>
               을{" "}
-              <span className="text-[#07090F] border-b border-primary-500">
+              <span className="text-[#07090F] dark:text-[#FFF8E7] border-b border-primary-500">
                 디자인
               </span>
               하세요
             </h2>
-            <h1 className="md:text-3xl text-xl">
+            <h1 className="md:text-3xl text-xl dark:text-white">
               쉽고 편해지는 구글 캘린더 관리
             </h1>
-            <h1 className="md:text-3xl text-xl">
+            <h1 className="md:text-3xl text-xl dark:text-white">
               나만의 AI일정관리 비서,{" "}
               <span className="text-orange-500">SchedAI</span>.
             </h1>
-            <Link
-              href="/chat"
-              className="text-lg text-white bg-primary-500 w-40 drop-shadow-md p-2 rounded-lg"
-              role="button"
-            >
-              <span className="flex justify-center">지금 대화시작하기</span>
+            <Link href="/chat">
+              <Button className="text-lg text-white bg-primary-500 w-40 drop-shadow-md p-2 rounded-lg hover:bg-orange-500">
+                지금 대화시작하기
+              </Button>
             </Link>
           </div>
         </div>
@@ -134,119 +128,44 @@ function FeatureSection1() {
 
 // FeatureSection2
 function FeatureSection2() {
-  return (
-    <section className="relative my-32 mx-5 flex justify-center gap-5 w-screen h-screen">
-      <FeatureBackground />
-
-      <div className="flex flex-col gap-10 justify-center items-start">
-        <Card className="backdrop-blur-md bg-white/5 shadow-lg p-5">
-          <CardHeader className="flex gap-5">
-            <Image src={GoolgleIcon} alt="googleLogo" className="md:w-9 w-6" />
-            <h3 className="text-xl">Google Calendar & Task 완벽연동</h3>
-          </CardHeader>
-          <CardBody>
-            <div>
-              SchedAI는 Google Calendar & Task에 완벽하게 연동되어있습니다.
-              여러분이 로그인한 구글계정에 적용된 일정을 확인해보세요!
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card className="backdrop-blur-md bg-white/5 shadow-lg p-5">
-          <CardHeader className="flex gap-5">
-            <LightBulbIcon className="md:w-10 w-6" />
-            <h3 className="text-xl">스마트 일정 관리</h3>
-          </CardHeader>
-          <CardBody>
-            <div>
-              일일이 찾을 필요없이, 중요한 일정과 약속을 AI에게 물어보고 가장
-              좋은 날로 새로운 일정을 잡아보세요.
-            </div>
-          </CardBody>
-        </Card>
-
-        <Card className="backdrop-blur-md bg-white/5 shadow-lg p-5">
-          <CardHeader className="flex gap-5">
-            <BeakerIcon className="md:w-10 w-6" />
-            <h3 className="text-xl">다양한 최신 LLM 모델 지원</h3>
-          </CardHeader>
-          <CardBody>
-            <div>
-              ChatGPT 4o mini, Gemini 2.0 flash 등 다양한 언어모델 지원으로
-              선호에 맞게 커스텀 가능
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-    </section>
-  );
-}
-
-function FeatureCards() {
   const features = [
     {
-      imageSrc: <ChatBubbleBottomCenterIcon className="md:w-10 w-6" />,
-      title: "AI ChatBot 기반 일정 관리",
+      icon: <Image src={GoolgleIcon} alt="googleLogo" className="md:w-9 w-6" />,
+      title: "Google Calendar & Task 완벽연동",
       description:
-        "편리한 대화형 인터페이스로 쉽고 빠르게 일정을 조정해보세요.",
+        "SchedAI는 Google Calendar & Task에 완벽하게 연동되어있습니다. 여러분이 로그인한 구글계정에 적용된 일정을 확인해보세요!",
     },
     {
-      imageSrc: <LightBulbIcon className="md:w-10 w-6" />,
-      title: "스마트 일정 검색",
+      icon: <LightBulbIcon className="md:w-10 w-6" />,
+      title: "스마트 일정 관리",
       description:
-        "일일이 찾을 필요없이, 중요한 일정과 약속을 손쉽게 AI에게 물어보세요.",
-    },
-    {
-      imageSrc: (
-        <Image src={GoolgleIcon} alt="googleLogo" className="md:w-9 w-6" />
-      ),
-      title: "Google Calendar & Task 완벽 연동",
-      description:
-        "구글 캘린더와 자동 동기화로 한 곳에서 모든 일정을 관리하세요.",
+        "일일이 찾을 필요없이, 중요한 일정과 약속을 AI에게 물어보고 가장 좋은 날로 새로운 일정을 잡아보세요.",
     },
     {
       icon: <BeakerIcon className="md:w-10 w-6" />,
-      title: "다양한 LLM모델 지원",
+      title: "다양한 최신 LLM 모델 지원",
       description:
         "ChatGPT 4o mini, Gemini 2.0 flash 등 다양한 언어모델 지원으로 선호에 맞게 커스텀 가능",
     },
   ];
-
   return (
-    <div className="grid grid-cols-2 gap-5">
-      {features.map((feature, index) => (
-        <FeatureCard
-          key={index}
-          icon={feature.icon}
-          title={feature.title}
-          description={feature.description}
-        />
-      ))}
-    </div>
-  );
-}
-
-function FeatureCard({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <Card className="bg-transparent md:py-4 md:px-4 p-2 shadow-md" isPressable>
-      <CardBody>
-        <div className="flex gap-5 justify-start items-center">
-          <div>{icon}</div>
-          <div>
-            <h3 className="md:text-lg text-md text-start">{title}</h3>
-            <p className="md:text-base text-xs">{description}</p>
-          </div>
-        </div>
-      </CardBody>
-    </Card>
+    <section className="relative my-32 flex justify-center w-screen h-screen">
+      <FeatureBackground />
+      <div className="flex flex-col gap-5 justify-center items-start m-5 h-full">
+        {features.map((feature, index) => (
+          <Card
+            key={index}
+            className="backdrop-blur-md bg-white/5 shadow-lg p-5"
+          >
+            <CardHeader className="flex gap-5">
+              {feature.icon}
+              <h3 className="text-xl">{feature.title}</h3>
+            </CardHeader>
+            <CardBody>{feature.description}</CardBody>
+          </Card>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -303,7 +222,8 @@ function ParallaxCard({
   // 간단하게 hover 시 이미지가 살짝 움직이는 정도로 예시
   return (
     <motion.div
-      className="relative w-80 h-72 rounded-lg overflow-hidden shadow-md "
+      className="relative w-80 h-72 rounded-lg overflow-hidden shadow-md"
+      role="button"
       whileHover={{ scale: 1.03 }}
       transition={{ duration: 0.3 }}
     >
