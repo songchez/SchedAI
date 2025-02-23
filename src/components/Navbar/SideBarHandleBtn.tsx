@@ -1,6 +1,5 @@
 "use client";
 
-import { Bars3BottomRightIcon } from "@heroicons/react/24/solid";
 import { Button } from "@heroui/react";
 import { useSidebarStore } from "@/lib/store/SideBarHandleStore";
 import { usePathname } from "next/navigation";
