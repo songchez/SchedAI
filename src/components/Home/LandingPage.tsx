@@ -286,25 +286,30 @@ function DeveloperSection() {
               프론트엔드 개발자, AI 스케줄링 서비스 SchedAI를 개발하고 있습니다.
               더 효율적인 삶을 위한 자동화와 UX를 고민합니다.
             </p>
-            <div className="flex items-center gap-3">
-              <a href="https://github.com/songchez" target="_blank">
+            <div className="flex md:flex-row flex-col md:items-center items-start gap-3 text-black">
+              <a
+                href="https://github.com/songchez"
+                target="_blank"
+                className="flex items-center justify-center gap-2 bg-neutral-200 p-2 rounded-2xl hover:shadow-md transition-all"
+              >
                 <GithubLogo />
+                <span className="text-lg">GITHUB </span>
               </a>
 
               <a
                 href="https://www.buymeacoffee.com/tama4840X"
                 target="_blank"
-                className="flex p-2 items-center bg-yellow-400 rounded-2xl hover:shadow-md"
+                className="flex p-2 items-center bg-yellow-400 rounded-2xl hover:shadow-md transition-all"
               >
-                <p className="text-xl">🍔</p>
-                <span className="ml-2 text-md font-bold text-primary-500">
+                <p className="text-2xl">🍔</p>
+                <span className="ml-2 text-lg text-primary-500">
                   Buy Me A BigMac
                 </span>
               </a>
               <a
                 href="https://eliclosetshop.tistory.com/"
                 target="_blank"
-                className="bg-[rgb(252,87,87)] text-white rounded-2xl px-4 py-2 hover:bg-primary-600 transition-all"
+                className="bg-[rgb(252,87,87)] text-lg text-white rounded-2xl p-2 hover:shadow-md transition-all"
               >
                 티스토리 블로그
               </a>
