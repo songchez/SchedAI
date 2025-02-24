@@ -37,7 +37,6 @@ export async function GET(request: Request) {
 
     // chatId 파싱
     const chatId = searchParams.get("chatId");
-    console.log("[GET] chatId:", chatId);
     if (!chatId) {
       console.error("[GET] chatId 누락");
       return NextResponse.json({ error: "Missing chatId" }, { status: 400 });
@@ -47,7 +46,6 @@ export async function GET(request: Request) {
       where: { chatId },
       orderBy: { createdAt: "asc" },
     });
-    console.log("[GET] messageEntities:", messageEntities);
 
     if (!messageEntities) {
       console.error("[GET] 채팅 없음");
@@ -90,7 +88,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       model: AIModels;
       chatId: string;
     };
-    console.log("[POST] 요청 본문 파싱 완료:", { messages, model, chatId });
+    console.log("[POST] 요청 본문 파싱 완료:");
 
     // 모델 유효성 검사
     if (!(model in providersMap)) {
@@ -175,23 +173,23 @@ User calendar id is: ${calendars?.[0]?.id?.toString() ?? "(No calendar id)"} `;
       },
     });
 
-    // 🛠️ **비동기적으로 DB 저장 (스트리밍 반환 후 실행)**
+    // 🛠️ **비동기적으로 DB 저장 (스트리밍 반환 후 실행. 병렬처리)**
     result.text.then(async (fullText) => {
       try {
-        await prisma.messageEntity.create({
-          data: {
-            content: fullText,
-            role: "assistant",
-            chatId: chatId!,
-            createdAt: new Date(),
-          },
-        });
-
-        // 채팅의 messageCount 업데이트
-        await prisma.chat.update({
-          where: { id: chatId },
-          data: { messageCount: { increment: 1 } },
-        });
+        await Promise.all([
+          prisma.messageEntity.create({
+            data: {
+              content: fullText,
+              role: "assistant",
+              chatId: chatId!,
+              createdAt: new Date(),
+            },
+          }),
+          prisma.chat.update({
+            where: { id: chatId },
+            data: { messageCount: { increment: 1 } },
+          }),
+        ]);
         console.log("[POST] AI 응답 메시지 DB 저장 완료");
       } catch (err) {
         console.error("[POST] DB 저장 중 오류 발생:", err);
