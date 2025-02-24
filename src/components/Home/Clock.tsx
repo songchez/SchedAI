@@ -1,15 +1,30 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export default function NeumorphicClock() {
   const [time, setTime] = useState(new Date());
+  const [mounted, setMounted] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTime(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
+    setMounted(true);
+    const updateTime = () => setTime(new Date());
+    const now = new Date();
+    const msToNextSecond = 1000 - now.getMilliseconds();
+
+    const timeout = setTimeout(() => {
+      updateTime();
+      intervalRef.current = setInterval(updateTime, 1000);
+    }, msToNextSecond);
+
+    return () => {
+      clearTimeout(timeout);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, []);
+
+  // 서버와의 HTML 불일치를 방지하기 위해 클라이언트에서만 렌더링
+  if (!mounted) return null;
 
   const seconds = time.getSeconds();
   const minutes = time.getMinutes();
@@ -48,7 +63,6 @@ export default function NeumorphicClock() {
         <div className="absolute w-4 h-1 bg-[#1D201F] dark:bg-[#ea580c] right-[10%] top-1/2 -translate-y-1/2 rounded-full" />
         <div className="absolute w-1 h-4 bg-[#1D201F] dark:bg-[#ea580c] bottom-[10%] left-1/2 -translate-x-1/2 rounded-full" />
         <div className="absolute w-4 h-1 bg-[#1D201F] dark:bg-[#ea580c] left-[10%] top-1/2 -translate-y-1/2 rounded-full" />
-        <div className="absolute -bottom-10">{time.toTimeString()}</div>
       </div>
     </div>
   );
