@@ -6,6 +6,7 @@ import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 import SideBarHandleBtn from "@/components/Navbar/SideBarHandleBtn";
 import { Gowun_Batang, IBM_Plex_Sans_KR } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const gowunBatang = Gowun_Batang({
   display: "swap",
@@ -29,6 +30,7 @@ export default async function RootLayout({
   return (
     <html lang="ko" className="dark">
       <body className={`${gowunBatang.className} ${ibmFlexSans.variable}`}>
+        <SpeedInsights />
         <Providers>
           <div className="flex w-screen">
             <SessionProvider session={session}>

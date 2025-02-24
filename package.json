@@ -17,6 +17,7 @@
     "@heroicons/react": "^2.2.0",
     "@heroui/react": "^2.6.14",
     "@prisma/client": "^6.2.1",
+    "@vercel/speed-insights": "^1.2.0",
     "ai": "^4.0.38",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
