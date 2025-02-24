@@ -1,26 +1,14 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function NeumorphicClock() {
   const [time, setTime] = useState(new Date());
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>();
 
   useEffect(() => {
-    const updateTime = () => setTime(new Date());
-    const now = new Date();
-    const msToNextSecond = 1000 - now.getMilliseconds();
-
-    const timeout = setTimeout(() => {
-      updateTime();
-      intervalRef.current = setInterval(updateTime, 1000);
-    }, msToNextSecond);
-
-    return () => {
-      clearTimeout(timeout);
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
+    const interval = setInterval(() => {
+      setTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const seconds = time.getSeconds();
@@ -60,6 +48,7 @@ export default function NeumorphicClock() {
         <div className="absolute w-4 h-1 bg-[#1D201F] dark:bg-[#ea580c] right-[10%] top-1/2 -translate-y-1/2 rounded-full" />
         <div className="absolute w-1 h-4 bg-[#1D201F] dark:bg-[#ea580c] bottom-[10%] left-1/2 -translate-x-1/2 rounded-full" />
         <div className="absolute w-4 h-1 bg-[#1D201F] dark:bg-[#ea580c] left-[10%] top-1/2 -translate-y-1/2 rounded-full" />
+        <div className="absolute -bottom-10">{time.toTimeString()}</div>
       </div>
     </div>
   );
