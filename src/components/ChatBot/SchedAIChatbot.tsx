@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import ChatMessageList from "./ChatMessageList";
 import ChatInput from "./ChatInput";
 import { Message, useChat } from "ai/react";
@@ -64,7 +64,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
       storedChatInput &&
       storedChatInput !== lastSubmittedUserMessage.current
     ) {
-      console.log("Store에 저장된 메시지", storedChatInput);
+      // console.log("Store에 저장된 메시지", storedChatInput);
       lastSubmittedUserMessage.current = storedChatInput;
       handleInputChange({
         target: { value: storedChatInput },
@@ -108,15 +108,18 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
     }
   }, [chatId]);
 
-  // preloadedMessages와 liveMessages를 합쳐서 중복 제거한 후, store 업데이트 (한번만 실행)
-  useEffect(() => {
+  // useMemo를 사용해 preloadedMessages와 liveMessages를 병합하고 중복 제거
+  const uniqueMessages = useMemo(() => {
     const mergedMessages = [...preloadedMessages, ...liveMessages];
-    // 중복 제거: 메시지 id를 기준으로 Map에 넣어 고유 메시지만 추출
-    const uniqueMessages = Array.from(
+    return Array.from(
       new Map(mergedMessages.map((msg) => [msg.id, msg])).values()
     );
+  }, [preloadedMessages, liveMessages]);
+
+  // uniqueMessages가 변경될 때마다 store 업데이트
+  useEffect(() => {
     setMessages(uniqueMessages);
-  }, [preloadedMessages, liveMessages, setMessages]);
+  }, [uniqueMessages, setMessages]);
 
   // 최종 렌더링할 메시지는 store에 있는 메시지입니다. (이미 중복 제거되어 업데이트되었음)
 

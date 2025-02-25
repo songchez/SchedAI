@@ -229,7 +229,13 @@ function ParallaxCard({
       transition={{ duration: 0.3 }}
     >
       {image ? (
-        <Image src={image} alt={title} fill className="object-cover" />
+        <Image
+          src={image}
+          alt={title}
+          fill={true}
+          sizes="512px"
+          className="object-cover"
+        />
       ) : (
         <div className="absolute inset-0 bg-gray-200" />
       )}
@@ -276,7 +282,6 @@ function DeveloperSection() {
               alt="Developer Profile"
               width={200}
               height={200}
-              style={{ objectFit: "cover" }}
             />
           </div>
 
@@ -294,7 +299,7 @@ function DeveloperSection() {
                 className="flex items-center justify-center gap-2 bg-neutral-200 p-2 rounded-2xl hover:shadow-md transition-all"
               >
                 <GithubLogo />
-                <span className="text-lg">GITHUB </span>
+                <span className="text-lg">github</span>
               </a>
 
               <a
@@ -304,7 +309,7 @@ function DeveloperSection() {
               >
                 <p className="text-2xl">🍔</p>
                 <span className="ml-2 text-lg text-primary-500">
-                  Buy Me A BigMac
+                  buy me a bigmac
                 </span>
               </a>
               <a
@@ -312,7 +317,7 @@ function DeveloperSection() {
                 target="_blank"
                 className="bg-[rgb(252,87,87)] text-lg text-white rounded-2xl p-2 hover:shadow-md transition-all"
               >
-                티스토리 블로그
+                tistory blog
               </a>
             </div>
           </div>

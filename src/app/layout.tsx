@@ -30,7 +30,6 @@ export default async function RootLayout({
   return (
     <html lang="ko" className="dark">
       <body className={`${gowunBatang.className} ${ibmFlexSans.variable}`}>
-        <SpeedInsights />
         <Providers>
           <div className="flex w-screen">
             <SessionProvider session={session}>
@@ -44,6 +43,7 @@ export default async function RootLayout({
               {children}
             </div>
           </div>
+          <SpeedInsights />
         </Providers>
       </body>
     </html>

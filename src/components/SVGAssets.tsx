@@ -94,7 +94,7 @@ export function SideBarIcon() {
       height="300pt"
       viewBox="0 0 300 300"
       preserveAspectRatio="xMidYMid meet"
-      className="dark:text-white"
+      className="dark:text-white w-8"
     >
       <g
         transform="translate(0,300) scale(0.1,-0.1)"
