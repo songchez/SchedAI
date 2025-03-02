@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useChat } from "ai/react";
 import ChatMessageList from "./ChatMessageList";
 import ChatInput from "./ChatInput";
-import { Message, useChat } from "ai/react";
+import { Message as LegacyMessage } from "ai/react"; // 기존 Message 타입 불러오기
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { useDisclosure } from "@heroui/react";
 import { PaymentModal } from "./PaymentModal";
@@ -16,33 +17,45 @@ interface SchedAIChatbotProps {
 }
 
 export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
-  // zustand의 Chats를 가져와서 chatId로 find -> selectedModel의 기본값으로 할당
+  // 1) zustand에서 chatId에 해당하는 정보 가져오기
   const { chats, updateChat } = useChatStore();
   const currentChat = chats.find((chat) => chat.id === chatId);
+
   const [selectedModel, setSelectedModel] = useState<AIModels>(
     currentChat?.aiModel
   );
 
+  // 2) 결제 모달/Disclosure 관련 state
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  // 3) ChatInputStore (바깥에서 입력된 메시지가 저장됨)
   const storedChatInput = useChatInputStore((state) => state.value);
   const { clearInput } = useChatInputStore();
 
-  // AI 스트리밍 요청 (채팅 시작)
+  // 4) form ref
+  const formRef = useRef<HTMLFormElement>(null);
+  //   동일 메시지 중복 제출 방지 ref
+  const lastSubmittedUserMessage = useRef<string>("");
+
+  // 5) ai-sdk/react에서 제공하는 useChat
   const {
     messages: liveMessages,
+    addToolResult,
     input,
-    setMessages,
     handleInputChange,
     handleSubmit,
     stop,
     isLoading,
+    setMessages, // messages 배열을 외부에서 업데이트할 때 사용
   } = useChat({
+    // 엔드포인트와 추가 body
     api: "/api/chat/stream",
     body: {
       chatId,
       model: selectedModel,
     },
     onResponse: async (response) => {
+      // 서버 응답 후 처리 (예: 결제 에러)
       if (chatId && currentChat?.aiModel !== selectedModel) {
         await updateChat(chatId, { aiModel: selectedModel });
       }
@@ -52,24 +65,19 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
     },
   });
 
-  // 동일 메시지 중복 제출 방지용 ref
-  const lastSubmittedUserMessage = useRef<string>("");
-
-  // 폼 엘리먼트를 참조하기 위한 ref
-  const formRef = useRef<HTMLFormElement>(null);
-
-  // storedChatInput이 변경되면 input 업데이트 후 폼 submit 이벤트 발생
+  // 6) ChatInputStore를 통한 외부 입력 -> 자동 제출 로직
   useEffect(() => {
     if (
       storedChatInput &&
       storedChatInput !== lastSubmittedUserMessage.current
     ) {
-      // console.log("Store에 저장된 메시지", storedChatInput);
       lastSubmittedUserMessage.current = storedChatInput;
+
+      // 타입 단언으로 이벤트 객체 형식을 맞춰준다
       handleInputChange({
         target: { value: storedChatInput },
       } as React.ChangeEvent<HTMLInputElement>);
-      // 상태 업데이트 후 폼 제출 (submit 이벤트 발생)
+
       setTimeout(() => {
         if (formRef.current) {
           formRef.current.dispatchEvent(
@@ -77,13 +85,15 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
           );
         }
       }, 0);
-      // 사용한 Input String 삭제
+
       clearInput();
     }
   }, [storedChatInput, handleInputChange, clearInput]);
 
-  // 기존 메시지들 (preloadedMessages)를 불러오기
-  const [preloadedMessages, setPreloadedMessages] = useState<Message[]>([]);
+  // 7) 기존 메시지(서버에서 불러오기) 관리
+  const [preloadedMessages, setPreloadedMessages] = useState<LegacyMessage[]>(
+    []
+  );
   const [isPreloading, setIsPreloading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -108,21 +118,23 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
     }
   }, [chatId]);
 
-  // useMemo를 사용해 preloadedMessages와 liveMessages를 병합하고 중복 제거
+  // 8) preloadedMessages + liveMessages 병합 & 중복 제거
+  //    (id를 기준으로 set/dict화)
   const uniqueMessages = useMemo(() => {
-    const mergedMessages = [...preloadedMessages, ...liveMessages];
-    return Array.from(
-      new Map(mergedMessages.map((msg) => [msg.id, msg])).values()
-    );
+    // preloadedMessages, liveMessages 모두 ai/react의 Message 형태라고 가정
+    // (만약 구조가 다르다면 변환 로직 필요)
+    const merged = [...preloadedMessages, ...liveMessages];
+    return Array.from(new Map(merged.map((m) => [m.id, m])).values());
   }, [preloadedMessages, liveMessages]);
 
-  // uniqueMessages가 변경될 때마다 store 업데이트
+  // 9) store/messages 상태 갱신
+  //    (liveMessages를 직접 바꾸기보다 setMessages로 업데이트)
   useEffect(() => {
     setMessages(uniqueMessages);
   }, [uniqueMessages, setMessages]);
 
-  // 최종 렌더링할 메시지는 store에 있는 메시지입니다. (이미 중복 제거되어 업데이트되었음)
-
+  // 최종 표시할 메시지: uniqueMessages (이미 setMessages로 반영됨)
+  // ChatMessageList에 isLoading과 함께 넘김
   return (
     <div className="flex flex-col justify-end w-full max-w-3xl mx-auto rounded-lg px-2">
       <PaymentModal isOpen={isOpen} onOpenChange={onOpenChange} />
@@ -133,7 +145,11 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
             메시지 불러오는 중...
           </div>
         ) : (
-          <ChatMessageList messages={liveMessages} isLoading={isLoading} />
+          <ChatMessageList
+            messages={liveMessages}
+            isLoading={isLoading}
+            addToolResult={addToolResult}
+          />
         )}
       </ScrollShadow>
 

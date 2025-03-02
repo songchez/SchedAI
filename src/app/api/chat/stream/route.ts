@@ -146,20 +146,20 @@ export async function POST(req: NextRequest): Promise<Response> {
     console.log("[POST] 토큰 및 구독 상태 확인 완료");
 
     // 시스템 프롬프트 메시지 생성
-    const systemMessage = `You are SchedAI (${model}).
+    const systemPrompt = `You are SchedAI.
 Professional schedule assistant.
-Current time: ${new Date().toISOString()}
+한국기준 현재시간: ${new Date().toLocaleString("ko-KR")}
 User calendar id is: ${calendars?.[0]?.id?.toString() ?? "(No calendar id)"} `;
-    console.log("[POST] 시스템 메시지 생성:", systemMessage);
+    console.log("[POST] 시스템 프롬프트 생성:", systemPrompt);
 
     // AI에 보낼 메시지
-    console.log("[POST] AI에 보낼 메시지:", messages);
+    // console.log("[POST] AI에 보낼 메시지:", messages);
 
     // AI 호출: streamText를 통해 스트리밍 결과를 받습니다.
     console.log("[POST] AI 호출 시작");
     const result = streamText({
       model: modelInstance,
-      system: systemMessage,
+      system: systemPrompt,
       messages: messages,
       tools: {
         getCalendarEventsTool,
@@ -171,6 +171,29 @@ User calendar id is: ${calendars?.[0]?.id?.toString() ?? "(No calendar id)"} `;
         updateTaskInListTool,
         deleteTaskFromListTool,
       },
+    });
+
+    result.toolResults.then(async (toolText) => {
+      try {
+        console.log(toolText);
+        // await Promise.all([
+        //   prisma.messageEntity.create({
+        //     data: {
+        //       content: toolText,
+        //       role: "assistant",
+        //       chatId: chatId!,
+        //       createdAt: new Date(),
+        //     },
+        //   }),
+        //   prisma.chat.update({
+        //     where: { id: chatId },
+        //     data: { messageCount: { increment: 1 } },
+        //   }),
+        // ]);
+        console.log("[POST] AI 응답 Tool Result DB 저장 완료");
+      } catch (err) {
+        console.error("[POST] DB 저장 중 오류 발생:", err);
+      }
     });
 
     // 🛠️ **비동기적으로 DB 저장 (스트리밍 반환 후 실행. 병렬처리)**
@@ -190,7 +213,7 @@ User calendar id is: ${calendars?.[0]?.id?.toString() ?? "(No calendar id)"} `;
             data: { messageCount: { increment: 1 } },
           }),
         ]);
-        console.log("[POST] AI 응답 메시지 DB 저장 완료");
+        console.log("[POST] AI 응답 Text Result DB 저장 완료");
       } catch (err) {
         console.error("[POST] DB 저장 중 오류 발생:", err);
       }

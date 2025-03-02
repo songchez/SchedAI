@@ -46,7 +46,7 @@ import {
  * 2. 특정 캘린더의 이벤트 조회
  */
 export const getCalendarEventsTool = {
-  description: "Get user events",
+  description: "Get user events at google calendar",
   parameters: z.object({
     calendarId: z.string(),
     timeMin: z.string().describe("start date in ISO 8601 format"),
@@ -78,27 +78,7 @@ export const getCalendarEventsTool = {
       return "일정이 없습니다.";
     }
 
-    // 날짜별로 그룹화
-    const groupedEvents = events.reduce<
-      Record<
-        string,
-        { summary: string; start?: { dateTime?: string }; id: string }[]
-      >
-    >((acc, event) => {
-      const dateTime = event.start?.dateTime;
-      if (!dateTime) return acc;
-      const date = new Date(dateTime).toISOString().split("T")[0];
-      if (!acc[date]) acc[date] = [];
-      acc[date].push({
-        summary: event.summary || "",
-        start: {
-          dateTime: event.start?.dateTime || undefined,
-        },
-        id: event.id || "", // eventId 추가
-      });
-      return acc;
-    }, {});
-    return groupedEvents;
+    return events;
   },
 };
 
@@ -106,7 +86,7 @@ export const getCalendarEventsTool = {
  * 3. 일정 추가
  */
 export const addEventToCalendarTool = {
-  description: "add new event",
+  description: "add new event on google calendar",
   parameters: z.object({
     calendarId: z.string(),
     eventDetails: z.object({
@@ -146,13 +126,9 @@ export const addEventToCalendarTool = {
         calendarId,
         eventDetails
       );
-      if (!newEvent) {
-        throw new Error("캘린더에 이벤트를 추가하지 못했습니다.");
-      }
+
       console.log("새로운 이벤트 추가:", newEvent);
-      return `"${newEvent.summary}" 일정이 추가되었습니다!
-      시작: ${formatToKoreanDateTime(newEvent.start?.dateTime)}
-      종료: ${formatToKoreanDateTime(newEvent.end?.dateTime)}`;
+      return newEvent;
     } catch (error) {
       if (error instanceof Error) {
         return `이벤트 추가함수에서 오류발생: ${error}`;
@@ -166,7 +142,7 @@ export const addEventToCalendarTool = {
  */
 export const updateEventInCalendarTool = {
   description:
-    "update existing event. In order to use update, eventId is necessary. if you dont know the eventId have to update, use getCalendarEventsTool(get eventIds). And ask user 'Which one would you like to update?'.don't tell the eventId to user.",
+    "update existing event at google calendar. In order to use update, eventId is necessary. if you dont know the eventId have to update, use getCalendarEventsTool(get eventIds). And ask user 'Which one would you like to update?'.don't tell the eventId to user.",
   parameters: z.object({
     calendarId: z.string(),
     eventId: z.string(),
@@ -231,7 +207,7 @@ export const updateEventInCalendarTool = {
 
 export const deleteEventFromCalendarTool = {
   description:
-    "delete existing event. if you dont know the event have to delete, use getCalendarEventsTool(get eventIds). And ask user 'Which one would you like to delete?'. don't tell the eventId to user.",
+    "delete existing event at google calendar. if you dont know the event have to delete, use getCalendarEventsTool(get eventIds). And ask user 'Which one would you like to delete?'. don't tell the eventId to user.",
   parameters: z.object({
     calendarId: z.string(),
     eventId: z.string(),
