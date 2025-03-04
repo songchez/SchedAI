@@ -5,10 +5,10 @@ import ChatSideBar from "@/components/ChatBot/ChatSideBar";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 import SideBarHandleBtn from "@/components/Navbar/SideBarHandleBtn";
-import { Gowun_Batang, IBM_Plex_Sans_KR } from "next/font/google";
+import { IBM_Plex_Sans_KR, Gowun_Batang } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-const gowunBatang = Gowun_Batang({
+const gowunSerif = Gowun_Batang({
   display: "swap",
   subsets: ["latin"],
   weight: ["400", "700"],
@@ -29,7 +29,7 @@ export default async function RootLayout({
   const session = await auth();
   return (
     <html lang="ko" className="dark">
-      <body className={`${gowunBatang.className} ${ibmFlexSans.variable}`}>
+      <body className={`${ibmFlexSans.variable} ${gowunSerif.className}`}>
         <Providers>
           <div className="flex w-screen">
             <SessionProvider session={session}>

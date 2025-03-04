@@ -146,8 +146,7 @@ export async function POST(req: NextRequest): Promise<Response> {
     console.log("[POST] 토큰 및 구독 상태 확인 완료");
 
     // 시스템 프롬프트 메시지 생성
-    const systemPrompt = `You are SchedAI.
-Professional schedule assistant.
+    const systemPrompt = `You are SchedAI. Professional schedule assistant.
 한국기준 현재시간: ${new Date().toLocaleString("ko-KR")}
 User calendar id is: ${calendars?.[0]?.id?.toString() ?? "(No calendar id)"} `;
     console.log("[POST] 시스템 프롬프트 생성:", systemPrompt);

@@ -18,7 +18,7 @@ export default function DesktopChatSideBar({
   setIsSidebarOpen,
 }: DesktopChatSideBarProps) {
   return (
-    <div className="w-80 flex flex-col bg-background border-r min-h-screen">
+    <div className="w-80 flex flex-col bg-background border-r min-h-screen transition-all duration-300">
       <div className="p-4 flex-shrink-0 sticky top-0 bg-background z-10 border-b">
         <div className="flex justify-between items-center">
           <Link href="/chat">

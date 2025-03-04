@@ -20,46 +20,46 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
   callbacks: {
     /* 로그인시 Accout데이터 업데이트: 
-    리프레쉬 토큰 만료로 재로그인할때 원래 정보와 충돌하지 않게하기 위함 */
-    async signIn({ user, account }) {
-      if (account?.provider === "google") {
-        await prisma.account.upsert({
-          where: {
-            provider_providerAccountId: {
-              provider: account.provider,
-              providerAccountId: account.providerAccountId,
-            },
-          },
-          /* 레코드가 존재할 경우 적용할 데이터 */
-          update: {
-            access_token: account.access_token,
-            refresh_token: account.refresh_token,
-            expires_at: account.expires_at
-              ? Math.floor(account.expires_at / 1000)
-              : null,
-            token_type: account.token_type,
-            scope: account.scope,
-            id_token: account.id_token,
-          },
-          /* 레코드가 존재하지 않을경우 적용할 데이터 */
-          create: {
-            userId: user.id as string,
-            type: account.type,
-            provider: account.provider,
-            providerAccountId: account.providerAccountId,
-            access_token: account.access_token,
-            refresh_token: account.refresh_token,
-            expires_at: account.expires_at
-              ? Math.floor(account.expires_at / 1000)
-              : null,
-            token_type: account.token_type,
-            scope: account.scope,
-            id_token: account.id_token,
-          },
-        });
-      }
-      return true;
-    },
+    리프레쉬 토큰 만료로 재로그인할때 원래 정보와 충돌하지 않게하기 위함: TODO:오류발생으로 다시만들어야함 */
+    // async signIn({ user, account }) {
+    //   if (account?.provider === "google") {
+    //     await prisma.account.upsert({
+    //       where: {
+    //         provider_providerAccountId: {
+    //           provider: account.provider,
+    //           providerAccountId: account.providerAccountId,
+    //         },
+    //       },
+    //       /* 레코드가 존재할 경우 적용할 데이터 */
+    //       update: {
+    //         access_token: account.access_token,
+    //         refresh_token: account.refresh_token,
+    //         expires_at: account.expires_at
+    //           ? Math.floor(account.expires_at / 1000)
+    //           : null,
+    //         token_type: account.token_type,
+    //         scope: account.scope,
+    //         id_token: account.id_token,
+    //       },
+    //       /* 레코드가 존재하지 않을경우 적용할 데이터 */
+    //       create: {
+    //         userId: user.id as string,
+    //         type: account.type,
+    //         provider: account.provider,
+    //         providerAccountId: account.providerAccountId,
+    //         access_token: account.access_token,
+    //         refresh_token: account.refresh_token,
+    //         expires_at: account.expires_at
+    //           ? Math.floor(account.expires_at / 1000)
+    //           : null,
+    //         token_type: account.token_type,
+    //         scope: account.scope,
+    //         id_token: account.id_token,
+    //       },
+    //     });
+    //   }
+    //   return true;
+    // },
     // 시간 만료시, 리프레쉬 토큰 과 엑세스토큰 교환 로직
     async session({ session, user }) {
       const [googleAccount] = await prisma.account.findMany({

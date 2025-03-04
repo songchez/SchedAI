@@ -61,45 +61,47 @@ export default function HomePage() {
 -----------------------------------*/
 function HeroSection() {
   return (
-    <section className="w-full min-h-screen flex md:flex-row flex-col items-center justify-start mt-14 md:-mt-10">
-      {/* 본문 컨테이너 */}
-      <motion.div
-        className="flex flex-col gap-8 order-2 md:order-1"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 0.3 }}
-      >
-        <div className="text-black drop-shadow-lg w-full backdrop-blur-sm">
-          {/* 메인 타이틀 */}
-          <div className="flex flex-col gap-7 p-10 md:mx-20">
-            <h2 className="md:text-7xl text-3xl mb-5 dark:text-white">
-              <span className="text-[#07090F] dark:text-[#FFF8E7] px-3 border-1 border-primary-500 rounded-lg">
-                시간
-              </span>
-              을{" "}
-              <span className="text-[#07090F] dark:text-[#FFF8E7] border-b border-primary-500">
-                디자인
-              </span>
-              하세요
-            </h2>
-            <h1 className="md:text-3xl text-xl dark:text-white">
-              쉽고 편해지는 구글 캘린더 관리
-            </h1>
-            <h1 className="md:text-3xl text-xl dark:text-white">
-              나만의 AI일정관리 비서,{" "}
-              <span className="text-orange-500">SchedAI</span>.
-            </h1>
-            <Link
-              href="/chat"
-              className="text-lg text-white bg-primary-500 w-40 drop-shadow-md p-3 rounded-lg hover:bg-orange-500 transition-all"
-            >
-              지금 대화시작하기
-            </Link>
+    <section className="w-full min-h-screen items-center justify-start">
+      <div className="flex md:flex-row flex-col 2xl:justify-center justify-start items-center mt-14">
+        {/* 본문 컨테이너 */}
+        <motion.div
+          className="flex flex-col gap-8 order-2 md:order-1"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.3 }}
+        >
+          <div className="text-black drop-shadow-lg w-full backdrop-blur-sm">
+            {/* 메인 타이틀 */}
+            <div className="flex flex-col gap-7 p-10 md:mx-20">
+              <h2 className="md:text-7xl text-3xl mb-5 dark:text-white">
+                <span className="text-[#07090F] dark:text-[#FFF8E7] px-3 border-1 border-primary-500 rounded-lg">
+                  시간
+                </span>
+                을{" "}
+                <span className="text-[#07090F] dark:text-[#FFF8E7] border-b border-primary-500">
+                  디자인
+                </span>
+                하세요
+              </h2>
+              <h1 className="md:text-3xl text-xl dark:text-white">
+                쉽고 편해지는 구글 캘린더 관리
+              </h1>
+              <h1 className="md:text-3xl text-xl dark:text-white">
+                나만의 AI일정관리 비서,{" "}
+                <span className="text-orange-500">SchedAI</span>.
+              </h1>
+              <Link
+                href="/chat"
+                className="text-lg text-white bg-primary-500 w-40 drop-shadow-md p-3 rounded-lg hover:bg-orange-500 transition-all"
+              >
+                지금 대화시작하기
+              </Link>
+            </div>
           </div>
+        </motion.div>
+        <div className="order-1 md:order-2">
+          <NeumorphicClock />
         </div>
-      </motion.div>
-      <div className="order-1 md:order-2">
-        <NeumorphicClock />
       </div>
     </section>
   );
