@@ -16,7 +16,7 @@ import {
 
 /**
  * 주의사항: zod스키마를 선언할때, object에 직접 optional을 붙이면 null Error 발생.
- * enum type넣으면 오류남. 아마 이것도
+ * enum type넣으면 오류남.
  */
 
 // # CALENDAR TOOLS
@@ -31,11 +31,9 @@ import {
 //     const session = await auth();
 //     const userId = session?.user.id;
 //     const calendars = await getCalendarList(userId);
-
 //     if (!calendars?.length) {
 //       return "등록된 캘린더가 없습니다.";
 //     }
-
 //     const calendarText = calendars.map((calendar) => calendar.id).join(", ");
 //     return `현재 캘린더 목록: ${calendarText}.
 // 원하시는 캘린더 ID를 알려주세요 (예: ${calendars[0].id}).`;

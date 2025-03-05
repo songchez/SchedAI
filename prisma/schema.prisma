@@ -43,7 +43,8 @@ model Chat {
 model MessageEntity {
   id              String    @id @default(cuid())
   createdAt       DateTime  @default(now())
-  content         String
+  content         String?     
+  parts           Json?
   role            String    // 'system' | 'user' | 'assistant' | 'data'
   chat            Chat?     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   chatId          String

@@ -24,3 +24,18 @@ export function formatToKoreanDateTime(
     ? formatted.replace(":", "시 ") + "분"
     : formatted;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function extractPlainToolResult(toolResult: any): object {
+  return {
+    type: "tool-invocation",
+    toolInvocation: {
+      state: "result",
+      step: 0,
+      toolCallId: toolResult.toolCallId,
+      toolName: toolResult.toolName,
+      args: toolResult.args,
+      result: toolResult.result,
+    },
+  };
+}

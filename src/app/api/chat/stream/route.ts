@@ -3,7 +3,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@ai-sdk/openai";
 import { google } from "@ai-sdk/google";
-import { LanguageModelV1, Message, streamText } from "ai";
+import { LanguageModelV1, streamText } from "ai";
+import { UIMessage } from "@ai-sdk/ui-utils";
 
 import { AIModels } from "@/lib/chatApiHandlers/constants";
 import {
@@ -19,6 +20,10 @@ import {
 import { auth } from "@/auth";
 import { getCalendarList } from "@/lib/googleClient";
 import { prisma } from "@/lib/prisma";
+import {
+  // deserializeUIMessage,
+  extractPlainToolResult,
+} from "@/lib/chatApiHandlers/utils";
 
 /**
  * AI 모델별 실제 LanguageModelV1 인스턴스를 생성하는 함수 맵
@@ -84,11 +89,11 @@ export async function POST(req: NextRequest): Promise<Response> {
 
     // 요청 본문 파싱
     const { messages, model, chatId } = (await req.json()) as {
-      messages: Message[];
+      messages: UIMessage[];
       model: AIModels;
       chatId: string;
     };
-    console.log("[POST] 요청 본문 파싱 완료:");
+    console.log("[POST] 요청 본문 파싱 완료:", messages);
 
     // 모델 유효성 검사
     if (!(model in providersMap)) {
@@ -111,6 +116,7 @@ export async function POST(req: NextRequest): Promise<Response> {
         data: {
           content: userMessage.content,
           role: userMessage.role,
+          parts: JSON.parse(JSON.stringify(userMessage.parts)),
           chatId: chatId,
           createdAt: userMessage.createdAt
             ? new Date(userMessage.createdAt)
@@ -152,7 +158,7 @@ User calendar id is: ${calendars?.[0]?.id?.toString() ?? "(No calendar id)"} `;
     console.log("[POST] 시스템 프롬프트 생성:", systemPrompt);
 
     // AI에 보낼 메시지
-    // console.log("[POST] AI에 보낼 메시지:", messages);
+    console.log("[POST] AI에 보낼 메시지:", JSON.stringify(messages));
 
     // AI 호출: streamText를 통해 스트리밍 결과를 받습니다.
     console.log("[POST] AI 호출 시작");
@@ -172,37 +178,21 @@ User calendar id is: ${calendars?.[0]?.id?.toString() ?? "(No calendar id)"} `;
       },
     });
 
-    result.toolResults.then(async (toolText) => {
-      try {
-        console.log(toolText);
-        // await Promise.all([
-        //   prisma.messageEntity.create({
-        //     data: {
-        //       content: toolText,
-        //       role: "assistant",
-        //       chatId: chatId!,
-        //       createdAt: new Date(),
-        //     },
-        //   }),
-        //   prisma.chat.update({
-        //     where: { id: chatId },
-        //     data: { messageCount: { increment: 1 } },
-        //   }),
-        // ]);
-        console.log("[POST] AI 응답 Tool Result DB 저장 완료");
-      } catch (err) {
-        console.error("[POST] DB 저장 중 오류 발생:", err);
-      }
-    });
-
     // 🛠️ **비동기적으로 DB 저장 (스트리밍 반환 후 실행. 병렬처리)**
-    result.text.then(async (fullText) => {
+    Promise.all([result.text, result.toolResults]).then(async (toolResults) => {
       try {
+        const plainToolResults = Array.isArray(toolResults[1])
+          ? toolResults[1].map(extractPlainToolResult)
+          : extractPlainToolResult(toolResults[1]);
+
+        console.log("변환 후", plainToolResults);
+
         await Promise.all([
           prisma.messageEntity.create({
             data: {
-              content: fullText,
+              parts: plainToolResults,
               role: "assistant",
+              content: toolResults[0] ? toolResults[0] : "---",
               chatId: chatId!,
               createdAt: new Date(),
             },
@@ -212,14 +202,14 @@ User calendar id is: ${calendars?.[0]?.id?.toString() ?? "(No calendar id)"} `;
             data: { messageCount: { increment: 1 } },
           }),
         ]);
-        console.log("[POST] AI 응답 Text Result DB 저장 완료");
+        console.log("[POST] AI 응답 Tool Result DB 저장 완료");
       } catch (err) {
         console.error("[POST] DB 저장 중 오류 발생:", err);
       }
     });
 
     // 스트리밍 응답을 클라이언트로 전달합니다.
-    console.log("[POST] 스트리밍 응답 클라이언트 전달");
+    console.log("[POST] 스트리밍 응답 클라이언트 전달:");
     return result.toDataStreamResponse();
   } catch (err) {
     if (userId && err instanceof Error) {

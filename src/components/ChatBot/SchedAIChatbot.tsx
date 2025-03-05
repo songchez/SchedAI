@@ -1,16 +1,18 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useChat } from "ai/react";
+import { UIMessage } from "@ai-sdk/ui-utils";
 import ChatMessageList from "./ChatMessageList";
 import ChatInput from "./ChatInput";
-import { Message as LegacyMessage } from "ai/react"; // 기존 Message 타입 불러오기
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { useDisclosure } from "@heroui/react";
 import { PaymentModal } from "./PaymentModal";
 import { AIModels } from "@/lib/chatApiHandlers/constants";
 import { useChatInputStore } from "@/lib/store/ChatInputStore";
 import { useChatStore } from "@/lib/store/ChatStore";
+import { prisma } from "@/lib/prisma";
+import { extractPlainToolResult } from "@/lib/chatApiHandlers/utils";
 
 interface SchedAIChatbotProps {
   chatId?: string;
@@ -24,7 +26,8 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
   const [selectedModel, setSelectedModel] = useState<AIModels>(
     currentChat?.aiModel
   );
-
+  const [preloadedMessages, setPreloadedMessages] = useState<UIMessage[]>([]);
+  const [isPreloading, setIsPreloading] = useState<boolean>(true);
   // 2) 결제 모달/Disclosure 관련 state
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
@@ -39,15 +42,15 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
 
   // 5) ai-sdk/react에서 제공하는 useChat
   const {
-    messages: liveMessages,
+    messages,
     addToolResult,
     input,
     handleInputChange,
     handleSubmit,
     stop,
     isLoading,
-    setMessages, // messages 배열을 외부에서 업데이트할 때 사용
   } = useChat({
+    initialMessages: preloadedMessages,
     // 엔드포인트와 추가 body
     api: "/api/chat/stream",
     body: {
@@ -91,10 +94,6 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
   }, [storedChatInput, handleInputChange, clearInput]);
 
   // 7) 기존 메시지(서버에서 불러오기) 관리
-  const [preloadedMessages, setPreloadedMessages] = useState<LegacyMessage[]>(
-    []
-  );
-  const [isPreloading, setIsPreloading] = useState<boolean>(true);
 
   useEffect(() => {
     if (chatId) {
@@ -105,7 +104,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
           }
           return res.json();
         })
-        .then((data) => {
+        .then((data: UIMessage[]) => {
           setPreloadedMessages(data);
           setIsPreloading(false);
         })
@@ -117,21 +116,6 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
       setIsPreloading(false);
     }
   }, [chatId]);
-
-  // 8) preloadedMessages + liveMessages 병합 & 중복 제거
-  //    (id를 기준으로 set/dict화)
-  const uniqueMessages = useMemo(() => {
-    // preloadedMessages, liveMessages 모두 ai/react의 Message 형태라고 가정
-    // (만약 구조가 다르다면 변환 로직 필요)
-    const merged = [...preloadedMessages, ...liveMessages];
-    return Array.from(new Map(merged.map((m) => [m.id, m])).values());
-  }, [preloadedMessages, liveMessages]);
-
-  // 9) store/messages 상태 갱신
-  //    (liveMessages를 직접 바꾸기보다 setMessages로 업데이트)
-  useEffect(() => {
-    setMessages(uniqueMessages);
-  }, [uniqueMessages, setMessages]);
 
   // 최종 표시할 메시지: uniqueMessages (이미 setMessages로 반영됨)
   // ChatMessageList에 isLoading과 함께 넘김
@@ -146,7 +130,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
           </div>
         ) : (
           <ChatMessageList
-            messages={liveMessages}
+            messages={messages}
             isLoading={isLoading}
             addToolResult={addToolResult}
           />
