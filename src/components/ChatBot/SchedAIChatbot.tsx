@@ -11,8 +11,6 @@ import { PaymentModal } from "./PaymentModal";
 import { AIModels } from "@/lib/chatApiHandlers/constants";
 import { useChatInputStore } from "@/lib/store/ChatInputStore";
 import { useChatStore } from "@/lib/store/ChatStore";
-import { prisma } from "@/lib/prisma";
-import { extractPlainToolResult } from "@/lib/chatApiHandlers/utils";
 
 interface SchedAIChatbotProps {
   chatId?: string;
