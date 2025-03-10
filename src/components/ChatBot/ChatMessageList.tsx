@@ -30,7 +30,6 @@ export default function ChatMessageList({
   return (
     <div className="flex flex-col gap-4 overflow-y-auto p-6">
       {messages.map((message) => {
-        console.log("야호", messages);
         return (
           <>
             <Card
@@ -45,7 +44,7 @@ export default function ChatMessageList({
                 {message.content || ""}
               </ReactMarkdown>
             </Card>
-            {message.parts?.map((part) => {
+            {message.parts?.map((part, index) => {
               switch (part.type) {
                 case "tool-invocation":
                   if (!part.toolInvocation) return null;
@@ -55,6 +54,13 @@ export default function ChatMessageList({
                       toolInvocation={part.toolInvocation}
                       addToolResult={addToolResult}
                     />
+                  );
+                case "reasoning":
+                  return (
+                    <pre key={index}>
+                      <span className="animate-pulse">고민중...</span>
+                      {part.reasoning}
+                    </pre>
                   );
               }
             })}

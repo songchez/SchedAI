@@ -3,6 +3,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@ai-sdk/openai";
 import { google } from "@ai-sdk/google";
+import { anthropic } from "@ai-sdk/anthropic";
+
 import { LanguageModelV1, streamText } from "ai";
 import { UIMessage } from "@ai-sdk/ui-utils";
 
@@ -32,6 +34,8 @@ const providersMap: Record<AIModels, () => LanguageModelV1> = {
   "gemini-1.5-flash": () => google("gemini-1.5-flash"),
   "gemini-2.0-flash-001": () => google("gemini-2.0-flash-001"),
   "gpt-4o-mini": () => openai("gpt-4o-mini"),
+  "claude-3-5-haiku-20241022": () =>
+    anthropic("claude-3-5-haiku-20241022") as LanguageModelV1,
 };
 
 /** GET: 특정 chatId의 메시지(Message타입)를 반환 : 동적라우팅(page.tsx) 렌더전에 호출 */
@@ -210,7 +214,7 @@ User calendar id is: ${calendars?.[0]?.id?.toString() ?? "(No calendar id)"} `;
 
     // 스트리밍 응답을 클라이언트로 전달합니다.
     console.log("[POST] 스트리밍 응답 클라이언트 전달:");
-    return result.toDataStreamResponse();
+    return result.toDataStreamResponse({ sendReasoning: true });
   } catch (err) {
     if (userId && err instanceof Error) {
       console.error("[POST] /api/chat POST Error:", err);

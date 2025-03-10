@@ -102,7 +102,7 @@ export default function ChatInput({
           <div className="flex bottom-2 right-2 absolute">
             <div>
               <Select
-                className="w-28"
+                className="w-36"
                 isRequired
                 value={selectedModel}
                 color="primary"
