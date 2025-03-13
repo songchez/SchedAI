@@ -1,7 +1,6 @@
 // app/api/chat/tools.ts
 import { z } from "zod";
 import { auth } from "@/auth";
-import { formatToKoreanDateTime } from "./utils";
 import {
   addEventToCalendar,
   addTaskToList,
@@ -11,34 +10,7 @@ import {
   getTasksFromList,
   updateEventInCalendar,
   updateTaskInList,
-  // getCalendarList,
 } from "@/lib/googleClient";
-
-/**
- * 주의사항: zod스키마를 선언할때, object에 직접 optional을 붙이면 null Error 발생.
- * enum type넣으면 오류남.
- */
-
-// # CALENDAR TOOLS
-
-/**
- * 1. 캘린더 목록 가져오기 : 캘린더 목록을 가져오면 너무 단계가 많아져서 캘린더ID를 시작전에 프롬프트로 줌으로써 일단 해결.(캘린더가 많은사람이 별로 없을거라는 가정.)
- */
-// export const getCalendarsListTool = {
-//   description: `Get the user calendars`,
-//   parameters: z.object({}),
-//   execute: async () => {
-//     const session = await auth();
-//     const userId = session?.user.id;
-//     const calendars = await getCalendarList(userId);
-//     if (!calendars?.length) {
-//       return "등록된 캘린더가 없습니다.";
-//     }
-//     const calendarText = calendars.map((calendar) => calendar.id).join(", ");
-//     return `현재 캘린더 목록: ${calendarText}.
-// 원하시는 캘린더 ID를 알려주세요 (예: ${calendars[0].id}).`;
-//   },
-// };
 
 /**
  * 2. 특정 캘린더의 이벤트 조회
@@ -50,33 +22,43 @@ export const getCalendarEventsTool = {
     timeMin: z.string().describe("start date in ISO 8601 format"),
     timeMax: z.string().describe("end date in ISO 8601 format"),
     maxResults: z.number().describe("최대 이벤트 개수"),
+    message: z
+      .string()
+      .optional()
+      .describe(
+        "표시할 메시지, 물어볼 내용이 있다면 질문, 추가설명이 필요하다면 설명"
+      ),
   }),
   execute: async ({
     calendarId,
     timeMin,
     timeMax,
     maxResults,
+    message,
   }: {
     calendarId: string;
     timeMin: string;
     timeMax: string;
     maxResults: number;
+    message?: string;
   }) => {
     const session = await auth();
     const userId = session?.user.id;
 
-    const events = await getCalendarEvents(
-      userId,
-      calendarId,
-      timeMin,
-      timeMax,
-      maxResults
-    );
-    if (!events.length) {
-      return "일정이 없습니다.";
-    }
+    try {
+      const events = await getCalendarEvents(
+        userId,
+        calendarId,
+        timeMin,
+        timeMax,
+        maxResults
+      );
 
-    return events;
+      return { events, message };
+    } catch (error) {
+      console.error("Calendar events fetch error:", error);
+      throw error;
+    }
   },
 };
 
@@ -100,10 +82,12 @@ export const addEventToCalendarTool = {
         timeZone: z.string().describe("GMT+09:00"),
       }),
     }),
+    message: z.string().optional().describe("표시할 메시지"),
   }),
   execute: async ({
     calendarId,
     eventDetails,
+    message,
   }: {
     calendarId: string;
     eventDetails: {
@@ -113,11 +97,11 @@ export const addEventToCalendarTool = {
       start: { dateTime: string; timeZone: string };
       end: { dateTime: string; timeZone: string };
     };
+    message?: string;
   }) => {
     try {
       const session = await auth();
       const userId = session?.user.id;
-      console.log(userId, calendarId, eventDetails);
 
       const newEvent = await addEventToCalendar(
         userId,
@@ -125,12 +109,11 @@ export const addEventToCalendarTool = {
         eventDetails
       );
 
-      console.log("새로운 이벤트 추가:", newEvent);
-      return newEvent;
+      // 결과 객체에 message 추가 (있는 경우만)
+      return { event: newEvent, message };
     } catch (error) {
-      if (error instanceof Error) {
-        return `이벤트 추가함수에서 오류발생: ${error}`;
-      }
+      console.error("Event addition error:", error);
+      throw error;
     }
   },
 };
@@ -140,10 +123,14 @@ export const addEventToCalendarTool = {
  */
 export const updateEventInCalendarTool = {
   description:
-    "update existing event at google calendar. In order to use update, eventId is necessary. if you dont know the eventId have to update, use getCalendarEventsTool(get eventIds). And ask user 'Which one would you like to update?'.don't tell the eventId to user.",
+    "update(modify) existing event at google calendar. In order to use update, eventId is necessary.",
   parameters: z.object({
     calendarId: z.string(),
-    eventId: z.string(),
+    eventId: z
+      .string()
+      .describe(
+        "Find the eventId from past messages. 'result.event.id' is the eventId."
+      ),
     eventDetails: z.object({
       summary: z.string().optional(),
       location: z.string().optional(),
@@ -157,11 +144,13 @@ export const updateEventInCalendarTool = {
         timeZone: z.string().optional().describe("GMT+09:00"),
       }),
     }),
+    message: z.string().optional().describe("표시할 메시지"),
   }),
   execute: async ({
     calendarId,
     eventId,
     eventDetails,
+    message,
   }: {
     calendarId: string;
     eventId: string;
@@ -172,11 +161,11 @@ export const updateEventInCalendarTool = {
       start?: { dateTime?: string; timeZone?: string };
       end?: { dateTime?: string; timeZone?: string };
     };
+    message?: string;
   }) => {
     try {
       const session = await auth();
       const userId = session?.user.id;
-      console.log(userId, calendarId, eventId, eventDetails);
 
       const updatedEvent = await updateEventInCalendar(
         userId,
@@ -184,31 +173,31 @@ export const updateEventInCalendarTool = {
         eventId,
         eventDetails
       );
+
       if (!updatedEvent) {
         throw new Error("캘린더 이벤트를 업데이트하지 못했습니다.");
       }
-      console.log("이벤트 업데이트 완료:", updatedEvent);
-      return `"${updatedEvent.summary}" 일정이 업데이트되었습니다!
-      시작: ${formatToKoreanDateTime(updatedEvent.start?.dateTime)}
-      종료: ${formatToKoreanDateTime(updatedEvent.end?.dateTime)}`;
+
+      return { event: updatedEvent, message };
     } catch (error) {
-      if (error instanceof Error) {
-        return `이벤트 업데이트 함수에서 오류 발생: ${error}`;
-      }
+      console.error("Event update error:", error);
+      throw error;
     }
   },
 };
 
 /**
- * 5. DeleteEventFromCalendar : 이벤트 삭제
+ * 5. DeleteEventFromCalendar
  */
-
 export const deleteEventFromCalendarTool = {
-  description:
-    "delete existing event at google calendar. if you dont know the event have to delete, use getCalendarEventsTool(get eventIds). And ask user 'Which one would you like to delete?'. don't tell the eventId to user.",
+  description: "delete existing event at google calendar.",
   parameters: z.object({
     calendarId: z.string(),
-    eventId: z.string(),
+    eventId: z
+      .string()
+      .describe(
+        "Find the eventId from past messages. 'result.event.id' is the eventId."
+      ),
     eventDetails: z.object({
       summary: z.string().optional(),
       location: z.string().optional(),
@@ -222,11 +211,13 @@ export const deleteEventFromCalendarTool = {
         timeZone: z.string().optional().describe("GMT+09:00"),
       }),
     }),
+    message: z.string().optional().describe("표시할 메시지"),
   }),
   execute: async ({
     calendarId,
     eventId,
     eventDetails,
+    message,
   }: {
     calendarId: string;
     eventId: string;
@@ -237,65 +228,64 @@ export const deleteEventFromCalendarTool = {
       start?: { dateTime?: string; timeZone?: string };
       end?: { dateTime?: string; timeZone?: string };
     };
+    message?: string;
   }) => {
     try {
       const session = await auth();
       const userId = session?.user.id;
-      console.log(
-        "deleteEventInCalendarTool 사용",
-        userId,
-        calendarId,
-        eventId
-      );
 
       const response = await deleteEventFromCalendar(
         userId,
         calendarId,
         eventId
       );
+
       if (!response.status) {
         throw new Error("캘린더 이벤트를 삭제하지 못했습니다.");
       }
-      console.log("이벤트 삭제 완료:");
-      return `"${eventDetails.summary}" 일정이 삭제되었습니다.`;
+
+      // 삭제된 이벤트 정보 반환
+      const deletedEvent = {
+        id: eventId,
+        summary: eventDetails.summary,
+        status: "deleted",
+        success: true,
+      };
+
+      return { event: deletedEvent, message };
     } catch (error) {
-      if (error instanceof Error) {
-        return `이벤트 삭제 함수에서 오류 발생: ${error}`;
-      }
+      console.error("Event deletion error:", error);
+      throw error;
     }
   },
 };
 
-// # TASK TOOLS
-
 /**
- * 6. getTasksFromListTool : task불러오기
+ * 6. getTasksFromListTool
  */
-
 export const getTasksFromListTool = {
   description: "Fetch tasks from a Google Task list",
-  parameters: z.object({}),
-  execute: async () => {
+  parameters: z.object({
+    message: z.string().optional().describe("표시할 메시지"),
+  }),
+  execute: async ({ message }: { message?: string }) => {
     try {
-      // 사용자 인증 세션 및 ID 가져오기
       const session = await auth();
       const userId = session?.user.id;
 
       // 작업 리스트 가져오기
       const tasks = await getTasksFromList(userId);
 
-      return tasks;
+      return { tasks, message };
     } catch (error) {
-      if (error instanceof Error) {
-        return `작업을 가져오는 중 오류가 발생했습니다: ${error.message}`;
-      }
-      return "작업을 가져오는 중 알 수 없는 오류가 발생했습니다.";
+      console.error("Tasks fetch error:", error);
+      throw error;
     }
   },
 };
 
 /**
- * 7. getTasksFromListTool : new task 추가
+ * 7. addTaskToListTool
  */
 export const addTaskToListTool = {
   description: "Add a new task to a Google Task list",
@@ -306,52 +296,44 @@ export const addTaskToListTool = {
       .optional()
       .describe("format => '2025-02-01T00:00:00+09:00'"),
     notes: z.string().optional().describe("Additional notes for the task"),
+    message: z.string().optional().describe("표시할 메시지"),
   }),
   execute: async ({
     title,
     due,
     notes,
+    message,
   }: {
     title: string;
     due?: string;
     notes?: string;
+    message?: string;
   }) => {
     try {
-      // 사용자 인증 세션 및 ID 가져오기
       const session = await auth();
       const userId = session?.user.id;
 
-      // 작업 추가
       const newTask = await addTaskToList(userId, title, due, notes);
 
-      console.log(newTask);
-
-      return `작업이 성공적으로 추가되었습니다:
-      - 제목: ${newTask.title}
-      - ${
-        newTask.due
-          ? `마감일: ${new Date(newTask.due).toLocaleString()}`
-          : "마감일 없음"
-      }
-      - ${newTask.notes ? `메모: ${newTask.notes}` : "메모 없음"}`;
+      return { task: newTask, message };
     } catch (error) {
-      if (error instanceof Error) {
-        return `작업을 추가하는 중 오류가 발생했습니다: ${error.message}`;
-      }
-      return "작업을 추가하는 중 알 수 없는 오류가 발생했습니다.";
+      console.error("Task addition error:", error);
+      throw error;
     }
   },
 };
 
 /**
- * 8. updateTaskInListTool : task수정
+ * 8. updateTaskInListTool
  */
-
 export const updateTaskInListTool = {
-  description:
-    "Update a task in a Google Task List. If you dont know the taskId have to update, use getTasksFromListTool(get taskIds). And ask user 'Which one would you like to update?'. don't tell the taskId to user.",
+  description: "Update a task in a Google Task List.",
   parameters: z.object({
-    taskId: z.string().describe("The ID of the task to update."),
+    taskId: z
+      .string()
+      .describe(
+        "Find the taskId from past messages. 'result.task.id' is the taskId."
+      ),
     title: z.string().optional().describe("The new title of the task."),
     dueDate: z
       .string()
@@ -364,6 +346,7 @@ export const updateTaskInListTool = {
       .describe(
         "The new status of the task. Enum Options: 'needsAction' or 'completed'."
       ),
+    message: z.string().optional().describe("표시할 메시지"),
   }),
   execute: async ({
     taskId,
@@ -371,16 +354,17 @@ export const updateTaskInListTool = {
     dueDate,
     notes,
     status,
+    message,
   }: {
-    taskListId: string;
+    taskListId?: string;
     taskId: string;
     title?: string;
     dueDate?: string;
     notes?: string;
     status?: "needsAction" | "completed";
+    message?: string;
   }) => {
     try {
-      // 사용자 인증 세션 및 ID 가져오기
       const session = await auth();
       const userId = session?.user.id;
 
@@ -392,68 +376,96 @@ export const updateTaskInListTool = {
       if (status) updateData.status = status;
 
       if (Object.keys(updateData).length === 0) {
-        return "업데이트할 내용이 없습니다.";
+        throw new Error("업데이트할 내용이 없습니다.");
       }
 
-      // 작업 업데이트
       const updatedTask = await updateTaskInList(userId, taskId, updateData);
 
-      return `작업이 성공적으로 업데이트되었습니다:
-      - 제목: ${updatedTask.title || "변경 없음"}
-      - ${
-        updatedTask.due
-          ? `마감일: ${new Date(updatedTask.due).toLocaleString()}`
-          : "마감일 없음"
-      }
-      - ${updatedTask.notes ? `메모: ${updatedTask.notes}` : "메모 없음"}
-      - 상태: ${updatedTask.status === "completed" ? "완료됨" : "진행 중"}`;
+      return { task: updatedTask, message };
     } catch (error) {
-      if (error instanceof Error) {
-        return `작업을 업데이트하는 중 오류가 발생했습니다: ${error.message}`;
-      }
-      return "작업을 업데이트하는 중 알 수 없는 오류가 발생했습니다.";
+      console.error("Task update error:", error);
+      throw error;
     }
   },
 };
 
 /**
- * 9. deleteTaskFromListTool : task삭제
+ * 9. deleteTaskFromListTool
  */
-
 export const deleteTaskFromListTool = {
-  description:
-    "Delete a task from a Google Task list. If you dont know the taskId have to delete, use getTasksFromListTool(get taskIds). And ask user 'Which one would you like to delete?'.don't tell the taskId to user.",
+  description: "Delete a task from a Google Task list.",
   parameters: z.object({
-    taskId: z.string().describe("The ID of the task to delete."),
+    taskId: z
+      .string()
+      .describe(
+        "Find the taskId from past messages. 'result.task.id' is the taskId."
+      ),
     title: z.string().describe("The title of the task to delete."),
+    message: z.string().optional().describe("표시할 메시지"),
   }),
-  execute: async ({ taskId, title }: { taskId: string; title: string }) => {
+  execute: async ({
+    taskId,
+    title,
+    message,
+  }: {
+    taskId: string;
+    title: string;
+    message?: string;
+  }) => {
     try {
-      // 사용자 인증 세션 및 ID 가져오기
       const session = await auth();
       const userId = session?.user.id;
 
       if (!taskId) {
-        return "작업 ID가 제공되지 않았습니다.";
+        throw new Error("작업 ID가 제공되지 않았습니다.");
       }
 
       // 작업 삭제
       await deleteTaskFromList(userId, taskId);
 
-      return `"${title}"가 성공적으로 삭제되었습니다.`;
+      // 삭제된 작업 정보 반환
+      const deletedTask = {
+        id: taskId,
+        title,
+        status: "deleted",
+        success: true,
+      };
+
+      return { task: deletedTask, message };
     } catch (error) {
-      if (error instanceof Error) {
-        return `작업을 삭제하는 중 오류가 발생했습니다: ${error.message}`;
-      }
-      return "작업을 삭제하는 중 알 수 없는 오류가 발생했습니다.";
+      console.error("Task deletion error:", error);
+      throw error;
     }
   },
 };
 
-// export const clearCompletedTasksTool = {
-//   description: "완료된 할 일을 정리 (미구현).",
-//   parameters: z.object({}),
-//   execute: async () => {
-//     return "이 기능은 아직 구현되지 않았습니다.";
+// /**
+//  * 10. askForConfirmation
+//  */
+// export const askForConfirmationTool = {
+//   description: "Ask the user for confirmation",
+//   parameters: z.object({
+//     message: z
+//       .string()
+//       .describe("The confirmation message to show to the user"),
+//     yesLabel: z.string().optional().describe("Label for the Yes button"),
+//     noLabel: z.string().optional().describe("Label for the No button"),
+//   }),
+//   execute: async ({
+//     message,
+//     yesLabel,
+//     noLabel,
+//   }: {
+//     message: string;
+//     yesLabel?: string;
+//     noLabel?: string;
+//   }) => {
+//     // 확인 요청은 항상 message가 필요함
+//     return {
+//       message,
+//       yesLabel: yesLabel || "예",
+//       noLabel: noLabel || "아니오",
+//       waiting: true,
+//     };
 //   },
 // };

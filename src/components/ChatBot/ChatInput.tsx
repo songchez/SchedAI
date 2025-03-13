@@ -60,8 +60,12 @@ export default function ChatInput({
       onOpen();
       return;
     }
-    onSubmit();
-  }, [session, onOpen, onSubmit]);
+    if (selectedModel === null) {
+      return new Error("AI모델이 선택되지 않았습니다.");
+    } else {
+      onSubmit();
+    }
+  }, [session, onOpen, onSubmit, selectedModel]);
 
   // 엔터키로 전송 처리 (Shift+Enter는 줄바꿈 허용)
   const handleKeyDown = (e: React.KeyboardEvent) => {

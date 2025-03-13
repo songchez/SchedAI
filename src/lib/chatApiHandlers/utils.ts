@@ -25,8 +25,12 @@ export function formatToKoreanDateTime(
     : formatted;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function extractPlainToolResult(toolResult: any): object {
+export function extractPlainToolResult(toolResult: {
+  toolCallId: string;
+  toolName: string;
+  args: object;
+  result: object;
+}): object {
   return {
     type: "tool-invocation",
     toolInvocation: {
