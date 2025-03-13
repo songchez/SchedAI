@@ -41,7 +41,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
   // 5) ai-sdk/react에서 제공하는 useChat
   const {
     messages,
-    addToolResult,
+    // addToolResult,
     input,
     handleInputChange,
     handleSubmit,
@@ -130,7 +130,7 @@ export default function SchedAIChatbot({ chatId }: SchedAIChatbotProps) {
           <ChatMessageList
             messages={messages}
             isLoading={isLoading}
-            addToolResult={addToolResult}
+            // addToolResult={addToolResult}
           />
         )}
       </ScrollShadow>

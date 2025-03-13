@@ -15,11 +15,11 @@ import ToolInvocationRenderer from "./ChatMessageList/ToolInvocationRenderer";
 export default function ChatMessageList({
   messages,
   isLoading,
-  addToolResult,
-}: {
+}: // addToolResult,
+{
   messages: UIMessage[];
   isLoading: boolean;
-  addToolResult: (args: { toolCallId: string; result: string }) => void;
+  // addToolResult: (args: { toolCallId: string; result: string }) => void;
 }) {
   const messageEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -52,7 +52,7 @@ export default function ChatMessageList({
                     <ToolInvocationRenderer
                       key={part.toolInvocation.toolCallId}
                       toolInvocation={part.toolInvocation}
-                      addToolResult={addToolResult}
+                      // addToolResult={addToolResult}
                     />
                   );
                 case "reasoning":
